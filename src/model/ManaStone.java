@@ -1,5 +1,5 @@
 package model;
 
-public class ManaStone implements Item {
+public class ManaStone extends ItemBase implements Item {
 
 }
