@@ -38,7 +38,7 @@ public class Interface { // #
 		int [][] grid = bag.grid();
 		for (int i = 0; i < 5; i++) {
 			for (int j = 0; j < 7; j++) {
-				if (grid[i][j] == 0) {
+				if (grid[i][j] >= -1) {
 					final int fi = i;
 		            final int fj = j;
 					context.renderFrame(graphics -> {
