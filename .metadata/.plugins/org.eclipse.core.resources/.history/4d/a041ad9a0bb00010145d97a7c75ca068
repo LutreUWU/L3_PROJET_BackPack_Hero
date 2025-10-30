@@ -1,0 +1,53 @@
+package fr.uge.manifest;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+public class Manifest {
+	private final ArrayList<ItemManifest> liste = new ArrayList<>();
+	private final Set<String> nom_liste = new HashSet<>();
+	
+	
+	/*
+	public void add(Container cont) {
+		Objects.requireNonNull(cont, "Le contenaire ne doit pas être Null\n");
+		liste_cont.add(cont);
+	}
+	*/
+	public void add(ItemManifest item) {
+		Objects.requireNonNull(item, "L'item ne doit pas être Null\n");
+		liste.add(item);
+		nom_liste.add(item.getId());
+	}
+	
+	public int totalPrice() {
+		int total = 0;
+		for (ItemManifest item : liste) {
+			total += item.price();
+		}
+		return total;
+	}
+	
+	@Override
+	public String toString() {
+		var chaine = new StringBuilder();
+		int i = 1;
+		for (var item : liste) {
+			chaine.append(i++).append(" : ").append(item.toString()).append("\n");
+		}
+		return chaine.toString();
+	}
+	
+	public List<ItemManifest> toDestination(String dest) {
+		final List<ItemManifest> liste_dest = new ArrayList<>();
+		for (var item : liste) {
+			if (item.getDestination().equals(dest)) {
+				liste_dest.add(item);
+			}
+		}
+		return liste_dest;
+	}
+	
+}

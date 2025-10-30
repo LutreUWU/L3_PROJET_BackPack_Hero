@@ -1,0 +1,8 @@
+package model;
+
+public class Hero {
+	// HP Stats
+	final private int max_HP = 40;
+	final private int HP = 40;
+			
+}
