@@ -8,7 +8,7 @@ public class ItemFactory {
 		 * @return Item : Item
 		 */
 		return switch(name) { // String name, int[] location, int[][] shape, String rarity + int energy_use + Other
-		  case "Baguette" -> new Weapon(name, new int[] {-1, -1}, new int[][] {{1}, {1}, {1}}, "Common", 1, "Melee", 4);
+		  case "Baguette" -> new Weapon(name, new int[] {2, 3}, new int[][] {{1}, {1}, {1}}, "Common", 1, "Melee", 4);
 		  case "Croissant Gun" -> new Weapon(name, new int[] {-1, -1}, new int[][] {{1, 1}, {1, 0}}, "Common", 1, "Ranged", 3);
 		  case "Cheese Armor" -> new Armor(name, new int[] {-1, -1}, new int[][] {{1, 1}, {1, 1}}, "Common", 1, 3);
 		  case "Umbrella" -> new Armor(name, new int[] {-1, -1}, new int[][] {{1, 1}, {1, 1}}, "Rare", 1, 5);

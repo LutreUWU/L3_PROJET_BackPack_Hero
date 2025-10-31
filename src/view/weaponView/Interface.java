@@ -1,11 +1,12 @@
-package view;
+package view.weaponView;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.ScreenInfo;
+
 import model.Backpack;
-import view.weaponView.SwordView;
 
 
 public class Interface { // #
@@ -27,7 +28,7 @@ public class Interface { // #
 	    });		
 	} 
 	
-	public void drawGrid(ApplicationContext context, int x, int y, ScreenInfo screenInfo, item.Backpack bag) {
+	public void drawGrid(ApplicationContext context, int x, int y, ScreenInfo screenInfo, Backpack bag) {
 	/** 
 	   * draw the grid from the Backpack
 	   * @param context 	which window to draw
@@ -43,10 +44,6 @@ public class Interface { // #
 	            final int fj = j;
 				if (grid[i][j] >= -1) {
 					context.renderFrame(graphics -> {
-						graphics.setColor(Color.GRAY);
-				        graphics.fill(new Rectangle2D.Double((screenInfo.width()/2) - 3.5*GRID_SIZE + (GRID_SIZE * fj), 
-				        									(screenInfo.height()/2) - 2.5*GRID_SIZE + (GRID_SIZE * fi), 
-				        									GRID_SIZE, GRID_SIZE));
 						graphics.setColor(Color.BLACK);
 				        graphics.draw(new Rectangle2D.Double((screenInfo.width()/2) - 3.5*GRID_SIZE + (GRID_SIZE * fj), 
 				        									(screenInfo.height()/2) - 2.5*GRID_SIZE + (GRID_SIZE * fi), 
@@ -57,24 +54,21 @@ public class Interface { // #
 		}
 	}
 	
-	public void drawGrid_Weapon(ApplicationContext context, int x, int y, ScreenInfo screenInfo, item.Backpack bag) {
-		var item_list = bag.all_item();
-		for (var item : item_list) {
-			for (var block : item.shape()) {
-				switch (item.id()) {
-					case 1 ->{
-						var drawSword = new SwordView(context, screenInfo, GRID_SIZE, block.y(), block.x());
+	public void drawGrid_Weapon(ApplicationContext context, int x, int y, ScreenInfo screenInfo, Backpack bag) {
+		int [][] grid = bag.grid();
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 7; j++) {
+				final int fi = i;
+	            final int fj = j;
+	            switch(grid[i][j]) {
+	            	case 1 ->  {
+	            		var drawSword = new SwordView(context, screenInfo, GRID_SIZE, fi, fj);
 						drawSword.draw();
-					}
-					default ->{}
-				}
+	            	}
+	            	default ->{}
+	            }
 			}
 		}
-	}
-	
-	public void drawBag(ApplicationContext context, int x, int y, ScreenInfo screenInfo, item.Backpack bag) {
-		drawGrid(context, 0, 0, screenInfo, bag);
-		drawGrid_Weapon(context, 0, 0, screenInfo, bag);
 	}
 	
 } // #

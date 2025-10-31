@@ -3,43 +3,48 @@ package demo;
 import java.awt.Color;
 
 import com.github.forax.zen.Application;
+import com.github.forax.zen.Event;
 import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
-import com.github.forax.zen.PointerEvent;
 
+import item.Backpack;
+import item.Sword;
 import view.Interface;
-import model.Backpack;
 
 
 public class Main { // #
 	public static void main(String[] args) { // ##
 		Application.run(Color.WHITE, context ->{ // ###
-			
+		  // Information
 		  Interface ui = new Interface();
 		  Backpack bag = new Backpack();
 		  var screenInfo = context.getScreenInfo();
-	      ui.drawGrid(context, 0, 0, screenInfo, bag);
-	      
+		  // Test for adding a weapon in the bag
+		  var arme =  new Sword();
+		  arme.setXY(3, 2); // Center of the backpack
+		  bag.add_itemToGrid(arme);
+		  // 
+		  ui.drawBag(context, 0, 0, screenInfo, bag);
 	      while (true) {
-			  var event = context.pollOrWaitEvent(10); // Lancer la détection d'event (s'il ne recoit rien au bout de 10 ms, renvoie null)
-			  if (event == null) {
-			    continue;
-			  }
-			  switch (event) {
-		        case PointerEvent e:{ // Si on a fait un clique
-		          var location = e.location(); // On récupère les coordonnées du clique
-		          // Et on crée un cercle bleu
-		          ui.drawRectangle(context, location.x(), location.y(), 20, 20, Color.BLUE);
-		          break;
-		    	}
-		        case KeyboardEvent e: // Si on a cliqué sur une touche
-			      if(e.key() == Key.E) { // Si on a cliqué sur la touche E, on quitte la fenêtre
-			        context.dispose();
-			        IO.println("fin");
-			        return;
-			      }
-			    default:
-		      }
+	    	  Event event = context.pollOrWaitEvent(10); 
+	    	  if (event == null) {
+	    		  continue;
+	    	  }
+	    	  if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
+	    		  switch(key.key()) {
+		    		  case Key.Z -> bag.move_item(arme, 0, -1);
+		    		  case Key.D -> bag.move_item(arme, 1, 0);
+		    		  case Key.S -> bag.move_item(arme, 0, 1);
+		    		  case Key.Q -> bag.move_item(arme, -1, 0);
+		    		  case Key.E -> {
+		    			context.dispose();
+		                System.out.println("Fin du programme");
+		                return;
+		    		  }
+		    		  default -> {}
+	    		  }
+	              ui.drawBag(context, 0, 0, screenInfo, bag);
+	          }
 			}
 	      
 		}); // ###
