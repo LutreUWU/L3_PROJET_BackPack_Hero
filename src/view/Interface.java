@@ -2,9 +2,10 @@ package view;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
+
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.ScreenInfo;
-import model.Backpack;
+
 import view.weaponView.SwordView;
 
 
@@ -27,7 +28,7 @@ public class Interface { // #
 	    });		
 	} 
 	
-	public void drawGrid(ApplicationContext context, int x, int y, ScreenInfo screenInfo, item.Backpack bag) {
+	public void drawGrid(ApplicationContext context, ScreenInfo screenInfo, item.Backpack bag) {
 	/** 
 	   * draw the grid from the Backpack
 	   * @param context 	which window to draw
@@ -53,11 +54,23 @@ public class Interface { // #
 				        									GRID_SIZE, GRID_SIZE));
 					});
 				}
+				if (grid[i][j] == -2) {
+					context.renderFrame(graphics -> {
+						graphics.setColor(Color.RED);
+				        graphics.fill(new Rectangle2D.Double((screenInfo.width()/2) - 3.5*GRID_SIZE + (GRID_SIZE * fj), 
+				        									(screenInfo.height()/2) - 2.5*GRID_SIZE + (GRID_SIZE * fi), 
+				        									GRID_SIZE, GRID_SIZE));
+						graphics.setColor(Color.BLACK);
+				        graphics.draw(new Rectangle2D.Double((screenInfo.width()/2) - 3.5*GRID_SIZE + (GRID_SIZE * fj), 
+				        									(screenInfo.height()/2) - 2.5*GRID_SIZE + (GRID_SIZE * fi), 
+				        									GRID_SIZE, GRID_SIZE));
+					});
+				}
 			}
 		}
 	}
 	
-	public void drawGrid_Weapon(ApplicationContext context, int x, int y, ScreenInfo screenInfo, item.Backpack bag) {
+	public void drawWeapon(ApplicationContext context, ScreenInfo screenInfo, item.Backpack bag) {
 		var item_list = bag.all_item();
 		for (var item : item_list) {
 			for (var block : item.shape()) {
@@ -72,9 +85,9 @@ public class Interface { // #
 		}
 	}
 	
-	public void drawBag(ApplicationContext context, int x, int y, ScreenInfo screenInfo, item.Backpack bag) {
-		drawGrid(context, 0, 0, screenInfo, bag);
-		drawGrid_Weapon(context, 0, 0, screenInfo, bag);
+	public void drawBag(ApplicationContext context, ScreenInfo screenInfo, item.Backpack bag) {
+		drawGrid(context, screenInfo, bag);
+		drawWeapon(context, screenInfo, bag);
 	}
 	
 } // #
