@@ -1,40 +1,42 @@
 package item;
 
-public class Item {
-	private Block b[];
-	private double angle = Math.toRadians(90); // For rotation
 
+/**
+ * Class for item in backpack.
+ * items are a list of block where each block has their own coordinate.
+ */
+public class Item {
+	/**
+	 * List of Object Block
+	 */
+	private Block b[];
+	/**
+	 * Angle use for the rotation of an item
+	 */
+	private double angle = Math.toRadians(90);
+	
+	/**
+	 * Method that initialize the list of Block for an item.
+	 * The number of Block is the number of tile the item will take.
+	 * 
+	 * @param item_size size of the item;
+	 * @throw IllegalArgumentException if item_size if below 1 
+	 */
 	public void create(int item_size) {
-		/* Method that initialize the list of Block for an item.
-		 * The number of Block is the number of tile the item will take.
-		 * 
-		 * @param item_size size of the item;
-		 */
+		if (item_size < 1) {
+			throw new IllegalArgumentException("size invalid");
+		}
 		b = new Block[item_size];
 		for (int i = 0; i < item_size; i++) {
 			b[i] = new Block(-1, -1);
 		}
 	}
-
-	public int length() {
-		/* Return the size of an item.
-		 * 
-		 */
-		return b.length;
-	}
 	
-	public Block[] shape() {
-		/* Return the shape of an item.		
-		 * 							
-		 * @return list of Block where each Block is the coordinate (x, y) of one tile.	
-		 */
-		return b;
-	}
-	
+	/**
+	 * Clone the position in the bag of an item.
+	 * This method is use for moving an object.
+	 */
 	public Block[] clone() {
-		/* Create a clone of the item.
-		 * 
-		 */
 		Block[] b_clone = new Block[b.length];
 		for (int i = 0; i < b.length; i++) {
 		    b_clone[i] = new Block(b[i].x(), b[i].y());
@@ -42,12 +44,13 @@ public class Item {
 		return b_clone;
 	}
 	
+	/**
+	 * Rotate the item clockwise by using trigonometry. 
+	 * The formula is the same whatever shape it is, this is why it's here.
+	 * 
+	 * @param bag The grid of the bag, we need to check if the new coordinate after rotation can fit in the bag
+	 */
 	public void rotateXY(Backpack bag) {
-		/* Rotate the item clockwise by using trigonometry.
-		 * The formula is the same whatever shape it is, this is why it's here.
-		 * 
-		 * @param bag	The grid of the bag, we need to check if the new coordinate can fit in the bag
-		 */
 		int new_x, new_y;
 		int cx = b[0].x(), cy = b[0].y();
 		Block[] b_rotated = b.clone();
@@ -61,6 +64,27 @@ public class Item {
 			
 		}
 		b = b_rotated;
+	}
+	
+	/**
+	 * Return the size of an item.
+	 * 
+	 * @return length of the item
+	 */
+	public int length() {
+		/* Return the size of an item.
+		 * 
+		 */
+		return b.length;
+	}
+	
+	/**
+	 * Return the shape of the item
+	 * 
+	 * @return list of Block where each Block is the coordinate (x, y) of one tile.	
+	 */
+	public Block[] shape() {
+		return b;
 	}
 }
 
