@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Enemy {
 	private int HP;
 	private int max_HP;
@@ -12,10 +14,15 @@ public class Enemy {
 	
 	public void subHP(int value) {
 		HP -= value;
+		if (HP < 0) HP = 0;
 	}
 	
-	public boolean isDead() {
-		return HP <= 0;
+	public boolean isDead(Hero hero) {
+		if (HP <= 0) {
+			Objects.requireNonNull(hero);
+			hero.add("xp", (int) max_HP / 4);
+		};
+		return false;
 	}
 	
 }

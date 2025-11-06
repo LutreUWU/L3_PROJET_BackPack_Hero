@@ -18,7 +18,7 @@ public class Backpack {
 	public int[][] grid(){
 		return array_backpack;
 	}
-	
+	/*
 	public void add_itemToGrid(Object item, int id) implements Interface{
 		var b = 
 		for (var block : b) {
@@ -26,4 +26,5 @@ public class Backpack {
 		}
 		items_list.add();
 	}
+	*/
 }

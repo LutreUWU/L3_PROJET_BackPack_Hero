@@ -5,7 +5,7 @@ import java.awt.geom.Rectangle2D;
 
 import com.github.forax.zen.ApplicationContext;
 
-import game.SimpleGameData;
+import game.GameData;
 
 /**
  * The SwordView class deals with the display of the screen.
@@ -16,7 +16,7 @@ import game.SimpleGameData;
  * @param y		  Position y of the center of the item.
  *
  */
-public record SwordView(ApplicationContext context, SimpleGameData data, int x, int y) {
+public record SwordView(ApplicationContext context, GameData data, int x, int y) {
 	/**
 	 * Draw a Sword using library.
 	 * 
