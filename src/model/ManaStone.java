@@ -2,11 +2,12 @@ package model;
 
 import java.util.Objects;
 
-public class ManaStone extends ItemBase implements Item {
+public class ManaStone implements Item {
 	private int mana_gain;
+	private ItemBase stats_base;
 	
-	public ManaStone(String name, int[][] shape, String rarity, int energy_use, int mana_gain) {
-		super(name, shape, rarity, energy_use);
+	public ManaStone(String name, int[][] shape, String rarity, int energy_use, int mana_gain, Direction direction) {
+		this.stats_base = new ItemBase(name, shape, rarity, energy_use, direction);
 		this.mana_gain = mana_gain;
 	}
 	
@@ -18,9 +19,9 @@ public class ManaStone extends ItemBase implements Item {
 		 * @param unused
 		 */
 		Objects.requireNonNull(hero);
-		if (isUsable(hero)) {
+		if (stats_base.isUsable(hero)) {
 			hero.add("mana", mana_gain);
-			hero.sub("energy", getEnergy_use());
+			hero.sub("energy", stats_base.energy_use());
 		}
 	}
 }

@@ -2,11 +2,12 @@ package model;
 
 import java.util.Objects;
 
-public class Shield extends ItemBase implements Item {
+public class Shield implements Item {
 	private int protection;
+	private ItemBase stats_base;
 	
-	public Shield(String name, int[][] shape, String rarity, int energy_use, int protection) {
-		super(name, shape, rarity, energy_use);
+	public Shield(String name, int[][] shape, String rarity, int energy_use, int protection, Direction direction) {
+		this.stats_base = new ItemBase(name, shape, rarity, energy_use, direction);
 		this.protection = protection;
 	}
 	
@@ -24,9 +25,9 @@ public class Shield extends ItemBase implements Item {
 		 * @param unused
 		 */
 		Objects.requireNonNull(hero);
-		if (isUsable(hero)) {
+		if (stats_base.isUsable(hero)) {
 			hero.add("protection", protection);
-			hero.sub("energy", getEnergy_use());
+			hero.sub("energy", stats_base.energy_use());
 		}
 	}
 }

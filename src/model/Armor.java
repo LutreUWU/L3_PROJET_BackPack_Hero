@@ -2,11 +2,12 @@ package model;
 
 import java.util.Objects;
 
-public class Armor extends ItemBase implements Item {
+public class Armor implements Item {
 	private int protection_armor;
+	private ItemBase stats_base;
 	
-	public Armor(String name, int[][] shape, String rarity, int energy_use, int protection_armor) {
-		super(name, shape, rarity, energy_use);
+	public Armor(String name, int[][] shape, String rarity, int energy_use, int protection_armor, Direction direction) {
+		this.stats_base = new ItemBase(name, shape, rarity, energy_use, direction);
 		this.protection_armor = protection_armor;
 	}
 	
@@ -24,9 +25,9 @@ public class Armor extends ItemBase implements Item {
 		 * @param unused
 		 */
 		Objects.requireNonNull(hero);
-		if (isUsable(hero)) {
+		if (stats_base.isUsable(hero)) {
 			hero.add("armor", protection_armor);
-			hero.sub("energy", getEnergy_use());
+			hero.sub("energy", stats_base.energy_use());
 		}
 	}
 }
