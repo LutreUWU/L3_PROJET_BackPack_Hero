@@ -2,6 +2,8 @@ package game.data;
 
 import java.util.Objects;
 
+import com.github.forax.zen.ScreenInfo;
+
 import item.Backpack;
 import item.Block;
 import item.Item_Object;
@@ -13,15 +15,18 @@ import item.Item_Object;
   */
 public class GameDataBackpack {
   private static Backpack backpack;
+  private static int grid_size;
+ 
   
   /**
    * Link the backpack with the one in GameData
    * @param data_backpack Backpack's data from GameData
    * @throws Objects.requireNonNull if no backpack is initialize
    */
-  public GameDataBackpack(Backpack data_backpack) { 
-	Objects.requireNonNull(backpack);
-	backpack = data_backpack;
+  public GameDataBackpack(Backpack data_backpack, int gridSize) { 
+		Objects.requireNonNull(data_backpack);
+		backpack = data_backpack;
+		grid_size = gridSize;
   }
   //==============================
   //   METHODS FOR BACKPACK
@@ -37,6 +42,7 @@ public class GameDataBackpack {
 	if (item == null) {
 	  return false;
 	}
+	
 	var b = item.shape();
     for (var block : b) {
       int y = block.y();
@@ -138,5 +144,26 @@ public class GameDataBackpack {
       item.rotateXY(backpack);
     }
   }
+  
+  /**
+   * Return which item in the backpack we click with the mouse
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * @param centerX center of the windows
+   */
+  public static int item_click(int x, int y, ScreenInfo screenInfo) {
+  	double left_grid = (screenInfo.width() / 2) - 3.5 * grid_size;
+  	double up_grid = (screenInfo.height() / 3.5) - 2.5 * grid_size;
+  	int new_x = (int) (x - left_grid) / grid_size;
+  	int new_y = (int) (y - up_grid) / grid_size;
+  	return backpack.grid()[new_y][new_x];
+  }
+  
+  /*
+   * 			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * data.grid_size() + (data.grid_size() * fj), 
+										        							  	 (screenInfo.height()/3.5) - 2.5*data.grid_size() + (data.grid_size() * fi), 
+										        							  	 data.grid_size(), data.grid_size()));
+   */
 
 }

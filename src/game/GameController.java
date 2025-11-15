@@ -35,12 +35,12 @@ public class GameController {
    * @return True if the game continue, False if we press the button to stop
    */
   private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
-	Event event = context.pollOrWaitEvent(10); 
+	Event event = context.pollOrWaitEvent(1); 
 	if (event instanceof PointerEvent pointerEvent) {
-	  if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
+	  if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) {
 	    int mouseX = pointerEvent.location().x();
 	    int mouseY = pointerEvent.location().y();
-	    IO.println(mouseX + " , " + mouseY);
+	    IO.println(GameDataBackpack.item_click(mouseX, mouseY, context.getScreenInfo()));
 	  }
 	}
 	// If event is a button pressed 
@@ -56,44 +56,44 @@ public class GameController {
 	  	    GameView.updateWeaponDraw(context, data);
 	  	  }
 	  	}
-		// Moving the selected weapon, do nothing if no weapon is selected
-		case Key.Z -> {
-		  GameDataBackpack.move_item(data.weapon(), 0, -1);
-		  GameView.updateWeaponDraw(context,data);
-		}
-		case Key.D -> {
-		  GameDataBackpack.move_item(data.weapon(), 1, 0);
-		  GameView.updateWeaponDraw(context, data);
-		}
-		case Key.S -> {
-		  GameDataBackpack.move_item(data.weapon(), 0, 1);
-		  GameView.updateWeaponDraw(context, data);
-		}
-		case Key.Q -> {
+			// Moving the selected weapon, do nothing if no weapon is selected
+			case Key.Z -> {
+			  GameDataBackpack.move_item(data.weapon(), 0, -1);
+			  GameView.updateWeaponDraw(context,data);
+			}
+			case Key.D -> {
+			  GameDataBackpack.move_item(data.weapon(), 1, 0);
+			  GameView.updateWeaponDraw(context, data);
+			}
+			case Key.S -> {
+			  GameDataBackpack.move_item(data.weapon(), 0, 1);
+			  GameView.updateWeaponDraw(context, data);
+			}
+			case Key.Q -> {
 	      GameDataBackpack.move_item(data.weapon(), -1, 0);
 	      GameView.updateWeaponDraw(context, data);
-		}
-		case Key.R -> {
-	      GameDataBackpack.rotate_item(data.weapon());
-		  GameView.updateWeaponDraw(context, data);
-		}
-		// Confirm the placement of the weapon (and check if we can put here)
+			}
+			case Key.R -> {
+		    GameDataBackpack.rotate_item(data.weapon());
+			  GameView.updateWeaponDraw(context, data);
+			}
+			// Confirm the placement of the weapon (and check if we can put here)
 	    case Key.ESCAPE -> {
-		  if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
-			data.setWeapon(null);
-			GameView.draw(context, data, view);
-		  } else { // if we can't place it here, just refresh the draw of the item.
-			GameDataBackpack.move_item(data.weapon(), 0, 0);
-			GameView.updateWeaponDraw(context, data);
-		  }
-		}
-		// Leave the game
-		case Key.E -> {
-          return false;
-		}
-		default -> {}
-	  }	  
-    }
+			  if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
+					data.setWeapon(null);
+					GameView.draw(context, data, view);
+			  } else { // if we can't place it here, just refresh the draw of the item.
+					GameDataBackpack.move_item(data.weapon(), 0, 0);
+					GameView.updateWeaponDraw(context, data);
+			  }
+			}
+			// Leave the game
+			case Key.E -> {
+	      return false;
+			}
+			default -> {}
+		}	  
+  }
 	return true;
 }
   
@@ -106,9 +106,9 @@ public class GameController {
     var screenInfo = context.getScreenInfo();
     var width = screenInfo.width();
     var height = screenInfo.height();
-    int grid_size = 100;
-    var data = new GameData(80);
-    new GameDataBackpack(data.bag());
+    int grid_size = 80;
+    var data = new GameData(grid_size);
+    new GameDataBackpack(data.bag(), grid_size);
     var view = GameView.initGameGraphics(width, height, grid_size);
     GameView.draw(context, data, view);
     while (true) {

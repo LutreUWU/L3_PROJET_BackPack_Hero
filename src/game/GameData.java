@@ -1,7 +1,7 @@
 package game;
 import item.Backpack;
 import item.Item_Object;
-import model.Hero;
+import item.Hero;
 
  /**
  * The SimpleGameData class stores all relevant pieces of information for the
