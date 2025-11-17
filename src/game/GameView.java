@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.ScreenInfo;
 
+import game.data.GameDataCombat;
 import game.weaponView.SwordView;
 import monster.Enemy;
 import monster.Rat;
@@ -34,8 +36,9 @@ public record GameView(int width, int height, int grid_size) {
   public static GameView initGameGraphics(int width, int height, int grid_size) {
   	return new GameView(width, height, grid_size);
   }
+  
   /** 
-   * Draw the grid from the Backpack
+   * Draw the grid of the Backpack
    * @param context Which window to draw
    * @param data	  Data of the game
    */	
@@ -53,7 +56,6 @@ public record GameView(int width, int height, int grid_size) {
 			  	if (grid[fi][fj] == -2) {
 			  		graphics.setColor(Color.RED);
 			  	}
-			  	
 			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * data.grid_size() + (data.grid_size() * fj), 
 										        							  	 (screenInfo.height()/3.5) - 2.5*data.grid_size() + (data.grid_size() * fi), 
 										        							  	 data.grid_size(), data.grid_size()));
@@ -73,18 +75,18 @@ public record GameView(int width, int height, int grid_size) {
    * @param data	  Data of the game
    */
   private static void drawItemBag(ApplicationContext context, GameData data) {
-	var item_list = data.bag().item_lst();
-	for (var item : item_list) {
-	  for (var block : item.shape()) {
-		switch (item.id()) {
-		  case 1 ->{
-				var drawSword = new SwordView(context, data, block.y(), block.x());
-				drawSword.draw();
+		var item_list = data.bag().item_lst();
+		for (var item : item_list) {
+		  for (var block : item.shape()) {
+				switch (item.id()) {
+				  case 1 ->{
+						var drawSword = new SwordView(context, data, block.y(), block.x());
+						drawSword.draw();
+				  }
+				  default ->{}
+				}
 		  }
-		  default ->{}
 		}
-	  }
-	}
   }
 	
   /**
@@ -96,19 +98,19 @@ public record GameView(int width, int height, int grid_size) {
    * @param data	  Data of the game
    */
   private static void drawWeaponGrid(ApplicationContext context, GameData data) {
-	var item = data.weapon();
-	if (item == null) {
-        return;
-    }
-	for (var block : item.shape()) {
-	  switch (item.id()) {
-		case 1 ->{
-		  var drawSword = new SwordView(context, data, block.y(), block.x());
-		  drawSword.draw();
+		var item = data.weapon();
+		if (item == null) {
+	        return;
+	    }
+		for (var block : item.shape()) {
+		  switch (item.id()) {
+			case 1 ->{
+			  var drawSword = new SwordView(context, data, block.y(), block.x());
+			  drawSword.draw();
+			}
+			  default ->{}
+		  }
 		}
-		  default ->{}
-	  }
-	}
   }
 		
   
@@ -129,23 +131,6 @@ public record GameView(int width, int height, int grid_size) {
 	  graphics.drawString("AP : " + String.valueOf(data.hero().getEnergy_point()), x,	y + size*3);
 	  graphics.drawString("MANA : " + String.valueOf(data.hero().getMana_point()), x,	y + size*4);
 	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()), x,	y + size*5);
-  }
-  
-  /**
-   * Draws all the information about the hero
-   * 
-   * @param graphics {@code Graphics2D} object for drawing.
-   * @param data 		 GameData containing the game data. 
-   * @param x				 coordinate x where we wants to draw.
-   * @param y				 coordinate y where we wants to draw.
-   */
-  private static void drawEnemyStats(Graphics2D graphics, Enemy enemy, int x, int y) {
-  	int size = 14;
-    Font font = new Font("Arial", Font.PLAIN, size);
-		graphics.setFont(font);
-	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
-	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
-	  graphics.drawString("NEXT ATK : " + String.valueOf(enemy.pre_action()), x,	y + size * 3);
   }
   
   /**
@@ -172,10 +157,28 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   /**
+   * Draws all the information about the enemy
+   * 
+   * @param graphics {@code Graphics2D} object for drawing.
+   * @param enemy 	 Data of the enemy.
+   * @param x				 Coordinate x where we wants to draw.
+   * @param y				 Coordinate y where we wants to draw.
+   */
+  private static void drawEnemyStats(Graphics2D graphics, Enemy enemy, int x, int y) {
+  	int size = 14;
+    Font font = new Font("Arial", Font.PLAIN, size);
+		graphics.setFont(font);
+	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
+	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
+	  graphics.drawString("NEXT ATK : " + String.valueOf(enemy.pre_action()), x,	y + size * 3);
+  }
+  
+  /**
    * Draws the enemy in the windows
    * 
    * @param context {@code ApplicationContext} of the game.
    * @param data    GameData containing the game data. 
+   * @param enemy 	Data of the enemy.
    */
   private static void drawEnemy(ApplicationContext context, GameData data, Enemy enemy) {
   	var screenInfo = context.getScreenInfo();
@@ -195,6 +198,21 @@ public record GameView(int width, int height, int grid_size) {
   }
 	
   /**
+   * Update the state of the combat. This method is called each team we do an action
+   * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   * @param lst_enemy List of all enemy we fight
+   */
+  public static void update_combat(ApplicationContext context, GameData data,  ArrayList<Enemy> lst_enemy) {
+  	Objects.requireNonNull(context);
+  	Objects.requireNonNull(data);
+  	Objects.requireNonNull(lst_enemy);
+  	lst_enemy.forEach(enemy -> drawEnemy(context, data, enemy));
+  	drawHero(context, data);
+  }
+  
+  /**
    * Draws the game board from its data.
    * 
    * @param context {@code ApplicationContext} of the game.
@@ -209,10 +227,7 @@ public record GameView(int width, int height, int grid_size) {
 	    ScreenInfo screenInfo = context.getScreenInfo();
 	    graphics.setColor(Color.WHITE);
 	    graphics.fillRect(0, 0, screenInfo.width(), screenInfo.height());
-	});
-		drawHero(context, data);
-		var Rat = new Rat();
-		drawEnemy(context, data, Rat);
+		});	
 		drawGrid(context, data);
 		drawItemBag(context, data);
   }

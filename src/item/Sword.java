@@ -2,20 +2,19 @@ package item;
 
 import java.util.Objects;
 
+import game.data.GameDataHero;
+import monster.Enemy;
+
 /**
  * Class for the Sword item
  */
 public class Sword implements Item_Object{
 	/**
-	 * Item weapon
+	 * - Item weapon
+	 * - ID of the weapon (Every weapon has a unique ID)
 	 */
 	private Item weapon = new Item();
-	/**
-	 * ID of the weapon.
-	 * Every weapon has a unique ID
-	 */
 	private int id = 1;
-	
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -74,15 +73,16 @@ public class Sword implements Item_Object{
 		weapon.rotateXY(bag);
 	}
 	
+	/**
+	 * Use this item on a enemy
+	 * 
+	 * @param enemy The enemy
+	 * 
+	 */
 	@Override
-	public String toString() {
-		var builder = new StringBuilder();
-		builder.append("Name : Sword\n").append("ID : 1\n");
-		for (var block : weapon.shape()) {
-			builder.append(block).append("\n");
-		}
-		
-		return builder.toString();
+	public void use(Enemy enemy) {
+		GameDataHero.sub("energy", 1);
+		enemy.subHP(3);
 	}
 }
 

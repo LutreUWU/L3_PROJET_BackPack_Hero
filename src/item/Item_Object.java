@@ -1,14 +1,17 @@
 package item;
 
+import monster.Enemy;
+
 /**
- * Since every Item has a different shape, ID, setXY,
+ * Since every Item has a different shape, ID, setXY, use
  * we use an interface.
  * 
  * They all have the same rotate function, but we put here to avoid copy paste in every function.
  */
 public interface Item_Object {
-	public Block[] shape();
-	public int id();
-	public void setXY(int x, int y);
-	public void rotateXY(Backpack bag);
+	Block[] shape();
+  int id();
+	void setXY(int x, int y);
+	void rotateXY(Backpack bag);
+	void use(Enemy enemy);
 }
