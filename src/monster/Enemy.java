@@ -25,6 +25,7 @@ public interface Enemy {
 	 */
 	int getShield();
 	
+	String getAction();
 	/**
 	 * Choose randomly an attack from the enemy. 
 	 * 

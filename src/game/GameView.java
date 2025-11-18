@@ -170,7 +170,7 @@ public record GameView(int width, int height, int grid_size) {
 		graphics.setFont(font);
 	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
 	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
-	  graphics.drawString("NEXT ATK : " + String.valueOf(enemy.pre_action()), x,	y + size * 3);
+	  graphics.drawString("NEXT ATK : " + String.valueOf(enemy.getAction()), x,	y + size * 3);
   }
   
   /**
@@ -230,6 +230,9 @@ public record GameView(int width, int height, int grid_size) {
 		});	
 		drawGrid(context, data);
 		drawItemBag(context, data);
+		if (GameDataCombat.combat()) {
+			GameDataCombat.refreshCombatDraw(context, data);;
+		}
   }
 	
   /**

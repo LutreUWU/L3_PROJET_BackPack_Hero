@@ -30,20 +30,18 @@ public class GameDataCombat {
 	/**
 	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
 	 * 
-	 * @param context {@code ApplicationContext} of the game.
 	 * @param monster The data of the monster we fight
 	 * @param data		The data of the game
 	 */
-	public static void start_combat(ApplicationContext context, ArrayList<Enemy> monsters, GameData data) {
+	public static void start_combat(ArrayList<Enemy> monsters, GameData data) {
 		if (combat) {
 			return;
 		}
-		Objects.requireNonNull(context);
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
 		lst_enemy = monsters;
+		lst_enemy.forEach(monster -> monster.pre_action());
 		target = monsters.getFirst();
-		GameView.update_combat(context, data, lst_enemy);	
 		combat = true;
 	}
 	
@@ -51,12 +49,10 @@ public class GameDataCombat {
 	 * This methods is called after the user click on a item in the backpack.
 	 * This methods will use the item we chose in the backpack
 	 * 
-	 * @param context	{@code ApplicationContext} of the game.
 	 * @param data		The data of the game.
 	 * @param id			The ID of the item we click in the backpack.
 	 */
-	public static void hero_action(ApplicationContext context, GameData data, int id) {
-		Objects.requireNonNull(context);
+	public static void hero_action(GameData data, int id) {
 		Objects.requireNonNull(data);
 		Optional<Item_Object> weapon =data.bag().item_lst().stream()
 																											 .filter(item -> item.id() == id)
@@ -65,9 +61,7 @@ public class GameDataCombat {
 			item.use(target);
 			lst_enemy.forEach(enemy -> enemy.action());
 			GameDataHero.reset();
-			
 		});
-		GameView.update_combat(context, data, lst_enemy);	
 	}
 	
 	/**
@@ -76,5 +70,15 @@ public class GameDataCombat {
 	 */
 	public static boolean combat() {
 		return combat;
+	}
+	
+	/**
+	 * Methods to refresh the graphic interface, we call it here since we needs the lst_enemy
+	 * 
+	 * @param context
+	 * @param data
+	 */
+	public static void refreshCombatDraw(ApplicationContext context, GameData data) {
+		GameView.update_combat(context, data, lst_enemy);
 	}
 }

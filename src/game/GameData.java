@@ -49,9 +49,10 @@ public class GameData {
   	int grid_size = backpack.grid_size();
   	double left_grid = (screenInfo.width() / 2) - 3.5 * grid_size;
   	double up_grid = (screenInfo.height() / 3.5) - 2.5 * grid_size;
-  	if(x < left_grid || x > left_grid * 7*grid_size ||
-  		 y < up_grid   || y > up_grid * 5*grid_size) {
-  		return -1;
+  	if(x < left_grid || x > (left_grid + 7 * grid_size) ||
+  		 y < up_grid   || y > (up_grid + 5 * grid_size)
+  		) {
+  		return -3;
   	}
   	int new_x = (int) (x - left_grid) / grid_size;
   	int new_y = (int) (y - up_grid) / grid_size;

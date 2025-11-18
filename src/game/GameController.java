@@ -22,7 +22,19 @@ import monster.Rat;
  * retrieving raw user actions, sending them for analysis to the GameView and
  * GameData, and dealing with time events.
  * 
+ * Key.A to create an Item in the bag (It's just for testing, it'll be useless for the end)
+ * - Key.(ZQSD) to move the item in the grid
+ * - Key.R to rotate the item clockwise
+ * - Key.ESCAPE (esc) to confirm and add an item in the backpack
+ * 
+ * Key.I to initiate a combat
+ * - Click on a item to use it
+ * 
+ * TO DO :
+ * - Event when the combat is finished
+ * - Room (Shop, healer ...)
  */
+
 public class GameController {
   /**
    * Default constructor, which does basically nothing.
@@ -43,11 +55,11 @@ public class GameController {
 		if (event instanceof PointerEvent pointerEvent) {
 			// If we click down on the screen
 		  if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) { 
-		  	GameView.draw(context, data, view);
 		    int res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y(), context.getScreenInfo());
-		    if (GameDataCombat.combat()) { 
-		    	GameDataCombat.hero_action(context, data, res);
+		    if (GameDataCombat.combat() && res != -3) { 
+		    	GameDataCombat.hero_action(data, res);
 		    }
+		    GameView.draw(context, data, view);
 		  }
 		}
 		// If event button is pressed 
@@ -56,7 +68,7 @@ public class GameController {
 		  switch(key.key()) {
 		    // A to add a weapon in the bag
 		  	case Key.A ->{ 
-		  	  if (data.weapon() == null) {
+		  	  if (data.weapon() == null && !GameDataCombat.combat()) {
 		  	    var sword = new Sword();
 		  	    sword.setXY(3, 2); // Center of the item
 		  	    data.setWeapon(sword); 
@@ -65,7 +77,8 @@ public class GameController {
 		  	}
 		  	// Start a combat against a RAT
 		  	case Key.I ->{ 
-		  		GameDataCombat.start_combat(context, new ArrayList<>(List.of(new Rat())) , data);
+		  		GameDataCombat.start_combat(new ArrayList<>(List.of(new Rat())) , data);
+		  		GameDataCombat.refreshCombatDraw(context, data);
 		  	}
 				// Moving the selected weapon, do nothing if no weapon is selected
 				case Key.Z -> {

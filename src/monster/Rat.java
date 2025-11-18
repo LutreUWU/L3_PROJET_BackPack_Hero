@@ -33,7 +33,7 @@ public class Rat implements Enemy{
 	}
 	
 	/**
-	 * Apply the action the monster will do
+	 * Apply the action the monster will do, and choose randomly the next action of the monster
 	 */
 	@Override
 	public void action() {
@@ -41,6 +41,7 @@ public class Rat implements Enemy{
 			case "Morsure" -> GameDataHero.sub("HP", 3);
 			case "Protection" -> shield += 2;
 		}
+		pre_action();
 	}
 	
 	/**
@@ -67,6 +68,11 @@ public class Rat implements Enemy{
 	@Override
 	public int getShield() {
 		return shield;
+	}
+	
+	@Override
+	public String getAction() {
+		return action;
 	}
 	
 	@Override
