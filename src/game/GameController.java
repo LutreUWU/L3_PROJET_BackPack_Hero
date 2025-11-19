@@ -14,27 +14,30 @@ import com.github.forax.zen.PointerEvent;
 import game.data.GameDataBackpack;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import game.data.GameDataMap;
 import item.Sword;
-import monster.Rat;
+import monster.Chicken;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
  * retrieving raw user actions, sending them for analysis to the GameView and
  * GameData, and dealing with time events.
  * 
+ * GUIDE : 
+ * 
  * Key.A to create an Item in the bag (It's just for testing, it'll be useless for the end)
  * - Key.(ZQSD) to move the item in the grid
  * - Key.R to rotate the item clockwise
- * - Key.ESCAPE (esc) to confirm and add an item in the backpack
+ * - Key.ESCAPE (esc) to confirm and add the item in the backpack
  * 
  * Key.I to initiate a combat
+ * - Using an item cost 1 AP, when it reach 0, enemy play.
  * - Click on a item to use it
  * 
  * TO DO :
- * - Event when the combat is finished
- * - Room (Shop, healer ...)
+ * - LA MAP ZEBI
+ * - Package model is useless, you can erase it
  */
-
 public class GameController {
   /**
    * Default constructor, which does basically nothing.
@@ -47,68 +50,63 @@ public class GameController {
    * 
    * @param context {@code ApplicationContext} of the game.
    * @param data 	GameData of the game.
-   * @param view 	GameView of the game.
    * @return True if the game continue, False if we press the button to stop
    */
-  private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
+  private static boolean gameLoop(ApplicationContext context, GameData data) {
 		Event event = context.pollOrWaitEvent(10); 
 		if (event instanceof PointerEvent pointerEvent) {
 			// If we click down on the screen
 		  if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) { 
-		    int res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y(), context.getScreenInfo());
-		    if (GameDataCombat.combat() && res != -3) { 
-		    	GameDataCombat.hero_action(data, res);
+		    var res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y(), context.getScreenInfo());
+		    var click = res.entrySet().iterator().next();
+		    if(!(click.getKey().equals("Nothing"))) {
+		    	if(data.mapOrBag() && click.getKey().equals("Bag")) {
+			    	if (GameDataCombat.combat()) { 
+				    	GameDataCombat.hero_action(data, click.getValue());
+				    }
+			    }
+		    	if(click.getKey().equals("MapOrBag")) {
+		    		if (!GameDataCombat.combat() && data.weapon() == null) {
+		    			data.swapMapOrBag();
+		    		}
+		    	}
 		    }
-		    GameView.draw(context, data, view);
+		    GameView.draw(context, data);
+		    if (data.weapon() != null) {
+	  	    GameView.updateWeaponDraw(context, data);
+			  }
 		  }
 		}
 		// If event button is pressed 
 		if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
-		  GameView.draw(context, data, view);
+		  GameView.draw(context, data);
 		  switch(key.key()) {
 		    // A to add a weapon in the bag
 		  	case Key.A ->{ 
-		  	  if (data.weapon() == null && !GameDataCombat.combat()) {
+		  	  if (data.weapon() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 		  	    var sword = new Sword();
 		  	    sword.setXY(3, 2); // Center of the item
 		  	    data.setWeapon(sword); 
-		  	    GameView.updateWeaponDraw(context, data);
 		  	  }
 		  	}
 		  	// Start a combat against a RAT
 		  	case Key.I ->{ 
-		  		GameDataCombat.start_combat(new ArrayList<>(List.of(new Rat())) , data);
-		  		GameDataCombat.refreshCombatDraw(context, data);
+		  		if(GameDataCombat.combat() == false) {
+		  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken())) , data);
+			  		GameDataCombat.refreshCombatDraw(context, data);
+		  		}
 		  	}
 				// Moving the selected weapon, do nothing if no weapon is selected
-				case Key.Z -> {
-				  GameDataBackpack.move_item(data.weapon(), 0, -1);
-				  GameView.updateWeaponDraw(context,data);
-				}
-				case Key.D -> {
-				  GameDataBackpack.move_item(data.weapon(), 1, 0);
-				  GameView.updateWeaponDraw(context, data);
-				}
-				case Key.S -> {
-				  GameDataBackpack.move_item(data.weapon(), 0, 1);
-				  GameView.updateWeaponDraw(context, data);
-				}
-				case Key.Q -> {
-		      GameDataBackpack.move_item(data.weapon(), -1, 0);
-		      GameView.updateWeaponDraw(context, data);
-				}
-				case Key.R -> {
-			    GameDataBackpack.rotate_item(data.weapon());
-				  GameView.updateWeaponDraw(context, data);
-				}
+				case Key.Z -> GameDataBackpack.move_item(data.weapon(), 0, -1);
+				case Key.D -> GameDataBackpack.move_item(data.weapon(), 1, 0);
+				case Key.S -> GameDataBackpack.move_item(data.weapon(), 0, 1);
+				case Key.Q -> GameDataBackpack.move_item(data.weapon(), -1, 0);
+				case Key.R -> GameDataBackpack.rotate_item(data.weapon());
 				// Confirm the placement of the weapon (and check if we can put here)
 		    case Key.ESCAPE -> {
 				  if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
 						data.setWeapon(null);
-						GameView.draw(context, data, view);
-				  } else { // if we can't place it here, just refresh the draw of the item.
-						GameDataBackpack.move_item(data.weapon(), 0, 0);
-						GameView.updateWeaponDraw(context, data);
+						GameView.draw(context, data);
 				  }
 				}
 				// Leave the game
@@ -117,6 +115,9 @@ public class GameController {
 				}
 				default -> {}
 			}	  
+		  if (data.weapon() != null) {
+  	    GameView.updateWeaponDraw(context, data);
+		  }
 	  }
 		return true;
   }
@@ -130,14 +131,15 @@ public class GameController {
     var screenInfo = context.getScreenInfo();
     var width = screenInfo.width();
     var height = screenInfo.height();
-    int grid_size = 80;
+    int grid_size = 60;
     var data = new GameData(grid_size);
     new GameDataBackpack(data.bag());
     new GameDataHero(data.hero());
-    var view = GameView.initGameGraphics(width, height, grid_size);
-    GameView.draw(context, data, view);
+    new GameDataMap(data.map());
+    GameView.initGameGraphics(width, height, grid_size);
+    GameView.draw(context, data);
     while (true) {
-      if (!gameLoop(context, data, view)) {
+      if (!gameLoop(context, data)) {
         System.out.println("Thank you for quitting!");
         context.dispose();
         return;

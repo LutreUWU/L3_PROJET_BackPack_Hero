@@ -6,22 +6,27 @@ import java.util.Random;
 import game.data.GameDataHero;
 
 /**
- * Class of a Rat
+ * Class of a Chicken
  */
-public class Rat implements Enemy{
+public class Chicken implements Enemy{
 	/**
 	 * - HP :				 	When it reach 0, the enemy die
 	 * - Shield : 		Can mitigate damage received
+	 * - xp :					XP he drops when he die
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
 	private int HP = 20;
 	private int shield = 0;
+	private int xp = 4;
 	private List<String> lst_attack = List.of("Morsure", "Protection");
 	private String action;
+	// For graphism
+	private String url_img = "data/monster/chicken.png";
+	private double size = 0.4;
 	
 	/**
-	 * Chose randomly an action
+	 * Chose randomly an action between all attacks the enemy has.
 	 * 
 	 * @return Action he'll do 
 	 */
@@ -76,7 +81,22 @@ public class Rat implements Enemy{
 	}
 	
 	@Override
+	public int getXP() {
+		return xp;
+	}
+	
+	@Override
+	public String getUrl() {
+		return url_img;
+	}
+	
+	@Override
+	public double getSize() {
+		return size;
+	}
+	
+	@Override
 	public String toString() {
-		return "Rat des toilettes";
+		return "Poulet malicieux";
 	}
 }

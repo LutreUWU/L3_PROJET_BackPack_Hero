@@ -1,4 +1,4 @@
-package game.weaponView;
+package game.ViewWeapon;
 
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
@@ -22,12 +22,12 @@ public record SwordView(ApplicationContext context, GameData data, int x, int y)
 	 * 
 	 */
 	public void draw(){
-		int grid_size = data.grid_size();
+		int grid_size = data.bag().grid_size();
 		var screenInfo = context.getScreenInfo();
 		context.renderFrame(graphics -> {
 			graphics.setColor(Color.RED);
 	        graphics.draw(new Rectangle2D.Double((grid_size/4 + screenInfo.width()/2) - 3.5*grid_size + (grid_size * y), 
-	        									( grid_size/4 + screenInfo.height()/3.5) - 2.5*grid_size + (grid_size * x), 
+	        									( grid_size/4 + screenInfo.height()/4) - 2.5*grid_size + (grid_size * x), 
 	        									  grid_size/2, grid_size/2));
 		});
 	}

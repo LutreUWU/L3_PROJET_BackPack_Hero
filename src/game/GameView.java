@@ -3,17 +3,22 @@ package game;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import javax.imageio.ImageIO;
 
 import com.github.forax.zen.ApplicationContext;
 import com.github.forax.zen.ScreenInfo;
 
+import game.ViewWeapon.SwordView;
 import game.data.GameDataCombat;
-import game.weaponView.SwordView;
 import monster.Enemy;
-import monster.Rat;
 
  /**
   * The SimpleGameView class deals with the display of the game the screen, and
@@ -44,30 +49,40 @@ public record GameView(int width, int height, int grid_size) {
    */	
   private static void drawGrid(ApplicationContext context, GameData data) {
     var screenInfo = context.getScreenInfo();
+    int size = data.bag().grid_size();
 		int [][] grid = data.bag().grid();
-		for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 7; j++) {
-	    	final int fi = i;
-	    	final int fj = j;
-			  context.renderFrame(graphics -> {
-			  	if (grid[fi][fj] >= -1) {
-			  		graphics.setColor(Color.GRAY);
-			  	}
-			  	if (grid[fi][fj] == -2) {
-			  		graphics.setColor(Color.RED);
-			  	}
-			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * data.grid_size() + (data.grid_size() * fj), 
-										        							  	 (screenInfo.height()/3.5) - 2.5*data.grid_size() + (data.grid_size() * fi), 
-										        							  	 data.grid_size(), data.grid_size()));
-			    graphics.setColor(Color.BLACK);
-			    graphics.draw(new Rectangle2D.Double((screenInfo.width()/2) - 3.5*data.grid_size() + (data.grid_size() * fj), 
-											        								 (screenInfo.height()/3.5) - 2.5*data.grid_size() + (data.grid_size() * fi), 
-											        								 data.grid_size(), data.grid_size()));
-			    
-			  });
-      }
-		}
+		context.renderFrame(graphics -> {
+			BufferedImage img = null;
+			try {
+				img = ImageIO.read(new File("data/bag.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			drawImage(graphics, img, screenInfo.width() * 0.5 - size * 4.5, 10, size * 9, size * 6);
+			for (int i = 0; i < 5; i++) {
+	      for (int j = 0; j < 7; j++) {
+		    	final int fi = i;
+		    	final int fj = j;				  
+		    		// TO DO (David) : instead of rectangle, change image of the grid
+				  	if (grid[fi][fj] >= -1) {
+				  		graphics.setColor(Color.GRAY);
+				  		graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * size + (size * fj), 
+																					    	   (screenInfo.height()/4) - 2.5*size + (size * fi), 
+																										size, size));
+				  		graphics.setColor(Color.BLACK);
+				  	}
+				  	if (grid[fi][fj] == -2) {
+				  		graphics.setColor(Color.RED);
+				  	}
+				    graphics.draw(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * size + (size * fj), 
+																				    	   (screenInfo.height()/4) - 2.5*size + (size * fi), 
+																									size, size));
+				    
+				}
+	    }
+		});
   }
+  
   /**
    * Draw all items inside the bag.
    * 
@@ -113,7 +128,6 @@ public record GameView(int width, int height, int grid_size) {
 		}
   }
 		
-  
   /**
    * Draws all the information about the hero
    * 
@@ -125,12 +139,13 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawHeroStats(Graphics2D graphics, GameData data, int x, int y) {
   	int size = 14;
     Font font = new Font("Arial", Font.PLAIN, size);
+    graphics.setColor(Color.WHITE);
 		graphics.setFont(font);
 	  graphics.drawString("PV : " + data.hero().getHP() + "/" + data.hero().getMax_HP(), x,	y + size);
 	  graphics.drawString("SHIELD : " + String.valueOf(data.hero().getCurrent_protection()), x,	y + size*2);
 	  graphics.drawString("AP : " + String.valueOf(data.hero().getEnergy_point()), x,	y + size*3);
 	  graphics.drawString("MANA : " + String.valueOf(data.hero().getMana_point()), x,	y + size*4);
-	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()), x,	y + size*5);
+	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()) + "/" + String.valueOf(10 + ((data.hero().getLevel() - 1) * 2)), x,	y + size*5);
   }
   
   /**
@@ -141,19 +156,18 @@ public record GameView(int width, int height, int grid_size) {
    */
   private static void drawHero(ApplicationContext context, GameData data) {
   	var screenInfo = context.getScreenInfo();
-  	double size_x = screenInfo.width() * 0.05;
-  	double size_y = screenInfo.height() * 0.2;
+  	double size_x = data.hero().getSizeX();
+  	double size_y = data.hero().getSizeY();
   	context.renderFrame(graphics -> {
-  		graphics.setColor(Color.BLUE);
-  		graphics.fill(new Rectangle2D.Double(screenInfo.width() * 0.25, screenInfo.height() * 0.65, 
-		        															 size_x, size_y));
-  		graphics.setColor(Color.BLACK);
-  		Font font = new Font("Arial", Font.PLAIN, 20);
-  		graphics.setFont(font);
-  	  graphics.drawString("HERO", (int) (screenInfo.width() * 0.25), (int) (screenInfo.height() * 0.64));
-  		drawHeroStats(graphics, data, (int) (screenInfo.width() * 0.25), (int) ((screenInfo.height() * 0.65) + size_y));
-  	});
-  	
+  		BufferedImage img = null;
+			try {
+				img = ImageIO.read(new File("data/Roland.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			drawImage(graphics, img, screenInfo.width() * 0.20, screenInfo.height() * 0.50, size_x, size_y);
+			drawHeroStats(graphics, data, (int) (screenInfo.width() * 0.20 + size_x/2),  (int) (screenInfo.height() * 0.50 + size_y));
+  	});	
   }
   
   /**
@@ -167,6 +181,7 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawEnemyStats(Graphics2D graphics, Enemy enemy, int x, int y) {
   	int size = 14;
     Font font = new Font("Arial", Font.PLAIN, size);
+    graphics.setColor(Color.WHITE);
 		graphics.setFont(font);
 	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
 	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
@@ -182,58 +197,93 @@ public record GameView(int width, int height, int grid_size) {
    */
   private static void drawEnemy(ApplicationContext context, GameData data, Enemy enemy) {
   	var screenInfo = context.getScreenInfo();
-  	double size_x = screenInfo.width() * 0.05;
-  	double size_y = screenInfo.height() * 0.2;
+  	double size_x = data.hero().getSizeX() * enemy.getSize();
+  	double size_y = data.hero().getSizeY() * enemy.getSize();
   	context.renderFrame(graphics -> {
-  		graphics.setColor(Color.RED);
-  		graphics.fill(new Rectangle2D.Double(screenInfo.width() * 0.75 - size_x, screenInfo.height() * 0.65, 
-		        															 size_x, size_y));
-  		graphics.setColor(Color.BLACK);
-  		Font font = new Font("Arial", Font.PLAIN, 20);
-  		graphics.setFont(font);
-  	  graphics.drawString(enemy.toString(), (int) (screenInfo.width() * 0.75 - size_x), (int) (screenInfo.height() * 0.64));
-  		drawEnemyStats(graphics, enemy, (int) (screenInfo.width() * 0.75 - size_x), (int) ((screenInfo.height() * 0.65) + size_y));
+			BufferedImage img = null;
+			try {
+				img = ImageIO.read(new File(enemy.getUrl()));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			drawImage(graphics, img, screenInfo.width() * 0.80 - size_x, screenInfo.height() * 0.5 + (data.hero().getSizeY() - size_y), size_x, size_y);
+  		drawEnemyStats(graphics, enemy, (int) (screenInfo.width() * 0.75 - size_x), (int) (screenInfo.height() * 0.5 + data.hero().getSizeY()));
   	});
   	
   }
 	
   /**
-   * Update the state of the combat. This method is called each team we do an action
+   * Draw the button for switching between map and bag
    * 
    * @param context		{@code ApplicationContext} of the game.
    * @param data			GameData containing the game data. 
-   * @param lst_enemy List of all enemy we fight
    */
-  public static void update_combat(ApplicationContext context, GameData data,  ArrayList<Enemy> lst_enemy) {
-  	Objects.requireNonNull(context);
-  	Objects.requireNonNull(data);
-  	Objects.requireNonNull(lst_enemy);
-  	lst_enemy.forEach(enemy -> drawEnemy(context, data, enemy));
-  	drawHero(context, data);
+  private static void drawButton(ApplicationContext context, GameData data) {
+  	ScreenInfo screenInfo = context.getScreenInfo();
+  	context.renderFrame(graphics -> {
+  		graphics.setColor(Color.RED);  		
+  		graphics.setColor(data.mapOrBag() ? Color.ORANGE : Color.CYAN);
+	    graphics.fill(new Rectangle2D.Double(screenInfo.width() - data.bag().grid_size() / 2, screenInfo.height()/3.5 - 2.5*data.bag().grid_size(), 
+	    																		 data.bag().grid_size() / 2,data.bag().grid_size() / 2));
+  	});
   }
   
   /**
-   * Draws the game board from its data.
+   * Draw the map in the screen
    * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data    GameData containing the game data.
-   */	
-  public static void draw(ApplicationContext context, GameData data, GameView view) {
-		Objects.requireNonNull(context);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(view);
-		context.renderFrame(graphics -> {
-	    // Refresh the screen with a white screen
-	    ScreenInfo screenInfo = context.getScreenInfo();
-	    graphics.setColor(Color.WHITE);
-	    graphics.fillRect(0, 0, screenInfo.width(), screenInfo.height());
-		});	
-		drawGrid(context, data);
-		drawItemBag(context, data);
-		if (GameDataCombat.combat()) {
-			GameDataCombat.refreshCombatDraw(context, data);;
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   */
+  private static void drawMap(ApplicationContext context, GameData data) {
+  	ScreenInfo screenInfo = context.getScreenInfo();
+  	int size = data.map().grid_size();  	
+		for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 11; j++) {
+	    	final int fi = i;
+	    	final int fj = j;
+			  context.renderFrame(graphics -> {
+			  	graphics.setColor(Color.GRAY);
+			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * fj), 
+										        							  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * fi), 
+			    																			size, size));
+			    graphics.setColor(Color.BLACK);
+			    graphics.draw(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * fj), 
+																					  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * fi), 
+																								size, size));
+			  });
+      }
 		}
   }
+  
+	/**
+	 * Draw the background of the game
+	 * 
+	 * @param context
+	 * @param data
+	 */
+	private static void drawBG(ApplicationContext context, GameData data) {
+		context.renderFrame(graphics -> {
+	    // Put a background, FAIRE LA FONCTIION POUR INSERER UNE IMG
+	    ScreenInfo screenInfo = context.getScreenInfo();
+			BufferedImage img = null;
+			try {
+				img = ImageIO.read(new File("data/BG/BG1.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			drawImage(graphics, img, 0, 0, screenInfo.width(), screenInfo.height());
+		});	
+	}
+	
+	
+	private static void drawImage(Graphics2D graphics, BufferedImage image, double x, double y, double dimX, double dimY) {
+		var width = image.getWidth();
+		var height = image.getHeight();
+		var scale = Math.max(dimX / width, dimY / height);
+		var transform = new AffineTransform(scale, 0, 0, scale, x + (dimX - scale * width) / 2,
+				y + (dimY - scale * height) / 2);
+		graphics.drawImage(image, transform, null);
+	}
 	
   /**
    * Update the position of the weapon if we move an item
@@ -245,5 +295,44 @@ public record GameView(int width, int height, int grid_size) {
 		Objects.requireNonNull(context);
 		Objects.requireNonNull(data);
 		drawWeaponGrid(context, data);
+  }
+  
+  /**
+   * Update the state of the combat.
+   * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   * @param lst_enemy List of all enemy we fight
+   */
+  public static void update_combat(ApplicationContext context, GameData data,  ArrayList<Enemy> lst_enemy) {
+  	Objects.requireNonNull(context);
+  	Objects.requireNonNull(data);
+  	Objects.requireNonNull(lst_enemy);
+  	lst_enemy.forEach(enemy -> drawEnemy(context, data, enemy));
+  }
+  
+  /**
+   * Methods for drawing the game 
+   * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   */
+  public static void draw(ApplicationContext context, GameData data) {
+		Objects.requireNonNull(context);
+		Objects.requireNonNull(data);
+		drawBG(context, data);
+		if (data.mapOrBag()) {
+			drawGrid(context, data);
+			drawItemBag(context, data);
+		} else {
+			drawMap(context, data);
+		}
+		
+		drawHero(context, data);
+		drawButton(context, data);
+		// Draw enemy if we're in combat
+		if (GameDataCombat.combat()) {
+			GameDataCombat.refreshCombatDraw(context, data);;
+		}
   }
 }

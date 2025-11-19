@@ -12,6 +12,10 @@ public class Hero {
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;
+	// For graphic interface
+	private int size_x = 150;
+	private int size_y = (int) (size_x * 1.2);
+	
 	
 	private int MAX_XP() {
 		return 10 + (level - 1) * 2;
@@ -100,6 +104,14 @@ public class Hero {
 
 	public int getXp() {
 		return xp;
+	}
+	
+	public int getSizeX() {
+		return size_x;
+	}
+	
+	public int getSizeY() {
+		return size_y;
 	}
 
 	public int getLevel() {

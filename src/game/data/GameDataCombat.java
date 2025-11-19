@@ -24,7 +24,7 @@ public class GameDataCombat {
 	 * - lst_enemy : List of all enemy we're fighting
 	 */
 	private static boolean combat = false;
-	private static Enemy target;
+	private static int target;
   private static ArrayList<Enemy> lst_enemy;
 
 	/**
@@ -41,25 +41,42 @@ public class GameDataCombat {
 		Objects.requireNonNull(data);
 		lst_enemy = monsters;
 		lst_enemy.forEach(monster -> monster.pre_action());
-		target = monsters.getFirst();
+		target = 0;
 		combat = true;
 	}
 	
 	/**
 	 * This methods is called after the user click on a item in the backpack.
-	 * This methods will use the item we chose in the backpack
+	 * This methods take an ID in parameter, it will checks in the bag if a weapon correspond to the ID, then it we'll use it.
 	 * 
 	 * @param data		The data of the game.
 	 * @param id			The ID of the item we click in the backpack.
 	 */
 	public static void hero_action(GameData data, int id) {
 		Objects.requireNonNull(data);
-		Optional<Item_Object> weapon =data.bag().item_lst().stream()
+		Enemy targetEnemy = lst_enemy.get(target); 
+		Optional<Item_Object> weapon = data.bag().item_lst().stream()
 																											 .filter(item -> item.id() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
-			item.use(target);
-			lst_enemy.forEach(enemy -> enemy.action());
+			item.use(targetEnemy);
+			if (targetEnemy.getHP() <= 0) {
+				lst_enemy.remove(target);
+				GameDataHero.add("xp", targetEnemy.getXP());
+			}
+			if (lst_enemy.isEmpty()) {
+				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
+				combat = false;
+			}
+			else {
+				if(data.hero().getEnergy_point() <= 0) {
+					lst_enemy.forEach(enemy -> enemy.action());
+					if(data.hero().getHP() == 0) {
+						// TO DO 
+					}
+					GameDataHero.add("energy", 3);
+				}
+			}
 			GameDataHero.reset();
 		});
 	}

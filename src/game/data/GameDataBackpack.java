@@ -37,7 +37,6 @@ public class GameDataBackpack {
 		if (item == null) {
 		  return false;
 		}
-		
 		var b = item.shape();
 	    for (var block : b) {
 	      int y = block.y();
