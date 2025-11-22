@@ -1,4 +1,4 @@
-package monster;
+package model.monster;
 
 /**
  * Interface for enemies in the game.

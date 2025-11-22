@@ -1,8 +1,8 @@
-package model;
+package model.shield;
 
 import java.util.Objects;
 
-public class Shield implements Item {
+public class Shield implements BlockItem {
 	private int protection;
 	private ItemBase stats_base;
 	

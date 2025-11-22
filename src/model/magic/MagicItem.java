@@ -1,8 +1,9 @@
-package model;
+package model.magic;
 
 import java.util.Objects;
 
-public class MagicItem implements Item {
+
+public class MagicItem implements BlockItem {
 	private int protection;
 	private int protection_armor;
 	private int damage;

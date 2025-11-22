@@ -3,10 +3,10 @@ import java.util.Map;
 
 import com.github.forax.zen.ScreenInfo;
 
-import item.Backpack;
-import item.Hero;
-import item.Item_Object;
-import item.MapGame;
+import model.Backpack;
+import model.Hero;
+import model.Object;
+import model.map.Floor;
 
  /**
  * The SimpleGameData class stores all relevant pieces of information for the
@@ -19,14 +19,14 @@ public class GameData {
    * - User's profile
    */
   private static Backpack backpack;
-  private static MapGame map;
+  private static Floor map;
   private static Hero hero;
   private static int floor;
   /**
    * To know if we're adding an item.
    * null if we're not adding.
    */
-  private Item_Object weapon = null; 
+  private Object weapon = null; 
   /**
    * To know if we display map or bag
    * 
@@ -40,9 +40,9 @@ public class GameData {
    * 
    * @param gridSize size of the grid in the backpack
    */
-  public GameData(int gridSize) {
-	  backpack = new Backpack(gridSize);
-	  map = new MapGame(gridSize / 2);
+  public GameData(int height) {
+	  backpack = new Backpack(height);
+	  map = new Floor(backpack.grid_size() / 2);
 	  hero = new Hero(); 
 	  floor = 1;
 	}
@@ -136,7 +136,7 @@ public class GameData {
    * 
    * @return Item_Object weapon
    */
-  public Item_Object weapon() {
+  public Object weapon() {
     return weapon;
   }
   
@@ -156,7 +156,7 @@ public class GameData {
    * 
    * @param item
    */
-  public void setWeapon(Item_Object item) {
+  public void setWeapon(Object item) {
     this.weapon = item;
   }
   
@@ -171,7 +171,7 @@ public class GameData {
    * Return the current map of the player from data
    * @return Objects MapGame
    */
-  public MapGame map() {
+  public Floor map() {
     return map;
   }
   

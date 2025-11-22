@@ -2,7 +2,7 @@ package game.data;
 
 import java.util.Objects;
 
-import item.MapGame;
+import model.map.Floor;
 
 /**
  * The game data with all methods for hero manipulation. 
@@ -10,7 +10,7 @@ import item.MapGame;
  * 
  */
 public class GameDataMap {
-	private static MapGame map;
+	private static Floor map;
 	
   /**
    * Link the map with the one in GameData
@@ -18,7 +18,7 @@ public class GameDataMap {
    * @param data_hero Hero's data from GameData
    * @throws Objects.requireNonNull if no hero is initialize
    */
-	public GameDataMap(MapGame data_map) { 
+	public GameDataMap(Floor data_map) { 
 		Objects.requireNonNull(data_map);
 		map = data_map;
   }
@@ -28,7 +28,7 @@ public class GameDataMap {
 	 * 
 	 */
 	public static void create_map(int floor) {
-		map.create_map();
+		map.create_floor();
 	}
 
 }

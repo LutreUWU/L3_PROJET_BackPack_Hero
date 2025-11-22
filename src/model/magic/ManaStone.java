@@ -1,8 +1,8 @@
-package model;
+package model.magic;
 
 import java.util.Objects;
 
-public class ManaStone implements Item {
+public class ManaStone implements BlockItem {
 	private int mana_gain;
 	private ItemBase stats_base;
 	

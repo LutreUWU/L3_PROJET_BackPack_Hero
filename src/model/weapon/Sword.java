@@ -1,19 +1,24 @@
-package item;
+package model.weapon;
 
 import java.util.Objects;
 
 import game.data.GameDataHero;
-import monster.Enemy;
+import model.Backpack;
+import model.Block;
+import model.BlockItem;
+import model.Direction;
+import model.Object;
+import model.monster.Enemy;
 
 /**
  * Class for the Sword item
  */
-public class Sword implements Item_Object{
+public class Sword implements Object{
 	/**
 	 * - Item weapon
 	 * - ID of the weapon (Every weapon has a unique ID)
 	 */
-	private Item weapon = new Item();
+	private BlockItem weapon = new BlockItem();
 	private int id = 1;
 	/**
 	 * Initialize a sword. 
@@ -84,6 +89,12 @@ public class Sword implements Item_Object{
 		GameDataHero.sub("energy", 1);
 		enemy.subHP(3);
 	}
+	
+	@Override
+	public Direction direction() {
+		return weapon.direction();
+	}
+
 }
 
 

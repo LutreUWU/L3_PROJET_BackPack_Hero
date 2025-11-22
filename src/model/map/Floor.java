@@ -1,6 +1,6 @@
-package item;
+package model.map;
 
-public class MapGame {
+public class Floor {
 	/**
 	 * - Backpack
 	 * - grid_size
@@ -20,7 +20,7 @@ public class MapGame {
 	 * 
 	 * @param gridSize
 	 */
-	public MapGame(int gridSize) {
+	public Floor(int gridSize) {
 		grid_size = gridSize;
 	}
 	
@@ -47,7 +47,7 @@ public class MapGame {
 	 * 
 	 * @param floor
 	 */
-	public void create_map(int floor) {
+	public void create_floor(int floor) {
 		// TO DO
 		
 		// Quelques indications :

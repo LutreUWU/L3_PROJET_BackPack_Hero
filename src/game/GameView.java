@@ -18,7 +18,9 @@ import com.github.forax.zen.ScreenInfo;
 
 import game.ViewWeapon.SwordView;
 import game.data.GameDataCombat;
-import monster.Enemy;
+import model.Block;
+import model.Direction;
+import model.monster.Enemy;
 
  /**
   * The SimpleGameView class deals with the display of the game the screen, and
@@ -58,7 +60,7 @@ public record GameView(int width, int height, int grid_size) {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			drawImage(graphics, img, screenInfo.width() * 0.5 - size * 4.5, 10, size * 9, size * 6);
+			drawElement(graphics, img, screenInfo.width() * 0.5 - size * 4.5, 10, size * 9, size * 6, Direction.UP);
 			for (int i = 0; i < 5; i++) {
 	      for (int j = 0; j < 7; j++) {
 		    	final int fi = i;
@@ -67,7 +69,7 @@ public record GameView(int width, int height, int grid_size) {
 				  	if (grid[fi][fj] >= -1) {
 				  		graphics.setColor(Color.GRAY);
 				  		graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * size + (size * fj), 
-																					    	   (screenInfo.height()/4) - 2.5*size + (size * fi), 
+																					    	   (screenInfo.height()/4.5) - 2.5*size + (size * fi), 
 																										size, size));
 				  		graphics.setColor(Color.BLACK);
 				  	}
@@ -75,9 +77,8 @@ public record GameView(int width, int height, int grid_size) {
 				  		graphics.setColor(Color.RED);
 				  	}
 				    graphics.draw(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * size + (size * fj), 
-																				    	   (screenInfo.height()/4) - 2.5*size + (size * fi), 
+																				    	   (screenInfo.height()/4.5) - 2.5*size + (size * fi), 
 																									size, size));
-				    
 				}
 	    }
 		});
@@ -92,14 +93,10 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawItemBag(ApplicationContext context, GameData data) {
 		var item_list = data.bag().item_lst();
 		for (var item : item_list) {
-		  for (var block : item.shape()) {
-				switch (item.id()) {
-				  case 1 ->{
-						var drawSword = new SwordView(context, data, block.y(), block.x());
-						drawSword.draw();
-				  }
-				  default ->{}
-				}
+			Block coordinate = item.shape()[0];
+		  switch (item.id()) {
+				case 1 -> new SwordView(context, data, item.direction(), coordinate.x(), coordinate.y()).draw();
+			  default ->{}
 		  }
 		}
   }
@@ -116,16 +113,12 @@ public record GameView(int width, int height, int grid_size) {
 		var item = data.weapon();
 		if (item == null) {
 	        return;
-	    }
-		for (var block : item.shape()) {
-		  switch (item.id()) {
-			case 1 ->{
-			  var drawSword = new SwordView(context, data, block.y(), block.x());
-			  drawSword.draw();
-			}
-			  default ->{}
-		  }
-		}
+	  }
+		Block coordinate = item.shape()[0];
+	  switch (item.id()) {
+			case 1 -> new SwordView(context, data, item.direction(), coordinate.x(), coordinate.y()).draw();
+		  default ->{}
+	  }
   }
 		
   /**
@@ -165,7 +158,7 @@ public record GameView(int width, int height, int grid_size) {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			drawImage(graphics, img, screenInfo.width() * 0.20, screenInfo.height() * 0.50, size_x, size_y);
+			drawElement(graphics, img, screenInfo.width() * 0.20, screenInfo.height() * 0.50, size_x, size_y, Direction.UP);
 			drawHeroStats(graphics, data, (int) (screenInfo.width() * 0.20 + size_x/2),  (int) (screenInfo.height() * 0.50 + size_y));
   	});	
   }
@@ -206,7 +199,7 @@ public record GameView(int width, int height, int grid_size) {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			drawImage(graphics, img, screenInfo.width() * 0.80 - size_x, screenInfo.height() * 0.5 + (data.hero().getSizeY() - size_y), size_x, size_y);
+			drawElement(graphics, img, screenInfo.width() * 0.80 - size_x, screenInfo.height() * 0.5 + (data.hero().getSizeY() - size_y), size_x, size_y, Direction.UP);
   		drawEnemyStats(graphics, enemy, (int) (screenInfo.width() * 0.75 - size_x), (int) (screenInfo.height() * 0.5 + data.hero().getSizeY()));
   	});
   	
@@ -258,8 +251,8 @@ public record GameView(int width, int height, int grid_size) {
 	/**
 	 * Draw the background of the game
 	 * 
-	 * @param context
-	 * @param data
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
 	 */
 	private static void drawBG(ApplicationContext context, GameData data) {
 		context.renderFrame(graphics -> {
@@ -271,19 +264,41 @@ public record GameView(int width, int height, int grid_size) {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			drawImage(graphics, img, 0, 0, screenInfo.width(), screenInfo.height());
+			var width = img.getWidth();
+			var height = img.getHeight();
+			double scale = Math.max(width / screenInfo.width(), height / screenInfo.height());
+			var transform = new AffineTransform(scale, 0, 0, scale, (screenInfo.width() - scale * width) / 2, (screenInfo.height() - scale * height) / 2);
+			graphics.drawImage(img, transform, null);
 		});	
 	}
 	
-	
-	private static void drawImage(Graphics2D graphics, BufferedImage image, double x, double y, double dimX, double dimY) {
-		var width = image.getWidth();
-		var height = image.getHeight();
-		var scale = Math.max(dimX / width, dimY / height);
-		var transform = new AffineTransform(scale, 0, 0, scale, x + (dimX - scale * width) / 2,
-				y + (dimY - scale * height) / 2);
-		graphics.drawImage(image, transform, null);
+	/**
+	 * Draw an image in the window
+	 * @param graphics	{@code Graphics2D} of the game
+	 * @param img				Image we wants to put
+   * @param x t				The x coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+   * @param y 				The y coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+	 * @param dimX			Width of the image
+	 * @param dimY			Height of the image
+	 * @param direction Direction we wants to draw it
+	 */
+	public static void drawElement(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction) {
+		double angle = Math.toRadians(90 * direction.ordinal());
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = Math.min(dimX / width, dimY / height);
+	  AffineTransform transform = new AffineTransform();
+	  double centerX = x + dimX / 2.0;
+	  double centerY = y + dimY / 2.0;
+	  transform.translate(centerX, centerY);
+	  transform.rotate(angle);
+	  transform.scale(scale, scale);
+	  transform.translate(-width / 2.0, -height / 2.0);
+	  graphics.drawImage(img, transform, null);
 	}
+
 	
   /**
    * Update the position of the weapon if we move an item

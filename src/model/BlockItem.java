@@ -1,11 +1,11 @@
-package item;
+package model;
 
 
 /**
  * Class for item in backpack.
  * items are a list of block where each block has their own coordinate.
  */
-public class Item {
+public class BlockItem {
 	/**
 	 * List of Object Block
 	 */
@@ -14,6 +14,7 @@ public class Item {
 	 * Angle use for the rotation of an item
 	 */
 	private double angle = Math.toRadians(90);
+	private Direction direction = Direction.UP; 
 	
 	/**
 	 * Method that initialize the list of Block for an item.
@@ -61,8 +62,8 @@ public class Item {
 				return;
 			}
 			b_rotated[i] = new Block(new_x, new_y);
-			
 		}
+		direction = direction.next();
 		b = b_rotated;
 	}
 	
@@ -85,6 +86,10 @@ public class Item {
 	 */
 	public Block[] shape() {
 		return b;
+	}
+	
+	public Direction direction() {
+		return direction;
 	}
 }
 

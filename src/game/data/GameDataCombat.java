@@ -8,8 +8,8 @@ import com.github.forax.zen.ApplicationContext;
 
 import game.GameData;
 import game.GameView;
-import item.Item_Object;
-import monster.Enemy;
+import model.Object;
+import model.monster.Enemy;
 
 /**
  * The game data with all methods for combat manipulation. 
@@ -55,7 +55,7 @@ public class GameDataCombat {
 	public static void hero_action(GameData data, int id) {
 		Objects.requireNonNull(data);
 		Enemy targetEnemy = lst_enemy.get(target); 
-		Optional<Item_Object> weapon = data.bag().item_lst().stream()
+		Optional<Object> weapon = data.bag().item_lst().stream()
 																											 .filter(item -> item.id() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {

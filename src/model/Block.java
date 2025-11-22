@@ -1,4 +1,4 @@
-package item;
+package model;
 
 /**
  * Block is what all items is made.

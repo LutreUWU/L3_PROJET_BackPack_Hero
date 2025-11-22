@@ -1,30 +1,67 @@
 package model;
 
 import java.util.ArrayList;
-import item.*;
 
 
 public class Backpack {
-	final private int[][] array_backpack = {  // -2 : not unlock, -1 empty, else ID of item
-											    {-2, -2, -2, -2, -2, -2, -2},
+	/**
+	 * - Backpack
+	 * - grid_size
+	 * - All items in the bag
+	 */
+	private int[][] backpack = {  // -2 : not unlock, -1 empty, else ID of item
 											    {-2, -2, -1, -1, -1, -2, -2},
-											    {-2, -2, -1, -1, -1, -2, -2},
-											    {-2, -2, -1, -1, -1, -2, -2},
-											    {-2, -2, -2, -2, -2, -2, -2}
+											    {-2, -1, -1, -1, -1, -1, -2},
+											    {-2, -1, -1, -1, -1, -1, -2},
+											    {-2, -1, -1, -1, -1, -1, -2},
+											    {-2, -2, -1, -1, -1, -2, -2}
 											};
+	private int grid_size;
+	private ArrayList<Object> items_list = new ArrayList<>(); // List of items I have (Index = ID)
 	
-	final private ArrayList<Object> items_list = new ArrayList<>(); // List of items I have (Index = ID)
+	/**
+	 * Register the grid size of each tile in the backpack
+	 * 
+	 * @param gridSize
+	 */
+	public Backpack(int screenHeight) {
+		grid_size = screenHeight / 15;
+	}
 	
+	/**
+	 * Return the grid of the backpack.
+	 * 
+	 * @return integer[][] 
+	 */
 	public int[][] grid(){
-		return array_backpack;
+		return backpack;
 	}
-	/*
-	public void add_itemToGrid(Object item, int id) implements Interface{
-		var b = 
-		for (var block : b) {
-			array_backpack[block.y()][block.x()] = id;
+	
+	/**
+	 * Return an ArrayList of all item in the backpack
+	 * 
+	 * @return ArrayList<Item_Object>
+	 */
+	public ArrayList<Object> item_lst(){
+		return items_list;
+	}
+	
+	/**
+	 * Return an ArrayList of all item in the backpack
+	 * 
+	 * @return ArrayList<Item_Object>
+	 */
+	public int grid_size(){
+		return grid_size;
+	}
+	
+	@Override
+	public String toString(){
+		var builder = new StringBuilder();
+		builder.append("Liste items : \n");
+		for (var item : items_list) {
+			builder.append(item);
 		}
-		items_list.add();
+		return builder.toString();
 	}
-	*/
 }

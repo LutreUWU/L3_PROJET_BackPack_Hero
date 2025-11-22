@@ -2,7 +2,7 @@ package game.data;
 
 import java.util.Objects;
 
-import item.Hero;
+import model.Hero;
 
 
 /**

@@ -15,8 +15,8 @@ import game.data.GameDataBackpack;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import game.data.GameDataMap;
-import item.Sword;
-import monster.Chicken;
+import model.monster.Chicken;
+import model.weapon.Sword;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
@@ -131,12 +131,11 @@ public class GameController {
     var screenInfo = context.getScreenInfo();
     var width = screenInfo.width();
     var height = screenInfo.height();
-    int grid_size = 60;
-    var data = new GameData(grid_size);
+    var data = new GameData(height);
     new GameDataBackpack(data.bag());
     new GameDataHero(data.hero());
     new GameDataMap(data.map());
-    GameView.initGameGraphics(width, height, grid_size);
+    GameView.initGameGraphics(width, height, data.bag().grid_size());
     GameView.draw(context, data);
     while (true) {
       if (!gameLoop(context, data)) {

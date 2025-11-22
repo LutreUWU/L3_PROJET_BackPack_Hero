@@ -1,11 +1,16 @@
 package game.ViewWeapon;
 
-import java.awt.Color;
-import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import com.github.forax.zen.ApplicationContext;
 
 import game.GameData;
+import game.GameView;
+import model.Direction;
 
 /**
  * The SwordView class deals with the display of the screen.
@@ -16,19 +21,23 @@ import game.GameData;
  * @param y		  Position y of the center of the item.
  *
  */
-public record SwordView(ApplicationContext context, GameData data, int x, int y) {
-	/**
+public record SwordView(ApplicationContext context, GameData data, Direction direction, int x, int y) {/**
 	 * Draw a Sword using library.
 	 * 
 	 */
 	public void draw(){
-		int grid_size = data.bag().grid_size();
+		int size = data.bag().grid_size();
 		var screenInfo = context.getScreenInfo();
 		context.renderFrame(graphics -> {
-			graphics.setColor(Color.RED);
-	        graphics.draw(new Rectangle2D.Double((grid_size/4 + screenInfo.width()/2) - 3.5*grid_size + (grid_size * y), 
-	        									( grid_size/4 + screenInfo.height()/4) - 2.5*grid_size + (grid_size * x), 
-	        									  grid_size/2, grid_size/2));
+			BufferedImage img = null;
+			try {
+				img = ImageIO.read(new File("data/weapon/sword.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			GameView.drawElement(graphics, img, screenInfo.width() / 2 - 3.5 * size + (size * x),
+																				screenInfo.height()/4.5 - 2.5*size + (size * (y - 1)), 
+																				size, size * 3, direction);
 		});
 	}
 }

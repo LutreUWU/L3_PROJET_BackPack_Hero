@@ -1,6 +1,6 @@
-package item;
+package model;
 
-import monster.Enemy;
+import model.monster.Enemy;
 
 /**
  * Since every Item has a different shape, ID, setXY, use
@@ -8,10 +8,11 @@ import monster.Enemy;
  * 
  * They all have the same rotate function, but we put here to avoid copy paste in every function.
  */
-public interface Item_Object {
+public interface Object {
 	Block[] shape();
   int id();
 	void setXY(int x, int y);
 	void rotateXY(Backpack bag);
 	void use(Enemy enemy);
+	Direction direction();
 }
