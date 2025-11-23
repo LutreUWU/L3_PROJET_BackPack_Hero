@@ -2,6 +2,7 @@ package model.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import model.monster.Enemy;
@@ -24,10 +25,27 @@ public class Floor {
   	generateFloor(floor);
   }
   
+ 
   
-  public Floor generateFloor(int floor) {
-  	Room start = createAllRoom(1);
-  	return null;
+  
+  public void generateFloor(int floor) {
+  	XY start = createAllRoom(1);
+  	HashSet<XY> visited = new HashSet<>();
+  	createWay(visited, start);
+  }
+  
+  private void createWay(HashSet<XY> visited, XY start) {
+    List<XY> accessible = new ArrayList<>(); addAcc(accessible, start.x(), start.y());
+    for (var coord : accessible) {
+        if (visited.contains(coord)) {
+           IO.println("We already have : X,Y = (" + coord.x() + ", " + coord.y() + ")");
+        } else {
+          visited.add(coord);
+          grid[start.y()][start.x()].addAccessible(coord);
+          grid[coord.y()][coord.x()].addAccessible(start);
+          createWay(visited, coord);
+        }
+    }
   }
   
   private void addAcc(List<XY> listacc, int x, int y) {
@@ -35,28 +53,26 @@ public class Floor {
   	if (y > 0) listacc.add(new XY(x, y - 1));
   	if (x < ROW - 1) listacc.add(new XY(x + 1, y));
   	if (y < LINE - 1) listacc.add(new XY(x, y + 1));
+  	Collections.shuffle(listacc);
   }
   
-  /**
-   * Put all accessible room
-   */
+  /*
   public void createAndRandomAccessible() {
   	for (int i = 0; i < LINE; i++) {
   		for (int j = 0; j < ROW; j++) {
   			List<XY> listacc = new ArrayList<>();
   			addAcc(listacc, j, i);
-  			Collections.shuffle(listacc);
   			grid[i][j].setAccessible(listacc);
   		}
   	}
-  }
+  }*/
   
   /**
    * Create All Room
    * @param floor
    * @return Starter Room
    */
-  private Room createAllRoom(int floor) {
+  private XY createAllRoom(int floor) {
   	List<XY> list1 = createXYList();
   	List<XY> list2 = shuffleList(list1);
   	createSpecialRoom(list2, 1);
@@ -67,7 +83,7 @@ public class Floor {
   			}
   		}
   	}
-  	return grid[list2.get(8).y()][list2.get(8).x()];
+  	return new XY(list2.get(8).x(), list2.get(8).y());
   }
   
   /**

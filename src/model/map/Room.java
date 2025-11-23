@@ -55,4 +55,8 @@ public class Room {
 	public List<XY> get_accessible(){
 		return accessible;
 	}
+	
+	public void addAccessible(XY coord){
+		accessible.add(coord);
+	}
 }
