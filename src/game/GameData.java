@@ -42,9 +42,9 @@ public class GameData {
    */
   public GameData(int height) {
 	  backpack = new Backpack(height);
-	  map = new Floor(backpack.grid_size() / 2);
 	  hero = new Hero(); 
 	  floor = 1;
+	  map = new Floor(floor);
 	}
   
   /**

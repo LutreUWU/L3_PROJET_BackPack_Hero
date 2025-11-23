@@ -20,6 +20,7 @@ import game.ViewWeapon.SwordView;
 import game.data.GameDataCombat;
 import model.Block;
 import model.Direction;
+import model.map.XY;
 import model.monster.Enemy;
 
  /**
@@ -229,13 +230,21 @@ public record GameView(int width, int height, int grid_size) {
    */
   private static void drawMap(ApplicationContext context, GameData data) {
   	ScreenInfo screenInfo = context.getScreenInfo();
-  	int size = data.map().grid_size();  	
+  	var size = data.bag().grid_size() / 1;  	
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 11; j++) {
 	    	final int fi = i;
 	    	final int fj = j;
 			  context.renderFrame(graphics -> {
-			  	graphics.setColor(Color.GRAY);
+			  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
+			  		case 'S' -> graphics.setColor(Color.YELLOW);
+			  		case 'O' -> graphics.setColor(Color.RED);
+			  		case 'T' -> graphics.setColor(Color.PINK);
+			  		case 'H' -> graphics.setColor(Color.GREEN);
+			  		case '$' -> graphics.setColor(Color.BLUE);
+			  		case 'E' -> graphics.setColor(Color.CYAN);
+			  		default ->  graphics.setColor(Color.GRAY);
+			  	}			  	
 			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * fj), 
 										        							  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * fi), 
 			    																			size, size));
@@ -246,6 +255,26 @@ public record GameView(int width, int height, int grid_size) {
 			  });
       }
 		}
+		
+		// A RETIRER QUAND ON AURA FINIT DE CRER LES MAPS
+		for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 11; j++) {
+	    	final int fi = i;
+	    	final int fj = j;
+			  context.renderFrame(graphics -> {
+			  	IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
+			  	graphics.setColor(Color.ORANGE);
+			  	for (var coord : data.map().getGrid()[fi][fj].get_accessible()) {
+			  		graphics.drawLine((int) ((screenInfo.width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
+								(int) ((screenInfo.height()/ 5.5) - 2.5* size + (size * coord.y() + size/2)), 
+								(int) ((screenInfo.width() / 2) - 5.5 * size + (size * fj) + size/2), 
+								(int) ((screenInfo.height()/ 5.5) - 2.5* size + (size * fi) + size/2));
+			  	}
+			  
+			  });
+      }
+		}
+		///////////////////////////////////
   }
   
 	/**

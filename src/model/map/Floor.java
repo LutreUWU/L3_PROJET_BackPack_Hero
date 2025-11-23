@@ -1,58 +1,134 @@
 package model.map;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import model.monster.Enemy;
+
 public class Floor {
-	/**
-	 * - Backpack
-	 * - grid_size
-	 * - All items in the bag
-	 */
-	private int[][] map = {
-	    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-	    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	};
-	private int grid_size;	
 	
-	/**
-	 * Register the grid size of each tile in the backpack
-	 * 
-	 * @param gridSize
-	 */
-	public Floor(int gridSize) {
-		grid_size = gridSize;
-	}
+	private final int ROW = 11;
+  private final int LINE = 5;
 	
-	/**
-	 * Return the grid of the map.
-	 * 
-	 * @return int[][] 
-	 */
-	public int[][] grid(){
-		return map;
-	}
+	private Room[][] grid = new Room[LINE][ROW];
 	
-	/**
-	 * Return the size of a grid map
-	 * 
-	 * @return Int
-	 */
-	public int grid_size(){
-		return grid_size;
-	}
-	
-	/**
-	 * Create the map depending of the floor level
-	 * 
-	 * @param floor
-	 */
-	public void create_floor(int floor) {
-		// TO DO
-		
-		// Quelques indications :
-		// - Dans chaque floor, on a des marchands, guerisseurs ... ne les oublies pas
-		// - Plus on monte dans les étages, plus le nombre d'ennemi augmente,
-		// J'ai plus d'autres idées bonne chance mdr
-	}
+	// Count of each room
+	private final int SHOP_COUNT = 1;
+  private final int TREASURE_COUNT = 2;
+  private final int EXIT_COUNT = 1;
+  private final int ENEMY_COUNT = 3;
+  private final int HEALER_COUNT = 1;
+  
+  public Floor(int floor) {
+  	generateFloor(floor);
+  }
+  
+  
+  public Floor generateFloor(int floor) {
+  	Room start = createAllRoom(1);
+  	return null;
+  }
+  
+  private void addAcc(List<XY> listacc, int x, int y) {
+  	if (x > 0) listacc.add(new XY(x - 1, y));
+  	if (y > 0) listacc.add(new XY(x, y - 1));
+  	if (x < ROW - 1) listacc.add(new XY(x + 1, y));
+  	if (y < LINE - 1) listacc.add(new XY(x, y + 1));
+  }
+  
+  /**
+   * Put all accessible room
+   */
+  public void createAndRandomAccessible() {
+  	for (int i = 0; i < LINE; i++) {
+  		for (int j = 0; j < ROW; j++) {
+  			List<XY> listacc = new ArrayList<>();
+  			addAcc(listacc, j, i);
+  			Collections.shuffle(listacc);
+  			grid[i][j].setAccessible(listacc);
+  		}
+  	}
+  }
+  
+  /**
+   * Create All Room
+   * @param floor
+   * @return Starter Room
+   */
+  private Room createAllRoom(int floor) {
+  	List<XY> list1 = createXYList();
+  	List<XY> list2 = shuffleList(list1);
+  	createSpecialRoom(list2, 1);
+  	for (int i = 0; i < LINE; i++) {
+  		for (int j = 0; j < ROW; j++) {
+  			if (grid[i][j] == null) {
+  				grid[i][j] = new Room(null, null, null, null, false, false);
+  			}
+  		}
+  	}
+  	return grid[list2.get(8).y()][list2.get(8).x()];
+  }
+  
+  /**
+   * Create all special room
+   * @param list
+   * @param floor
+   */
+  private void createSpecialRoom(List<XY> list, int floor) {
+  	grid[list.get(0).y()][list.get(0).x()] = new Room(null, null, new Shop(floor), null, false, false); // Create shop
+  	grid[list.get(1).y()][list.get(1).x()] = new Room(null, new Treasure(floor), null, null, false, false); // Create treasure
+  	grid[list.get(2).y()][list.get(2).x()] = new Room(null, new Treasure(floor), null, null, false, false); // Create treasure
+  	grid[list.get(3).y()][list.get(3).x()] = new Room(null, null, null, null, true, false); // Create exit
+  	grid[list.get(4).y()][list.get(4).x()] = new Room(createEnemyList(floor), null, null, null, false, false); // Create Enemy
+  	grid[list.get(5).y()][list.get(5).x()] = new Room(createEnemyList(floor), null, null, null, false, false); // Create Enemy
+  	grid[list.get(6).y()][list.get(6).x()] = new Room(createEnemyList(floor), null, null, null, false, false); // Create Enemy
+  	grid[list.get(7).y()][list.get(7).x()] = new Room(null, null, null, new Healer(floor), false, false); // Create shop
+  	grid[list.get(8).y()][list.get(8).x()] = new Room(null, null, null, null, false, true); // Create start
+  }
+  
+  public Enemy[] createEnemyList(int floor) {
+  	// Classe a faire quand on aura bien organisé et a mettre dans la classe Enemy
+  	return new Enemy[floor];
+  }
+  
+  /**
+   * @return a list of 55 XY
+   */
+  private List<XY> createXYList() {
+  	List<XY> list = new ArrayList<>();
+  	for (int i = 0; i < ROW; i++) {
+  		for (int j = 0; j < LINE; j++) {
+  			list.add(new XY(i, j));
+  		}
+  	}
+  	return list;
+  }
+  
+  /**
+   * @param list of 55 XY
+   * @return a new list shuffled
+   */
+  private List<XY> shuffleList(List<XY> list) {
+  	List<XY> list2 = new ArrayList<>(list);
+  	Collections.shuffle(list2);
+  	return list2;
+  }
+  
+  public Room[][] getGrid() {
+    return grid;
+}
+  
+  @Override
+  public String toString() {
+  	StringBuilder chaine = new StringBuilder();
+  	for (int i = 0; i < LINE; i++) {
+  		for (int j = 0; j < ROW; j++) {
+  			chaine.append(grid[i][j].letterRoom()).append(" ");
+  		}
+  		chaine.append("\n");
+  	}
+  	return chaine.toString();
+  }
+  
 }

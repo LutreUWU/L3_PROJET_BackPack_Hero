@@ -15,6 +15,7 @@ import game.data.GameDataBackpack;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import game.data.GameDataMap;
+import model.map.Floor;
 import model.monster.Chicken;
 import model.weapon.Sword;
 
