@@ -235,16 +235,21 @@ public record GameView(int width, int height, int grid_size) {
       for (int j = 0; j < 11; j++) {
 	    	final int fi = i;
 	    	final int fj = j;
+	    	
 			  context.renderFrame(graphics -> {
-			  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
-			  		case 'S' -> graphics.setColor(Color.YELLOW);
-			  		case 'O' -> graphics.setColor(Color.RED);
-			  		case 'T' -> graphics.setColor(Color.PINK);
-			  		case 'H' -> graphics.setColor(Color.GREEN);
-			  		case '$' -> graphics.setColor(Color.BLUE);
-			  		case 'E' -> graphics.setColor(Color.CYAN);
-			  		default ->  graphics.setColor(Color.GRAY);
-			  	}			  	
+			  	var coordXY = new XY(fj, fi);
+			  	if (data.map().getHeroVisited().contains(coordXY)) {
+				  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
+				  		case 'S' -> graphics.setColor(Color.YELLOW);
+				  		case 'O' -> graphics.setColor(Color.RED);
+				  		case 'T' -> graphics.setColor(Color.PINK);
+				  		case 'H' -> graphics.setColor(Color.GREEN);
+				  		case '$' -> graphics.setColor(Color.BLUE);
+				  		case 'E' -> graphics.setColor(Color.CYAN);
+				  		default ->  graphics.setColor(Color.GRAY);
+				  	}
+			  	} else if (data.map().getHeroAccessible().contains(coordXY)) graphics.setColor(Color.MAGENTA);
+			  		else graphics.setColor(Color.DARK_GRAY);
 			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * fj), 
 										        							  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * fi), 
 			    																			size, size));

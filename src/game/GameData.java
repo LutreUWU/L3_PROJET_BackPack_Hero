@@ -1,4 +1,5 @@
 package game;
+import java.util.HashSet;
 import java.util.Map;
 
 import com.github.forax.zen.ScreenInfo;
@@ -7,6 +8,7 @@ import model.Backpack;
 import model.Hero;
 import model.Object;
 import model.map.Floor;
+import model.map.Room;
 
  /**
  * The SimpleGameData class stores all relevant pieces of information for the

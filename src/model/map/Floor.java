@@ -21,25 +21,27 @@ public class Floor {
   private final int ENEMY_COUNT = 3;
   private final int HEALER_COUNT = 1;
   
+  final private HashSet<XY> hero_visited = new HashSet<>();
+  final private HashSet<XY> hero_accessible = new HashSet<>();
+  
   public Floor(int floor) {
   	generateFloor(floor);
   }
   
- 
-  
-  
   public void generateFloor(int floor) {
   	XY start = createAllRoom(1);
   	HashSet<XY> visited = new HashSet<>();
+  	hero_visited.add(start);
   	createWay(visited, start);
+  	updateHeroAccessible();
   }
+  
+  
   
   private void createWay(HashSet<XY> visited, XY start) {
     List<XY> accessible = new ArrayList<>(); addAcc(accessible, start.x(), start.y());
     for (var coord : accessible) {
-        if (visited.contains(coord)) {
-           IO.println("We already have : X,Y = (" + coord.x() + ", " + coord.y() + ")");
-        } else {
+        if (!visited.contains(coord)) {
           visited.add(coord);
           grid[start.y()][start.x()].addAccessible(coord);
           grid[coord.y()][coord.x()].addAccessible(start);
@@ -131,9 +133,26 @@ public class Floor {
   	return list2;
   }
   
+  public void updateHeroAccessible() {
+  	hero_accessible.clear();
+  	for (var coord : hero_visited) {
+  		for (var coord_acc : grid[coord.y()][coord.x()].get_accessible()) {
+  			hero_accessible.add(coord_acc);
+  		}
+  	}
+  }
+  
   public Room[][] getGrid() {
     return grid;
-}
+  }
+  
+  public HashSet<XY> getHeroVisited() {
+    return hero_visited;
+  }
+  
+  public HashSet<XY> getHeroAccessible() {
+    return hero_accessible;
+  }
   
   @Override
   public String toString() {
