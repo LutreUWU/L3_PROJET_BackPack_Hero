@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import model.Backpack;
 import model.Block;
-import model.Object;
+import model.Item;
 
  /**
   * The game data with all methods for backpack manipulation. 
@@ -31,7 +31,7 @@ public class GameDataBackpack {
    * @param item Item we wants to check
    * @return true if we can, else false if we can't
    */
-  private static boolean check_place(Object item) {
+  private static boolean check_place(Item item) {
 		if (item == null) {
 		  return false;
 		}
@@ -56,7 +56,7 @@ public class GameDataBackpack {
    * @param item Item we wants to check
    * @return true if we can add it, else false if we can't
    */
-  public static boolean add_ItemToBackpack(Object item) {
+  public static boolean add_ItemToBackpack(Item item) {
     if (item == null) {
       return false;
     }
@@ -77,7 +77,7 @@ public class GameDataBackpack {
    * @param item Item we wants to remove
    * @throws Objects.requireNonNull if item is null
    */
-  public static void remove_itemFromBackpack(Object item) {
+  public static void remove_itemFromBackpack(Item item) {
     Objects.requireNonNull(item);
     var b = item.shape();
     for (var block : b) {
@@ -94,7 +94,7 @@ public class GameDataBackpack {
    * @param addY How many tiles vertically the item wants to move.
    * @return true if it's inside the backpack, else return false
    */
-  private static boolean border_backpack(Object item, int addX, int addY) {
+  private static boolean border_backpack(Item item, int addX, int addY) {
     var b = item.shape();
     for (var block : b) {
       int y = block.y() + addY;
@@ -116,7 +116,7 @@ public class GameDataBackpack {
    * @param addX How many tiles horizontally the item wants to move.
    * @param addY How many tiles vertically the item wants to move.
    */
-  public static void move_item(Object item, int addX, int addY) {
+  public static void move_item(Item item, int addX, int addY) {
     if (item != null && border_backpack(item, addX, addY)) {
       var b = item.shape();
       for (int i = 0; i < b.length; i++) {
@@ -131,7 +131,7 @@ public class GameDataBackpack {
    * 
    * @param item
    */
-  public static void rotate_item(Object item) {
+  public static void rotate_item(Item item) {
     if (item != null) {
       item.rotateXY(backpack);
     }

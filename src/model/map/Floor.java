@@ -23,9 +23,12 @@ public class Floor {
   
   final private HashSet<XY> hero_visited = new HashSet<>();
   final private HashSet<XY> hero_accessible = new HashSet<>();
+  final private XY hero_pos;
+
   
   public Floor(int floor) {
-  	generateFloor(floor);
+		generateFloor(floor);
+		this.hero_pos = hero_visited.stream().findFirst().get();
   }
   
   public void generateFloor(int floor) {
@@ -152,6 +155,10 @@ public class Floor {
   
   public HashSet<XY> getHeroAccessible() {
     return hero_accessible;
+  }
+  
+  public XY get_heroPos() {
+  	return hero_pos;
   }
   
   @Override

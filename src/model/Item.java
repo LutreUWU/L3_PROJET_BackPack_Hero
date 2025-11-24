@@ -8,7 +8,7 @@ import model.monster.Enemy;
  * 
  * They all have the same rotate function, but we put here to avoid copy paste in every function.
  */
-public interface Object {
+public interface Item {
 	Block[] shape();
   int id();
 	void setXY(int x, int y);

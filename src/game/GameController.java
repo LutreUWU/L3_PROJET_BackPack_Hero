@@ -61,15 +61,19 @@ public class GameController {
 		    var res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y(), context.getScreenInfo());
 		    var click = res.entrySet().iterator().next();
 		    if(!(click.getKey().equals("Nothing"))) {
+		    	if(click.getKey().equals("MapOrBag")) {
+		    		if (!GameDataCombat.combat() && data.weapon() == null) {
+		    			data.swapMapOrBag();
+		    		}
+		    	}
 		    	if(data.mapOrBag() && click.getKey().equals("Bag")) {
 			    	if (GameDataCombat.combat()) { 
 				    	GameDataCombat.hero_action(data, click.getValue());
 				    }
 			    }
-		    	if(click.getKey().equals("MapOrBag")) {
-		    		if (!GameDataCombat.combat() && data.weapon() == null) {
-		    			data.swapMapOrBag();
-		    		}
+		    	else if (click.getKey().equals("Map")) {
+		    		// res.get("Map") renvoie un XY() des cases qu'on a cliqué
+		    		IO.println(res.get("Map")); // A retirer
 		    	}
 		    }
 		    GameView.draw(context, data);

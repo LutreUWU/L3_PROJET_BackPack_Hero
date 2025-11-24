@@ -267,7 +267,7 @@ public record GameView(int width, int height, int grid_size) {
 	    	final int fi = i;
 	    	final int fj = j;
 			  context.renderFrame(graphics -> {
-			  	IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
+			  	// IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
 			  	graphics.setColor(Color.ORANGE);
 			  	for (var coord : data.map().getGrid()[fi][fj].get_accessible()) {
 			  		graphics.drawLine((int) ((screenInfo.width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
@@ -279,6 +279,14 @@ public record GameView(int width, int height, int grid_size) {
 			  });
       }
 		}
+		
+		context.renderFrame(graphics -> {
+			graphics.setColor(Color.WHITE);
+			var coord = data.map().get_heroPos();
+	    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * coord.x()) + size/4, 
+																			  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * coord.y()) + size/4, 
+																						size/2, size/2));
+		});
 		///////////////////////////////////
   }
   

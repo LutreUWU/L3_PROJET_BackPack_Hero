@@ -68,18 +68,6 @@ public class BlockItem {
 	}
 	
 	/**
-	 * Return the size of an item.
-	 * 
-	 * @return length of the item
-	 */
-	public int length() {
-		/* Return the size of an item.
-		 * 
-		 */
-		return b.length;
-	}
-	
-	/**
 	 * Return the shape of the item
 	 * 
 	 * @return list of Block where each Block is the coordinate (x, y) of one tile.	

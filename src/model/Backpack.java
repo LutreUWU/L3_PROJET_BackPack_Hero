@@ -17,7 +17,7 @@ public class Backpack {
 											    {-2, -2, -1, -1, -1, -2, -2}
 											};
 	private int grid_size;
-	private ArrayList<Object> items_list = new ArrayList<>(); // List of items I have (Index = ID)
+	private ArrayList<Item> items_list = new ArrayList<>(); // List of items I have (Index = ID)
 	
 	/**
 	 * Register the grid size of each tile in the backpack
@@ -42,7 +42,7 @@ public class Backpack {
 	 * 
 	 * @return ArrayList<Item_Object>
 	 */
-	public ArrayList<Object> item_lst(){
+	public ArrayList<Item> item_lst(){
 		return items_list;
 	}
 	

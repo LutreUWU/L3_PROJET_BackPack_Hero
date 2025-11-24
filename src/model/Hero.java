@@ -1,5 +1,9 @@
 package model;
 
+import java.util.Objects;
+
+import model.map.XY;
+
 public class Hero {
   // Statistics of the hero
 	private int max_HP = 40;
@@ -12,10 +16,10 @@ public class Hero {
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;
+	
 	// For graphic interface
 	private int size_x = 150;
 	private int size_y = (int) (size_x * 1.2);
-	
 	
 	
 	private int MAX_XP() {
@@ -25,6 +29,10 @@ public class Hero {
 	//==============================
   //   METHODS FOR ATTRIBUTES
   //==============================
+	
+	public void setPos(XY coord) {
+		Objects.requireNonNull(coord);
+	}
 	
 	public void add(String string, int value) {
 		/**
@@ -72,6 +80,7 @@ public class Hero {
 		current_armor = 0;
 		
 	}
+	
 	
 	
 	// Getter

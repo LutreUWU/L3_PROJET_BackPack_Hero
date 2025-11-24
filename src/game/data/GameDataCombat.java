@@ -8,7 +8,7 @@ import com.github.forax.zen.ApplicationContext;
 
 import game.GameData;
 import game.GameView;
-import model.Object;
+import model.Item;
 import model.monster.Enemy;
 
 /**
@@ -50,13 +50,13 @@ public class GameDataCombat {
 	 * This methods take an ID in parameter, it will checks in the bag if a weapon correspond to the ID, then it we'll use it.
 	 * 
 	 * @param data		The data of the game.
-	 * @param id			The ID of the item we click in the backpack.
+	 * @param object			The ID of the item we click in the backpack.
 	 */
-	public static void hero_action(GameData data, int id) {
+	public static void hero_action(GameData data, Object object) {
 		Objects.requireNonNull(data);
 		Enemy targetEnemy = lst_enemy.get(target); 
-		Optional<Object> weapon = data.bag().item_lst().stream()
-																											 .filter(item -> item.id() == id)
+		Optional<Item> weapon = data.bag().item_lst().stream()
+																											 .filter(item -> item.id() == (int) object)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
 			item.use(targetEnemy);

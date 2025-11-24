@@ -1,14 +1,14 @@
 package game;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.github.forax.zen.ScreenInfo;
 
 import model.Backpack;
 import model.Hero;
-import model.Object;
+import model.Item;
 import model.map.Floor;
-import model.map.Room;
+import model.map.XY;
 
  /**
  * The SimpleGameData class stores all relevant pieces of information for the
@@ -28,14 +28,14 @@ public class GameData {
    * To know if we're adding an item.
    * null if we're not adding.
    */
-  private Object weapon = null; 
+  private Item weapon = null; 
   /**
    * To know if we display map or bag
    * 
    * - false : map
    * - true : bag
    */
-  private static boolean mapOrBag = true;
+  private static boolean mapOrBag = false;
   
   /**
    * Initialize data of the game 
@@ -61,7 +61,7 @@ public class GameData {
   private static int bag_click(int x, int y, ScreenInfo screenInfo) {
   	int grid_size = backpack.grid_size();
   	double left_grid = (screenInfo.width() / 2) - 3.5 * grid_size;
-  	double up_grid = (screenInfo.height() / 3.5) - 2.5 * grid_size;
+  	double up_grid = (screenInfo.height() / 4.5) - 2.5 * grid_size;
   	if(x < left_grid || x > (left_grid + 7 * grid_size) ||
   		 y < up_grid   || y > (up_grid + 5 * grid_size)
   		) {
@@ -70,6 +70,27 @@ public class GameData {
   	int new_x = (int) (x - left_grid) / grid_size;
   	int new_y = (int) (y - up_grid) / grid_size;
   	return backpack.grid()[new_y][new_x];
+  }
+  
+  /**
+   * Methods to check if we click inside the map
+   * @param x					 Coordinate x we click
+   * @param y 				 Coordinate y we click
+   * @param screenInfo Width and Height of the screen
+   * 
+   */
+  private static XY map_click(int x, int y, ScreenInfo screenInfo) {
+  	int grid_size = backpack.grid_size();
+  	double left_grid = (screenInfo.width() / 2) - 5.5 * grid_size;
+  	double up_grid = (screenInfo.height() / 5.5) - 2.5 * grid_size;
+  	if(x < left_grid || x > (left_grid + 7 * grid_size) ||
+   		 y < up_grid   || y > (up_grid + 5 * grid_size)
+   		) {
+   		return new XY(-1, -1);
+   	}
+  	int new_x = (int) (x - left_grid) / grid_size;
+  	int new_y = (int) (y - up_grid) / grid_size;
+  	return new XY(new_x, new_y);
   }
   
   /**
@@ -99,17 +120,20 @@ public class GameData {
    * 
    * @return Map<String, Integer> String give the information of what we clicks, Integer that can be usefull dependent on what we click
    */
-  public static Map<String, Integer> item_click(int x, int y, ScreenInfo screenInfo) {
+  public static Map<String, Object> item_click(int x, int y, ScreenInfo screenInfo) {
   	// Here we add other click info
-  	Map<String, Integer> res = null;
+  	Map<String, Object> res = new HashMap<>();
   	if (bag_click(x, y, screenInfo) != 0) { // If we click the bag
-  		res = Map.of("Bag", bag_click(x, y, screenInfo)) ;
+  		res.put("Bag", bag_click(x, y, screenInfo));
+  	}
+  	else if (map_click(x, y, screenInfo).x() != -1) {
+  		res.put("Map", map_click(x, y, screenInfo));
   	}
   	else if (mapOrBag_click(x, y, screenInfo) != 0) {
-  		res = Map.of("MapOrBag", 1);
+  		res.put("MapOrBag", 1);
   	}
   	else {
-  		res = Map.of("Nothing", 0);
+  		res.put("Nothing", 0);
   	}
   	return res;
   }
@@ -138,7 +162,7 @@ public class GameData {
    * 
    * @return Item_Object weapon
    */
-  public Object weapon() {
+  public Item weapon() {
     return weapon;
   }
   
@@ -158,7 +182,7 @@ public class GameData {
    * 
    * @param item
    */
-  public void setWeapon(Object item) {
+  public void setWeapon(Item item) {
     this.weapon = item;
   }
   

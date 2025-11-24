@@ -23,7 +23,6 @@ public class Room {
     this.healer = healer;
     this.exit = exit;
     this.start = start;
-
     if (!isValide()) throw new IllegalArgumentException("Room must have exactly one type");
 	}
 	
