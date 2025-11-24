@@ -62,6 +62,9 @@ public class GameData {
   	int grid_size = backpack.grid_size();
   	double left_grid = (screenInfo.width() / 2) - 3.5 * grid_size;
   	double up_grid = (screenInfo.height() / 4.5) - 2.5 * grid_size;
+  	if (mapOrBag == false) {
+  	  return 0;
+  	}
   	if(x < left_grid || x > (left_grid + 7 * grid_size) ||
   		 y < up_grid   || y > (up_grid + 5 * grid_size)
   		) {
@@ -83,7 +86,7 @@ public class GameData {
   	int grid_size = backpack.grid_size();
   	double left_grid = (screenInfo.width() / 2) - 5.5 * grid_size;
   	double up_grid = (screenInfo.height() / 5.5) - 2.5 * grid_size;
-  	if(x < left_grid || x > (left_grid + 7 * grid_size) ||
+  	if(x < left_grid || x > (left_grid + 11 * grid_size) ||
    		 y < up_grid   || y > (up_grid + 5 * grid_size)
    		) {
    		return new XY(-1, -1);

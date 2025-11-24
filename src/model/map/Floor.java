@@ -23,25 +23,27 @@ public class Floor {
   
   final private HashSet<XY> hero_visited = new HashSet<>();
   final private HashSet<XY> hero_accessible = new HashSet<>();
-  final private XY hero_pos;
+  private XY hero_pos;
 
   
   public Floor(int floor) {
-		generateFloor(floor);
-		this.hero_pos = hero_visited.stream().findFirst().get();
-  }
-  
-  public void generateFloor(int floor) {
   	XY start = createAllRoom(1);
   	HashSet<XY> visited = new HashSet<>();
   	hero_visited.add(start);
   	createWay(visited, start);
+  	hero_pos = start;
   	updateHeroAccessible();
   }
-  
-  
-  
-  private void createWay(HashSet<XY> visited, XY start) {
+
+
+	public void setHero_pos(XY hero_pos) {
+		this.hero_pos = hero_pos;
+	}
+
+
+
+
+	private void createWay(HashSet<XY> visited, XY start) {
     List<XY> accessible = new ArrayList<>(); addAcc(accessible, start.x(), start.y());
     for (var coord : accessible) {
         if (!visited.contains(coord)) {
@@ -147,6 +149,10 @@ public class Floor {
   
   public Room[][] getGrid() {
     return grid;
+  }
+  
+  public void addHeroVisited(XY coord) {
+  	hero_visited.add(coord);
   }
   
   public HashSet<XY> getHeroVisited() {

@@ -16,6 +16,7 @@ import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import game.data.GameDataMap;
 import model.map.Floor;
+import model.map.XY;
 import model.monster.Chicken;
 import model.weapon.Sword;
 
@@ -73,7 +74,21 @@ public class GameController {
 			    }
 		    	else if (click.getKey().equals("Map")) {
 		    		// res.get("Map") renvoie un XY() des cases qu'on a cliqué
-		    		IO.println(res.get("Map")); // A retirer
+		    		var coord = (XY) res.get("Map");
+		    		if (data.map().getHeroVisited().contains(coord)) {
+		    			data.map().setHero_pos(coord);
+		    			IO.println("VISITED");
+		    		} else if (data.map().getHeroAccessible().contains(coord)) {
+		    			data.map().setHero_pos(coord);
+		    			data.map().addHeroVisited(coord);
+		    			data.map().updateHeroAccessible();
+		    			IO.println("ACCESSIBLE");
+		    		} else {
+		    			IO.println(data.map().get_heroPos());
+		    			IO.println(data.map().getHeroAccessible());
+		    			IO.println(data.map().getHeroVisited());
+		    		}
+		    		
 		    	}
 		    }
 		    GameView.draw(context, data);
