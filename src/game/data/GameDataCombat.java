@@ -89,13 +89,7 @@ public class GameDataCombat {
 		return combat;
 	}
 	
-	/**
-	 * Methods to refresh the graphic interface, we call it here since we needs the lst_enemy
-	 * 
-	 * @param context
-	 * @param data
-	 */
-	public static void refreshCombatDraw(ApplicationContext context, GameData data) {
-		GameView.update_combat(context, data, lst_enemy);
+	public static ArrayList<Enemy> lst_enemy(){
+		return lst_enemy;
 	}
 }

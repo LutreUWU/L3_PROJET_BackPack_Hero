@@ -1,5 +1,6 @@
 package game.ViewWeapon;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -21,23 +22,20 @@ import model.Direction;
  * @param y		  Position y of the center of the item.
  *
  */
-public record SwordView(ApplicationContext context, GameData data, Direction direction, int x, int y) {/**
+public record SwordView(Graphics2D graphics, GameData data, Direction direction, int x, int y) {/**
 	 * Draw a Sword using library.
 	 * 
 	 */
 	public void draw(){
 		int size = data.bag().grid_size();
-		var screenInfo = context.getScreenInfo();
-		context.renderFrame(graphics -> {
-			BufferedImage img = null;
-			try {
-				img = ImageIO.read(new File("data/weapon/sword.png"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			GameView.drawElement(graphics, img, screenInfo.width() / 2 - 3.5 * size + (size * x),
-																				screenInfo.height()/4.5 - 2.5*size + (size * (y - 1)), 
-																				size, size * 3, direction);
-		});
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("data/weapon/sword.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		GameView.drawElement(graphics, img, data.screenInfo().width() / 2 - 3.5 * size + (size * x),
+																			data.screenInfo().height()/4.5 - 2.5*size + (size * (y - 1)), 
+																			size, size * 3, direction);
 	}
 }

@@ -14,7 +14,6 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 
 import com.github.forax.zen.ApplicationContext;
-import com.github.forax.zen.ScreenInfo;
 
 import game.ViewWeapon.SwordView;
 import game.data.GameDataCombat;
@@ -50,39 +49,36 @@ public record GameView(int width, int height, int grid_size) {
    * @param context Which window to draw
    * @param data	  Data of the game
    */	
-  private static void drawGrid(ApplicationContext context, GameData data) {
-    var screenInfo = context.getScreenInfo();
+  private static void drawGrid(Graphics2D graphics, GameData data) {
     int size = data.bag().grid_size();
 		int [][] grid = data.bag().grid();
-		context.renderFrame(graphics -> {
-			BufferedImage img = null;
-			try {
-				img = ImageIO.read(new File("data/bag.png"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			drawElement(graphics, img, screenInfo.width() * 0.5 - size * 4.5, 10, size * 9, size * 6, Direction.UP);
-			for (int i = 0; i < 5; i++) {
-	      for (int j = 0; j < 7; j++) {
-		    	final int fi = i;
-		    	final int fj = j;				  
-		    		// TO DO (David) : instead of rectangle, change image of the grid
-				  	if (grid[fi][fj] >= -1) {
-				  		graphics.setColor(Color.GRAY);
-				  		graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * size + (size * fj), 
-																					    	   (screenInfo.height()/4.5) - 2.5*size + (size * fi), 
-																										size, size));
-				  		graphics.setColor(Color.BLACK);
-				  	}
-				  	if (grid[fi][fj] == -2) {
-				  		graphics.setColor(Color.RED);
-				  	}
-				    graphics.draw(new Rectangle2D.Double((screenInfo.width() / 2) - 3.5 * size + (size * fj), 
-																				    	   (screenInfo.height()/4.5) - 2.5*size + (size * fi), 
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("data/bag.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		drawElement(graphics, img, data.screenInfo().width() * 0.5 - size * 4.5, 10, size * 9, size * 6, Direction.UP);
+		for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 7; j++) {
+	    	final int fi = i;
+	    	final int fj = j;				  
+	    		// TO DO (David) : instead of rectangle, change image of the grid
+			  	if (grid[fi][fj] >= -1) {
+			  		graphics.setColor(Color.GRAY);
+			  		graphics.fill(new Rectangle2D.Double((data.screenInfo().width() / 2) - 3.5 * size + (size * fj), 
+																				    	   (data.screenInfo().height()/4.5) - 2.5*size + (size * fi), 
 																									size, size));
-				}
-	    }
-		});
+			  		graphics.setColor(Color.BLACK);
+			  	}
+			  	if (grid[fi][fj] == -2) {
+			  		graphics.setColor(Color.RED);
+			  	}
+			    graphics.draw(new Rectangle2D.Double((data.screenInfo().width() / 2) - 3.5 * size + (size * fj), 
+																			    	   (data.screenInfo().height()/4.5) - 2.5*size + (size * fi), 
+																								size, size));
+			}
+    }
   }
   
   /**
@@ -91,12 +87,12 @@ public record GameView(int width, int height, int grid_size) {
    * @param context Which window to draw
    * @param data	  Data of the game
    */
-  private static void drawItemBag(ApplicationContext context, GameData data) {
+  private static void drawItemBag(Graphics2D graphics, GameData data) {
 		var item_list = data.bag().item_lst();
 		for (var item : item_list) {
 			Block coordinate = item.shape()[0];
 		  switch (item.id()) {
-				case 1 -> new SwordView(context, data, item.direction(), coordinate.x(), coordinate.y()).draw();
+				case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).draw();
 			  default ->{}
 		  }
 		}
@@ -110,14 +106,14 @@ public record GameView(int width, int height, int grid_size) {
    * @param context {@code ApplicationContext} of the game.
    * @param data	  Data of the game
    */
-  private static void drawWeaponGrid(ApplicationContext context, GameData data) {
+  private static void drawWeaponGrid(Graphics2D graphics, GameData data) {
 		var item = data.weapon();
 		if (item == null) {
 	        return;
 	  }
 		Block coordinate = item.shape()[0];
 	  switch (item.id()) {
-			case 1 -> new SwordView(context, data, item.direction(), coordinate.x(), coordinate.y()).draw();
+			case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).draw();
 		  default ->{}
 	  }
   }
@@ -148,20 +144,17 @@ public record GameView(int width, int height, int grid_size) {
    * @param context {@code ApplicationContext} of the game.
    * @param data    GameData containing the game data. 
    */
-  private static void drawHero(ApplicationContext context, GameData data) {
-  	var screenInfo = context.getScreenInfo();
+  private static void drawHero(Graphics2D graphics, GameData data) {
   	double size_x = data.hero().getSizeX();
   	double size_y = data.hero().getSizeY();
-  	context.renderFrame(graphics -> {
-  		BufferedImage img = null;
-			try {
-				img = ImageIO.read(new File("data/Roland.png"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			drawElement(graphics, img, screenInfo.width() * 0.20, screenInfo.height() * 0.50, size_x, size_y, Direction.UP);
-			drawHeroStats(graphics, data, (int) (screenInfo.width() * 0.20 + size_x/2),  (int) (screenInfo.height() * 0.50 + size_y));
-  	});	
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("data/Roland.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		drawElement(graphics, img, data.screenInfo().width() * 0.20, data.screenInfo().height() * 0.50, size_x, size_y, Direction.UP);
+		drawHeroStats(graphics, data, (int) (data.screenInfo().width() * 0.20 + size_x/2),  (int) (data.screenInfo().height() * 0.50 + size_y));
   }
   
   /**
@@ -189,20 +182,17 @@ public record GameView(int width, int height, int grid_size) {
    * @param data    GameData containing the game data. 
    * @param enemy 	Data of the enemy.
    */
-  private static void drawEnemy(ApplicationContext context, GameData data, Enemy enemy) {
-  	var screenInfo = context.getScreenInfo();
+  private static void drawEnemy(Graphics2D graphics, GameData data, Enemy enemy) {
   	double size_x = data.hero().getSizeX() * enemy.getSize();
   	double size_y = data.hero().getSizeY() * enemy.getSize();
-  	context.renderFrame(graphics -> {
-			BufferedImage img = null;
-			try {
-				img = ImageIO.read(new File(enemy.getUrl()));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			drawElement(graphics, img, screenInfo.width() * 0.80 - size_x, screenInfo.height() * 0.5 + (data.hero().getSizeY() - size_y), size_x, size_y, Direction.UP);
-  		drawEnemyStats(graphics, enemy, (int) (screenInfo.width() * 0.75 - size_x), (int) (screenInfo.height() * 0.5 + data.hero().getSizeY()));
-  	});
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File(enemy.getUrl()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		drawElement(graphics, img, data.screenInfo().width() * 0.80 - size_x, data.screenInfo().height() * 0.5 + (data.hero().getSizeY() - size_y), size_x, size_y, Direction.UP);
+		drawEnemyStats(graphics, enemy, (int) (data.screenInfo().width() * 0.75 - size_x), (int) (data.screenInfo().height() * 0.5 + data.hero().getSizeY()));
   	
   }
 	
@@ -212,14 +202,11 @@ public record GameView(int width, int height, int grid_size) {
    * @param context		{@code ApplicationContext} of the game.
    * @param data			GameData containing the game data. 
    */
-  private static void drawButton(ApplicationContext context, GameData data) {
-  	ScreenInfo screenInfo = context.getScreenInfo();
-  	context.renderFrame(graphics -> {
-  		graphics.setColor(Color.RED);  		
-  		graphics.setColor(data.mapOrBag() ? Color.ORANGE : Color.CYAN);
-	    graphics.fill(new Rectangle2D.Double(screenInfo.width() - data.bag().grid_size() / 2, screenInfo.height()/3.5 - 2.5*data.bag().grid_size(), 
-	    																		 data.bag().grid_size() / 2,data.bag().grid_size() / 2));
-  	});
+  private static void drawButton(Graphics2D graphics, GameData data) {
+		graphics.setColor(Color.RED);  		
+		graphics.setColor(data.mapOrBag() ? Color.ORANGE : Color.CYAN);
+    graphics.fill(new Rectangle2D.Double(data.screenInfo().width() - data.bag().grid_size() / 2, data.screenInfo().height()/3.5 - 2.5*data.bag().grid_size(), 
+    																		 data.bag().grid_size() / 2,data.bag().grid_size() / 2));
   }
   
   /**
@@ -228,65 +215,53 @@ public record GameView(int width, int height, int grid_size) {
    * @param context		{@code ApplicationContext} of the game.
    * @param data			GameData containing the game data. 
    */
-  private static void drawMap(ApplicationContext context, GameData data) {
-  	ScreenInfo screenInfo = context.getScreenInfo();
-  	var size = data.bag().grid_size() / 1;  	
+  private static void drawMap(Graphics2D graphics, GameData data) {
+  	var size = data.bag().grid_size();  	
+  	var gap = size * 0.1;
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 11; j++) {
 	    	final int fi = i;
 	    	final int fj = j;
-	    	
-			  context.renderFrame(graphics -> {
-			  	var coordXY = new XY(fj, fi);
-			  	if (data.map().getHeroVisited().contains(coordXY)) {
-				  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
-				  		case 'S' -> graphics.setColor(Color.YELLOW);
-				  		case 'O' -> graphics.setColor(Color.RED);
-				  		case 'T' -> graphics.setColor(Color.PINK);
-				  		case 'H' -> graphics.setColor(Color.GREEN);
-				  		case '$' -> graphics.setColor(Color.BLUE);
-				  		case 'E' -> graphics.setColor(Color.CYAN);
-				  		default ->  graphics.setColor(Color.GRAY);
-				  	}
-			  	} else if (data.map().getHeroAccessible().contains(coordXY)) graphics.setColor(Color.MAGENTA);
-			  		else graphics.setColor(Color.DARK_GRAY);
-			    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * fj), 
-										        							  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * fi), 
-			    																			size, size));
-			    graphics.setColor(Color.BLACK);
-			    graphics.draw(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * fj), 
-																					  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * fi), 
-																								size, size));
-			  });
+		  	var coordXY = new XY(fj, fi);
+		  	if (data.map().getHeroVisited().contains(coordXY)) {
+			  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
+			  		case 'S' -> graphics.setColor(Color.YELLOW);
+			  		case 'O' -> graphics.setColor(Color.RED);
+			  		case 'T' -> graphics.setColor(Color.PINK);
+			  		case 'H' -> graphics.setColor(Color.GREEN);
+			  		case '$' -> graphics.setColor(Color.BLUE);
+			  		case 'E' -> graphics.setColor(Color.CYAN);
+			  		default ->  graphics.setColor(Color.GRAY);
+			  	}
+		  	} else if (data.map().getHeroAccessible().contains(coordXY)) graphics.setColor(Color.MAGENTA);
+		  		else graphics.setColor(Color.DARK_GRAY);
+		    graphics.fill(new Rectangle2D.Double((gap * fj) + (data.screenInfo().width() / 2) - 5.5 * size + (size * fj), 
+		    																		 (gap * fi) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi), 
+		    																			size, size));
+		    graphics.setColor(Color.BLACK);
+		    graphics.draw(new Rectangle2D.Double((gap * fj) + (data.screenInfo().width() / 2) - 5.5 * size + (size * fj), 
+		    																		 (gap * fi) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi), 
+																							size, size));
       }
 		}
 		
 		// A RETIRER QUAND ON AURA FINIT DE CRER LES MAPS
-		for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 11; j++) {
-	    	final int fi = i;
-	    	final int fj = j;
-			  context.renderFrame(graphics -> {
-			  	// IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
-			  	graphics.setColor(Color.ORANGE);
-			  	for (var coord : data.map().getGrid()[fi][fj].get_accessible()) {
-			  		graphics.drawLine((int) ((screenInfo.width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
-								(int) ((screenInfo.height()/ 5.5) - 2.5* size + (size * coord.y() + size/2)), 
-								(int) ((screenInfo.width() / 2) - 5.5 * size + (size * fj) + size/2), 
-								(int) ((screenInfo.height()/ 5.5) - 2.5* size + (size * fi) + size/2));
-			  	}
-			  
-			  });
-      }
-		}
+		// IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
+  	graphics.setColor(Color.ORANGE);
+  	for (var coord : data.map().getHeroVisited()) {
+  		for (var coord_acc : data.map().getGrid()[coord.y()][coord.x()].get_accessible()) {
+  			graphics.drawLine((int) ((gap * coord.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
+													(int) ((gap * coord.y()) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y() + size/2)), 
+													(int) ((gap * coord_acc.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord_acc.x()) + size/2), 
+													(int) ((gap * coord_acc.y()) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord_acc.y()) + size/2));
+  		}
+  	}
 		
-		context.renderFrame(graphics -> {
-			graphics.setColor(Color.WHITE);
-			var coord = data.map().get_heroPos();
-	    graphics.fill(new Rectangle2D.Double((screenInfo.width() / 2) - 5.5 * size + (size * coord.x()) + size/4, 
-																			  	 (screenInfo.height()/ 5.5) - 2.5* size + (size * coord.y()) + size/4, 
-																						size/2, size/2));
-		});
+		graphics.setColor(Color.WHITE);
+		var coord = data.map().get_heroPos();
+    graphics.fill(new Rectangle2D.Double(((gap * coord.x()) + data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x()) + size/4, 
+																		  	 ((gap * coord.y()) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y()) + size/4, 
+																					size/2, size/2));
 		///////////////////////////////////
   }
   
@@ -296,22 +271,19 @@ public record GameView(int width, int height, int grid_size) {
    * @param context		{@code ApplicationContext} of the game.
    * @param data			GameData containing the game data. 
 	 */
-	private static void drawBG(ApplicationContext context, GameData data) {
-		context.renderFrame(graphics -> {
-	    // Put a background, FAIRE LA FONCTIION POUR INSERER UNE IMG
-	    ScreenInfo screenInfo = context.getScreenInfo();
-			BufferedImage img = null;
-			try {
-				img = ImageIO.read(new File("data/BG/BG1.png"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			var width = img.getWidth();
-			var height = img.getHeight();
-			double scale = Math.max(width / screenInfo.width(), height / screenInfo.height());
-			var transform = new AffineTransform(scale, 0, 0, scale, (screenInfo.width() - scale * width) / 2, (screenInfo.height() - scale * height) / 2);
-			graphics.drawImage(img, transform, null);
-		});	
+	private static void drawBG(Graphics2D graphics, GameData data) {
+    // Put a background, FAIRE LA FONCTIION POUR INSERER UNE IMG
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(new File("data/BG/BG1.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		var width = img.getWidth();
+		var height = img.getHeight();
+		double scale = Math.max(width / data.screenInfo().width(), height / data.screenInfo().height());
+		var transform = new AffineTransform(scale, 0, 0, scale, (data.screenInfo().width() - scale * width) / 2, (data.screenInfo().height() - scale * height) / 2);
+		graphics.drawImage(img, transform, null);
 	}
 	
 	/**
@@ -348,10 +320,10 @@ public record GameView(int width, int height, int grid_size) {
    * @param graphics {@code ApplicationContext} of the game.
    * @param data     GameData containing the game data.
    */	
-  public static void updateWeaponDraw(ApplicationContext context, GameData data) {
-		Objects.requireNonNull(context);
+  public static void updateWeaponDraw(Graphics2D graphics, GameData data) {
+		Objects.requireNonNull(graphics);
 		Objects.requireNonNull(data);
-		drawWeaponGrid(context, data);
+		drawWeaponGrid(graphics, data);
   }
   
   /**
@@ -361,11 +333,11 @@ public record GameView(int width, int height, int grid_size) {
    * @param data			GameData containing the game data. 
    * @param lst_enemy List of all enemy we fight
    */
-  public static void update_combat(ApplicationContext context, GameData data,  ArrayList<Enemy> lst_enemy) {
-  	Objects.requireNonNull(context);
+  public static void update_combat(Graphics2D graphics, GameData data,  ArrayList<Enemy> lst_enemy) {
+  	Objects.requireNonNull(graphics);
   	Objects.requireNonNull(data);
   	Objects.requireNonNull(lst_enemy);
-  	lst_enemy.forEach(enemy -> drawEnemy(context, data, enemy));
+  	lst_enemy.forEach(enemy -> drawEnemy(graphics, data, enemy));
   }
   
   /**
@@ -377,19 +349,23 @@ public record GameView(int width, int height, int grid_size) {
   public static void draw(ApplicationContext context, GameData data) {
 		Objects.requireNonNull(context);
 		Objects.requireNonNull(data);
-		drawBG(context, data);
-		if (data.mapOrBag()) {
-			drawGrid(context, data);
-			drawItemBag(context, data);
-		} else {
-			drawMap(context, data);
-		}
-		
-		drawHero(context, data);
-		drawButton(context, data);
-		// Draw enemy if we're in combat
-		if (GameDataCombat.combat()) {
-			GameDataCombat.refreshCombatDraw(context, data);;
-		}
+		context.renderFrame(graphics -> {
+			drawBG(graphics, data);
+			if (data.mapOrBag()) {
+				drawGrid(graphics, data);
+				drawItemBag(graphics, data);
+				if (data.weapon() != null) {
+	  	    GameView.updateWeaponDraw(graphics, data);
+			  }
+			} else {
+				drawMap(graphics, data);
+			}
+			drawHero(graphics, data);
+			drawButton(graphics, data);
+			// Draw enemy if we're in combat
+			if (GameDataCombat.combat()) {
+				update_combat(graphics, data, GameDataCombat.lst_enemy());
+			}
+	  });
   }
 }

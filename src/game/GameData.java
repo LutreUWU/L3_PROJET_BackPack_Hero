@@ -4,6 +4,9 @@ import java.util.Map;
 
 import com.github.forax.zen.ScreenInfo;
 
+import game.data.GameDataBackpack;
+import game.data.GameDataHero;
+import game.data.GameDataMap;
 import model.Backpack;
 import model.Hero;
 import model.Item;
@@ -24,6 +27,7 @@ public class GameData {
   private static Floor map;
   private static Hero hero;
   private static int floor;
+  private static ScreenInfo screenInfo;
   /**
    * To know if we're adding an item.
    * null if we're not adding.
@@ -42,23 +46,26 @@ public class GameData {
    * 
    * @param gridSize size of the grid in the backpack
    */
-  public GameData(int height) {
-	  backpack = new Backpack(height);
+  public GameData(ScreenInfo screenInfo_) {
+	  backpack = new Backpack(screenInfo_.height());
 	  hero = new Hero(); 
 	  floor = 1;
 	  map = new Floor(floor);
+	  screenInfo = screenInfo_;
+	  new GameDataBackpack(backpack);
+    new GameDataHero(hero);
+    new GameDataMap(map);
 	}
   
   /**
    * Methods to check if we click inside the bag
    * @param x					 Coordinate x we click
    * @param y 				 Coordinate y we click
-   * @param screenInfo Width and Height of the screen
    * 
    * @return -2 if we click a lock case, -1 if we click a free case else, ID of the weapon
    * 				  0 if we click outside of the bag.
    */
-  private static int bag_click(int x, int y, ScreenInfo screenInfo) {
+  private static int bag_click(int x, int y) {
   	int grid_size = backpack.grid_size();
   	double left_grid = (screenInfo.width() / 2) - 3.5 * grid_size;
   	double up_grid = (screenInfo.height() / 4.5) - 2.5 * grid_size;
@@ -75,25 +82,76 @@ public class GameData {
   	return backpack.grid()[new_y][new_x];
   }
   
+  
+  /**
+   * Check the column of the the clicked position inside the grid
+   * 
+   * <p>The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.</br>
+   * This method determines in which row the y-coordinate of a mouse click falls.</p>
+   * 
+	 * @param left_grid The x-coordinate of the top of the grid.
+	 * @param grid_size The height of each grid cell.
+	 * @param gap       The horizontal gap between two grid cells.
+	 * @param x         The x-coordinate of the click.
+
+	 * @return The column index (0 to 11), or -1 if the click is outside the grid cells.
+   */
+  private static int check_mapXclick(double left_grid, double grid_size, double gap, int x) {
+  	double positionX = left_grid;
+  	int newX = -1;
+  	for (var i = 0; i < 11; i++) {
+  		if (positionX <= x && x <= positionX + grid_size) {
+  			newX = i;
+  			break;
+  		}
+  		positionX += gap + grid_size;
+  	}
+  	return newX;
+  }
+  
+  /**
+   * Check the row of the the clicked position inside the grid
+   * 
+   * <p>The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.</br>
+   * This method determines in which row the y-coordinate of a mouse click falls.</p>
+   * 
+	 * @param y         The y-coordinate of the click.
+	 * @param up_grid   The y-coordinate of the top of the grid.
+	 * @param grid_size The height of each grid cell.
+	 * @param gap       The vertical gap between two grid cells.
+	 * 
+	 * @return The row index (0 to 4), or -1 if the click is outside the grid cells.
+   */
+  private static int check_mapYclick(double up_grid, double grid_size, double gap, int y) {
+  	double positionY = up_grid;
+  	int newY = -1;
+  	for (var j = 0; j < 5; j++) {
+  		if (positionY <= y && y <= positionY + grid_size) {
+  			newY = j;
+  			break;
+  		}
+  		positionY += gap + grid_size;
+  	}  	
+  	return newY;
+  }
+  
   /**
    * Methods to check if we click inside the map
+   * 
    * @param x					 Coordinate x we click
    * @param y 				 Coordinate y we click
-   * @param screenInfo Width and Height of the screen
-   * 
    */
-  private static XY map_click(int x, int y, ScreenInfo screenInfo) {
+  private static XY map_click(int x, int y) {
   	int grid_size = backpack.grid_size();
+  	var gap = grid_size * 0.1;
   	double left_grid = (screenInfo.width() / 2) - 5.5 * grid_size;
   	double up_grid = (screenInfo.height() / 5.5) - 2.5 * grid_size;
-  	if(x < left_grid || x > (left_grid + 11 * grid_size) ||
-   		 y < up_grid   || y > (up_grid + 5 * grid_size)
+  	if(x < left_grid || x > (left_grid + 11 * grid_size + 10 * gap) ||
+   		 y < up_grid   || y > (up_grid + 5 * grid_size + 4 * gap)
    		) {
    		return new XY(-1, -1);
    	}
-  	int new_x = (int) (x - left_grid) / grid_size;
-  	int new_y = (int) (y - up_grid) / grid_size;
-  	return new XY(new_x, new_y);
+  	return new XY(check_mapXclick(left_grid, grid_size, gap, x), check_mapYclick(up_grid, grid_size, gap, y));
   }
   
   /**
@@ -101,11 +159,10 @@ public class GameData {
    * 
    * @param x					 Coordinate x we click
    * @param y 				 Coordinate y we click
-   * @param screenInfo Width and Height of the screen
    * 
    * @return 1 if we click in the button, else 0
    */
-  private static int mapOrBag_click(int x, int y, ScreenInfo screenInfo) {
+  private static int mapOrBag_click(int x, int y) {
   	int grid_size = backpack.grid_size();
   	if (x < screenInfo.width() - grid_size / 2 || x > screenInfo.width() ||
   			y < screenInfo.height()/3.5 - 2.5* grid_size || y > screenInfo.height()/3.5 - 2.5*grid_size + grid_size / 2) {
@@ -119,20 +176,19 @@ public class GameData {
    * 
    * @param x coordinate x of the mouse click
    * @param y coordinate y of the mouse click
-   * @param centerX center of the windows
    * 
    * @return Map<String, Integer> String give the information of what we clicks, Integer that can be usefull dependent on what we click
    */
-  public static Map<String, Object> item_click(int x, int y, ScreenInfo screenInfo) {
+  public static Map<String, Object> item_click(int x, int y) {
   	// Here we add other click info
   	Map<String, Object> res = new HashMap<>();
-  	if (bag_click(x, y, screenInfo) != 0) { // If we click the bag
-  		res.put("Bag", bag_click(x, y, screenInfo));
+  	if (bag_click(x, y) != 0) { // If we click the bag
+  		res.put("Bag", bag_click(x, y));
   	}
-  	else if (map_click(x, y, screenInfo).x() != -1) {
-  		res.put("Map", map_click(x, y, screenInfo));
+  	else if (map_click(x, y).x() != -1) {
+  		res.put("Map", map_click(x, y));
   	}
-  	else if (mapOrBag_click(x, y, screenInfo) != 0) {
+  	else if (mapOrBag_click(x, y) != 0) {
   		res.put("MapOrBag", 1);
   	}
   	else {
@@ -145,8 +201,6 @@ public class GameData {
    * Switch the current value of the var mapOrBag
    * - true : We wants to display Bag
    * - false : We wants to display Map
-   * 
-   * 
    */
   public void swapMapOrBag() {
   	if (mapOrBag) {
@@ -218,5 +272,14 @@ public class GameData {
    */
   public Hero hero() {
     return hero;
+  }
+  
+  /**
+   * Return the width and height of the screen
+   * 
+   * @return
+   */
+  public ScreenInfo screenInfo() {
+    return screenInfo;
   }
 }

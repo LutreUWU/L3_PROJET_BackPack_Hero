@@ -38,7 +38,6 @@ import model.weapon.Sword;
  * 
  * TO DO :
  * - LA MAP ZEBI
- * - Package model is useless, you can erase it
  */
 public class GameController {
   /**
@@ -59,47 +58,39 @@ public class GameController {
 		if (event instanceof PointerEvent pointerEvent) {
 			// If we click down on the screen
 		  if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) { 
-		    var res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y(), context.getScreenInfo());
+		    var res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y());
 		    var click = res.entrySet().iterator().next();
 		    if(!(click.getKey().equals("Nothing"))) {
-		    	if(click.getKey().equals("MapOrBag")) {
-		    		if (!GameDataCombat.combat() && data.weapon() == null) {
-		    			data.swapMapOrBag();
-		    		}
+		    	if(click.getKey().equals("MapOrBag") && (!GameDataCombat.combat() && data.weapon() == null)) {
+		    		data.swapMapOrBag();
 		    	}
-		    	if(data.mapOrBag() && click.getKey().equals("Bag")) {
-			    	if (GameDataCombat.combat()) { 
-				    	GameDataCombat.hero_action(data, click.getValue());
-				    }
+		    	else if(data.mapOrBag() && click.getKey().equals("Bag") && GameDataCombat.combat()) {
+				    GameDataCombat.hero_action(data, click.getValue());
 			    }
 		    	else if (click.getKey().equals("Map")) {
 		    		// res.get("Map") renvoie un XY() des cases qu'on a cliqué
 		    		var coord = (XY) res.get("Map");
 		    		if (data.map().getHeroVisited().contains(coord)) {
 		    			data.map().setHero_pos(coord);
-		    			IO.println("VISITED");
+//		    			IO.println("VISITED");
 		    		} else if (data.map().getHeroAccessible().contains(coord)) {
 		    			data.map().setHero_pos(coord);
 		    			data.map().addHeroVisited(coord);
 		    			data.map().updateHeroAccessible();
-		    			IO.println("ACCESSIBLE");
+//		    			IO.println("ACCESSIBLE");
 		    		} else {
-		    			IO.println(data.map().get_heroPos());
-		    			IO.println(data.map().getHeroAccessible());
-		    			IO.println(data.map().getHeroVisited());
+//		    			IO.println(data.map().get_heroPos());
+//		    			IO.println(data.map().getHeroAccessible());
+//		    			IO.println(data.map().getHeroVisited());
 		    		}
 		    		
 		    	}
 		    }
 		    GameView.draw(context, data);
-		    if (data.weapon() != null) {
-	  	    GameView.updateWeaponDraw(context, data);
-			  }
 		  }
 		}
 		// If event button is pressed 
 		if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
-		  GameView.draw(context, data);
 		  switch(key.key()) {
 		    // A to add a weapon in the bag
 		  	case Key.A ->{ 
@@ -113,7 +104,6 @@ public class GameController {
 		  	case Key.I ->{ 
 		  		if(GameDataCombat.combat() == false) {
 		  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken())) , data);
-			  		GameDataCombat.refreshCombatDraw(context, data);
 		  		}
 		  	}
 				// Moving the selected weapon, do nothing if no weapon is selected
@@ -126,7 +116,6 @@ public class GameController {
 		    case Key.ESCAPE -> {
 				  if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
 						data.setWeapon(null);
-						GameView.draw(context, data);
 				  }
 				}
 				// Leave the game
@@ -135,13 +124,10 @@ public class GameController {
 				}
 				default -> {}
 			}	  
-		  if (data.weapon() != null) {
-  	    GameView.updateWeaponDraw(context, data);
-		  }
+		  GameView.draw(context, data);
 	  }
 		return true;
   }
-  
   /**
    * Sets up the game, then launches the game loop.
    * 
@@ -149,13 +135,8 @@ public class GameController {
    */
   private static void memoryGame(ApplicationContext context) {
     var screenInfo = context.getScreenInfo();
-    var width = screenInfo.width();
-    var height = screenInfo.height();
-    var data = new GameData(height);
-    new GameDataBackpack(data.bag());
-    new GameDataHero(data.hero());
-    new GameDataMap(data.map());
-    GameView.initGameGraphics(width, height, data.bag().grid_size());
+    var data = new GameData(screenInfo);
+    GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().grid_size());
     GameView.draw(context, data);
     while (true) {
       if (!gameLoop(context, data)) {
