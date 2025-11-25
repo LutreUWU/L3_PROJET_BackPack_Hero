@@ -23,6 +23,8 @@ public class Floor {
   
   final private HashSet<XY> hero_visited = new HashSet<>();
   final private HashSet<XY> hero_accessible = new HashSet<>();
+  final private HashSet<XY> hero_visible = new HashSet<>();
+  final private HashSet<XY> hero_visible_for_line = new HashSet<>();
   private XY hero_pos;
 
   
@@ -33,6 +35,7 @@ public class Floor {
   	createWay(visited, start);
   	hero_pos = start;
   	updateHeroAccessible();
+  	updateHeroVisible();
   }
 
 
@@ -138,11 +141,25 @@ public class Floor {
   	return list2;
   }
   
+  public void updateHeroVisible() {
+  	for (var coord : hero_accessible) {
+  		hero_visible.add(coord);
+  		
+  		for (var coord_acc : grid[coord.y()][coord.x()].get_accessible()) {
+  			hero_visible.add(coord_acc);
+  			hero_visible_for_line.add(coord_acc);
+  			for (var coord_acc2 : grid[coord_acc.y()][coord_acc.x()].get_accessible()) {
+  				hero_visible.add(coord_acc2);
+  			}
+  		}
+  	}
+  }
+  
   public void updateHeroAccessible() {
   	hero_accessible.clear();
   	for (var coord : hero_visited) {
   		for (var coord_acc : grid[coord.y()][coord.x()].get_accessible()) {
-  			hero_accessible.add(coord_acc);
+  			if (!hero_visited.contains(coord_acc)) hero_accessible.add(coord_acc);
   		}
   	}
   }
@@ -157,6 +174,14 @@ public class Floor {
   
   public HashSet<XY> getHeroVisited() {
     return hero_visited;
+  }
+  
+  public HashSet<XY> getHeroVisible() {
+    return hero_visible;
+  }
+  
+  public HashSet<XY> getHeroVisibleLine() {
+    return hero_visible_for_line;
   }
   
   public HashSet<XY> getHeroAccessible() {

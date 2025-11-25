@@ -77,6 +77,7 @@ public class GameController {
 		    			data.map().setHero_pos(coord);
 		    			data.map().addHeroVisited(coord);
 		    			data.map().updateHeroAccessible();
+		    			data.map().updateHeroVisible();
 //		    			IO.println("ACCESSIBLE");
 		    		} else {
 //		    			IO.println(data.map().get_heroPos());

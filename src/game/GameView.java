@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -223,7 +224,7 @@ public record GameView(int width, int height, int grid_size) {
 	    	final int fi = i;
 	    	final int fj = j;
 		  	var coordXY = new XY(fj, fi);
-		  	if (data.map().getHeroVisited().contains(coordXY)) {
+		  	if (data.map().getHeroVisible().contains(coordXY)) {
 			  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
 			  		case 'S' -> graphics.setColor(Color.YELLOW);
 			  		case 'O' -> graphics.setColor(Color.RED);
@@ -233,8 +234,7 @@ public record GameView(int width, int height, int grid_size) {
 			  		case 'E' -> graphics.setColor(Color.CYAN);
 			  		default ->  graphics.setColor(Color.GRAY);
 			  	}
-		  	} else if (data.map().getHeroAccessible().contains(coordXY)) graphics.setColor(Color.MAGENTA);
-		  		else graphics.setColor(Color.DARK_GRAY);
+		  	} else graphics.setColor(Color.DARK_GRAY);
 		    graphics.fill(new Rectangle2D.Double((gap * fj) + (data.screenInfo().width() / 2) - 5.5 * size + (size * fj), 
 		    																		 (gap * fi) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi), 
 		    																			size, size));
@@ -242,13 +242,26 @@ public record GameView(int width, int height, int grid_size) {
 		    graphics.draw(new Rectangle2D.Double((gap * fj) + (data.screenInfo().width() / 2) - 5.5 * size + (size * fj), 
 		    																		 (gap * fi) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi), 
 																							size, size));
+		    
+		    if (data.map().getHeroAccessible().contains(coordXY)) {
+		    	IO.println(coordXY);
+		    	graphics.setColor(Color.MAGENTA);
+		      graphics.fill(new Rectangle2D.Double(((gap * fj) + data.screenInfo().width() / 2) - 5.5 * size + (size * fj) + size/4, 
+		  																		  	 ((gap * fi) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi) + size/4, 
+		  																					size/2, size/2));
+		      graphics.draw(new Rectangle2D.Double(((gap * fj) + data.screenInfo().width() / 2) - 5.5 * size + (size * fj) + size/4, 
+					  	 ((gap * fi) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi) + size/4, 
+								size/2, size/2));
+		      IO.println(data.map().getHeroAccessible());
+		    }
       }
 		}
 		
 		// A RETIRER QUAND ON AURA FINIT DE CRER LES MAPS
 		// IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
   	graphics.setColor(Color.ORANGE);
-  	for (var coord : data.map().getHeroVisited()) {
+  	graphics.setStroke(new BasicStroke(5));
+  	for (var coord : data.map().getHeroVisibleLine()) {
   		for (var coord_acc : data.map().getGrid()[coord.y()][coord.x()].get_accessible()) {
   			graphics.drawLine((int) ((gap * coord.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
 													(int) ((gap * coord.y()) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y() + size/2)), 
@@ -275,12 +288,13 @@ public record GameView(int width, int height, int grid_size) {
     // Put a background, FAIRE LA FONCTIION POUR INSERER UNE IMG
 		BufferedImage img = null;
 		try {
-			img = ImageIO.read(new File("data/BG/BG1.png"));
+			img = ImageIO.read(new File("data/BG/BG3.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		var width = img.getWidth();
 		var height = img.getHeight();
+		IO.println(width + "" + height);
 		double scale = Math.max(width / data.screenInfo().width(), height / data.screenInfo().height());
 		var transform = new AffineTransform(scale, 0, 0, scale, (data.screenInfo().width() - scale * width) / 2, (data.screenInfo().height() - scale * height) / 2);
 		graphics.drawImage(img, transform, null);

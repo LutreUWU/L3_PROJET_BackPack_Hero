@@ -5,5 +5,6 @@ public class Shop {
 
   public Shop(int floor) {
       this.floor = floor;
-  }    
+  }
+  
 }
