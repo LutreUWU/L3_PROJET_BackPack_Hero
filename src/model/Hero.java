@@ -2,8 +2,6 @@ package model;
 
 import java.util.Objects;
 
-import model.map.XY;
-
 public class Hero {
   // Statistics of the hero
 	private int max_HP = 40;

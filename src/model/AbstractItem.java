@@ -16,7 +16,34 @@ public abstract class AbstractItem implements Item {
             b[i] = new Block(-1, -1);
         }
     }
+    @Override
+    public int getWidth() {
+      int minX = Integer.MAX_VALUE;
+      int maxX = Integer.MIN_VALUE;
 
+      for (Block block : b) {
+          int x = block.x();
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+      }
+
+      return maxX - minX + 1;
+  }
+
+  @Override
+  public int getHeight() {
+  	int minY = Integer.MAX_VALUE;
+    int maxY = Integer.MIN_VALUE;
+
+    for (Block block : b) {
+        int y = block.y();
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    }
+
+    return maxY - minY + 1;
+  }
+  
   	/**
   	 * Shape of the weapon
   	 * 
@@ -39,19 +66,19 @@ public abstract class AbstractItem implements Item {
   	 * @throws Objects.requireNonNull if bag is null
   	 */
     @Override
-    public void rotateXY(Backpack bag) {
-    	int new_x, new_y;
-  		int cx = b[0].x(), cy = b[0].y();
-  		Block[] b_rotated = b.clone();
-  		for (int i = 0; i < b.length; i++) {
-  			new_x = (int) Math.round(cx + (b[i].x() - cx) * Math.cos(angle) - (b[i].y() - cy) * Math.sin(angle));
-  			new_y = (int) Math.round(cy + (b[i].x() - cx) * Math.sin(angle) + (b[i].y() - cy) * Math.cos(angle));
-  			if (new_x < 0 || new_x > 6 || new_y < 0 || new_y > 4 || bag.grid()[new_y][new_x] == -2) { // -2 = Inaccessible
-  				return;
-  			}
-  			b_rotated[i] = new Block(new_x, new_y);
-  		}
+    public void rotateXY() {
+    	if (b == null || b.length == 0) return;
+      int cx = b[0].x();
+      int cy = b[0].y();
+      for (int i = 0; i < b.length; i++) {
+          int x = b[i].x() - cx;
+          int y = b[i].y() - cy;
+
+          // Rotation 90° clockwise : (x, y) -> (-y, x)
+          int newX = -y;
+          int newY = x;
+          b[i] = new Block(cx + newX, cy + newY);
+      }
   		direction = direction.next();
-  		b = b_rotated;
     }
 }

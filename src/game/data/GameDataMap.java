@@ -27,8 +27,5 @@ public class GameDataMap {
 	 * create the map of the current floor
 	 * 
 	 */
-	public static void create_map(int floor) {
-		map.create_floor();
-	}
 
 }

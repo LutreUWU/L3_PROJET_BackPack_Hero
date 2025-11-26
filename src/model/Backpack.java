@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Backpack {
@@ -17,7 +18,12 @@ public class Backpack {
 											    {-2, -2, -1, -1, -1, -2, -2}
 											};
 	private int grid_size;
-	private ArrayList<Item> items_list = new ArrayList<>(); // List of items I have (Index = ID)
+	private static ArrayList<Item> items_list = new ArrayList<>(); // List of items I have (Index = ID)
+	
+	public Item get_item(int x, int y) {
+		var itemFromBag = items_list.stream().filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
+		return itemFromBag;
+	}
 	
 	/**
 	 * Register the grid size of each tile in the backpack

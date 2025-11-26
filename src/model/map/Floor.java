@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import model.XY;
 import model.monster.Enemy;
 
 public class Floor {

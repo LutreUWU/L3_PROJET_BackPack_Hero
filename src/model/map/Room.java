@@ -3,6 +3,7 @@ package model.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.XY;
 import model.monster.Enemy;
 
 public class Room {

@@ -11,8 +11,10 @@ import model.monster.Enemy;
 public interface Item {
 	Block[] shape();
   int id();
-	void setXY(int x, int y);
-	void rotateXY(Backpack bag);
+	void setXY(XY coord);
+	void rotateXY();
 	void use(Enemy enemy);
 	Direction direction();
+	int getWidth();
+	int getHeight();
 }

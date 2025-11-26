@@ -11,12 +11,12 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 
+import game.data.ClickType;
 import game.data.GameDataBackpack;
+import game.data.GameDataClick;
 import game.data.GameDataCombat;
-import game.data.GameDataHero;
-import game.data.GameDataMap;
-import model.map.Floor;
-import model.map.XY;
+import model.Item;
+import model.XY;
 import model.monster.Chicken;
 import model.weapon.Sword;
 
@@ -58,37 +58,58 @@ public class GameController {
 		if (event instanceof PointerEvent pointerEvent) {
 			// If we click down on the screen
 		  if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) { 
-		    var res = GameData.item_click(pointerEvent.location().x(), pointerEvent.location().y());
-		    var click = res.entrySet().iterator().next();
-		    if(!(click.getKey().equals("Nothing"))) {
-		    	if(click.getKey().equals("MapOrBag") && (!GameDataCombat.combat() && data.weapon() == null)) {
-		    		data.swapMapOrBag();
+		    var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
+		    switch(res.type()) {
+		    	case ITEM -> {
+		    		data.setWeapon((Item) res.value());
+		    		GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+				  	GameDataClick.update_boundingBox(data.weapon(), pointerEvent.location().x(), pointerEvent.location().y());
 		    	}
-		    	else if(data.mapOrBag() && click.getKey().equals("Bag") && GameDataCombat.combat()) {
-				    GameDataCombat.hero_action(data, click.getValue());
-			    }
-		    	else if (click.getKey().equals("Map")) {
-		    		// res.get("Map") renvoie un XY() des cases qu'on a cliqué
-		    		var coord = (XY) res.get("Map");
+		    	case MAP_OR_BAG -> {	
+		    		if (!GameDataCombat.combat() && data.weapon() == null) {
+		    			data.swapMapOrBag();
+		    		}
+		    	}
+		    	case BAG -> {
+		    		if (data.mapOrBag() && GameDataCombat.combat()) {
+		    			GameDataCombat.hero_action(data, (XY) res.value());
+		    		}
+		    	}
+		    	case MAP ->{
+		    		var coord = (XY) res.value();
 		    		if (data.map().getHeroVisited().contains(coord)) {
 		    			data.map().setHero_pos(coord);
-//		    			IO.println("VISITED");
 		    		} else if (data.map().getHeroAccessible().contains(coord)) {
 		    			data.map().setHero_pos(coord);
 		    			data.map().addHeroVisited(coord);
 		    			data.map().updateHeroAccessible();
 		    			data.map().updateHeroVisible();
-//		    			IO.println("ACCESSIBLE");
-		    		} else {
-//		    			IO.println(data.map().get_heroPos());
-//		    			IO.println(data.map().getHeroAccessible());
-//		    			IO.println(data.map().getHeroVisited());
 		    		}
-		    		
 		    	}
-		    }
-		    GameView.draw(context, data);
+		    	default -> {}
+		    }	
 		  }
+		  if (data.weapon() != null && pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
+		  	GameDataClick.move_item(data.weapon(), pointerEvent.location().x(), pointerEvent.location().y());
+		  	GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+		  }
+		  if (data.weapon() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+		  	int x = pointerEvent.location().x();
+		  	int y = pointerEvent.location().y();
+		  	var res = GameDataClick.bag_click(x, y);
+		    if(res.x() != -1) {
+		    	data.weapon().setXY(GameDataClick.bag_click(x, y));
+		    	if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
+						data.remove_itemMap(data.weapon());
+				  }
+		    	else {
+		    		GameDataClick.add_item(data.weapon());
+		    	}
+	    	}
+		    data.setWeapon(null);
+		  }
+		  GameView.draw(context, data);
+		  data.setMouse_coord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));	
 		}
 		// If event button is pressed 
 		if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
@@ -96,9 +117,7 @@ public class GameController {
 		    // A to add a weapon in the bag
 		  	case Key.A ->{ 
 		  	  if (data.weapon() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-		  	    var sword = new Sword();
-		  	    sword.setXY(3, 2); // Center of the item
-		  	    data.setWeapon(sword); 
+		  	    GameDataClick.add_item(new Sword()); 
 		  	  }
 		  	}
 		  	// Start a combat against a RAT
@@ -107,18 +126,13 @@ public class GameController {
 		  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken())) , data);
 		  		}
 		  	}
-				// Moving the selected weapon, do nothing if no weapon is selected
-				case Key.Z -> GameDataBackpack.move_item(data.weapon(), 0, -1);
-				case Key.D -> GameDataBackpack.move_item(data.weapon(), 1, 0);
-				case Key.S -> GameDataBackpack.move_item(data.weapon(), 0, 1);
-				case Key.Q -> GameDataBackpack.move_item(data.weapon(), -1, 0);
-				case Key.R -> GameDataBackpack.rotate_item(data.weapon());
-				// Confirm the placement of the weapon (and check if we can put here)
-		    case Key.ESCAPE -> {
-				  if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
-						data.setWeapon(null);
-				  }
-				}
+		  	
+		  	case Key.R ->{
+		  		if (data.weapon() != null) {
+		  			GameData.rotate_item(data.weapon());
+				  	GameDataClick.update_boundingBox(data.weapon(), data.getMouse_coord().x(), data.getMouse_coord().y());
+		  		}
+		  	}
 				// Leave the game
 				case Key.E -> {
 		      return false;

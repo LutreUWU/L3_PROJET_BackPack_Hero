@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.github.forax.zen.ApplicationContext;
-
 import game.GameData;
-import game.GameView;
 import model.Item;
+import model.XY;
 import model.monster.Enemy;
 
 /**
@@ -19,7 +17,7 @@ import model.monster.Enemy;
  */
 public class GameDataCombat {
 	/**
-	 * - combat : We're in combat, else false
+	 * - combat : True if we're in combat, else false
 	 * - target : Since we can have multiple enemy, target is the enemy we're focusing
 	 * - lst_enemy : List of all enemy we're fighting
 	 */
@@ -52,11 +50,12 @@ public class GameDataCombat {
 	 * @param data		The data of the game.
 	 * @param object			The ID of the item we click in the backpack.
 	 */
-	public static void hero_action(GameData data, Object object) {
+	public static void hero_action(GameData data, XY coord) {
 		Objects.requireNonNull(data);
+		int id = data.bag().grid()[coord.y()][coord.x()];
 		Enemy targetEnemy = lst_enemy.get(target); 
 		Optional<Item> weapon = data.bag().item_lst().stream()
-																											 .filter(item -> item.id() == (int) object)
+																											 .filter(item -> item.id() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
 			item.use(targetEnemy);

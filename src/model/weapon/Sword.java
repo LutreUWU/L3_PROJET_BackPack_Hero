@@ -3,6 +3,8 @@ package model.weapon;
 import game.data.GameDataHero;
 import model.AbstractItem;
 import model.Block;
+import model.Direction;
+import model.XY;
 import model.monster.Enemy;
 
 /**
@@ -19,6 +21,7 @@ public class Sword extends AbstractItem{
 	 */
 	public Sword() {
 		create(3);
+		setXY(new XY(0, 0));
 	}
 	
 	/**
@@ -33,10 +36,18 @@ public class Sword extends AbstractItem{
 	 *  @param x Coordinate X
 	 *  @param y Coordinate Y
 	 */
-	public void setXY(int x, int y) {
-		b[0] = new Block(x, y);
-		b[1] = new Block(x, y - 1);
-		b[2] = new Block(x, y + 1);
+	public void setXY(XY coord) {
+		if (direction() == Direction.UP || direction() == Direction.DOWN) {
+			b[0] = new Block(coord.x(), coord.y());
+			b[1] = new Block(coord.x(), coord.y() - 1);
+			b[2] = new Block(coord.x(), coord.y() + 1);
+		}
+		else {
+			b[0] = new Block(coord.x(), coord.y());
+			b[1] = new Block(coord.x() - 1, coord.y());
+			b[2] = new Block(coord.x() + 1, coord.y());
+		}
+		
 	}
 	
 	/**

@@ -19,9 +19,12 @@ import com.github.forax.zen.ApplicationContext;
 import game.ViewWeapon.SwordView;
 import game.data.GameDataCombat;
 import model.Block;
+import model.BoundingBox;
 import model.Direction;
-import model.map.XY;
+import model.Item;
+import model.XY;
 import model.monster.Enemy;
+import model.weapon.Sword;
 
  /**
   * The SimpleGameView class deals with the display of the game the screen, and
@@ -53,13 +56,7 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawGrid(Graphics2D graphics, GameData data) {
     int size = data.bag().grid_size();
 		int [][] grid = data.bag().grid();
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File("data/bag.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		drawElement(graphics, img, data.screenInfo().width() * 0.5 - size * 4.5, 10, size * 9, size * 6, Direction.UP);
+		drawElement(graphics, data.img_map().get("bag"), data.screenInfo().width() * 0.5 - size * 4.5, 10, size * 9, size * 6, Direction.UP);
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 7; j++) {
 	    	final int fi = i;
@@ -83,6 +80,10 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   /**
+   * 
+   * 
+   */
+  /**
    * Draw all items inside the bag.
    * 
    * @param context Which window to draw
@@ -93,7 +94,7 @@ public record GameView(int width, int height, int grid_size) {
 		for (var item : item_list) {
 			Block coordinate = item.shape()[0];
 		  switch (item.id()) {
-				case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).draw();
+				case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).drawInBag();
 			  default ->{}
 		  }
 		}
@@ -107,17 +108,17 @@ public record GameView(int width, int height, int grid_size) {
    * @param context {@code ApplicationContext} of the game.
    * @param data	  Data of the game
    */
-  private static void drawWeaponGrid(Graphics2D graphics, GameData data) {
-		var item = data.weapon();
-		if (item == null) {
-	        return;
-	  }
-		Block coordinate = item.shape()[0];
-	  switch (item.id()) {
-			case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).draw();
-		  default ->{}
-	  }
-  }
+//  private static void drawWeaponGrid(Graphics2D graphics, GameData data) {
+//		var item = data.weapon();
+//		if (item == null) {
+//	        return;
+//	  }
+//		Block coordinate = item.shape()[0];
+//	  switch (item.id()) {
+//			case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).draw();
+//		  default ->{}
+//	  }
+//  }
 		
   /**
    * Draws all the information about the hero
@@ -244,7 +245,6 @@ public record GameView(int width, int height, int grid_size) {
 																							size, size));
 		    
 		    if (data.map().getHeroAccessible().contains(coordXY)) {
-		    	IO.println(coordXY);
 		    	graphics.setColor(Color.MAGENTA);
 		      graphics.fill(new Rectangle2D.Double(((gap * fj) + data.screenInfo().width() / 2) - 5.5 * size + (size * fj) + size/4, 
 		  																		  	 ((gap * fi) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi) + size/4, 
@@ -252,13 +252,11 @@ public record GameView(int width, int height, int grid_size) {
 		      graphics.draw(new Rectangle2D.Double(((gap * fj) + data.screenInfo().width() / 2) - 5.5 * size + (size * fj) + size/4, 
 					  	 ((gap * fi) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi) + size/4, 
 								size/2, size/2));
-		      IO.println(data.map().getHeroAccessible());
 		    }
       }
 		}
 		
 		// A RETIRER QUAND ON AURA FINIT DE CRER LES MAPS
-		// IO.println("Accessible de coordonnée XY (" + fj + ", " + fi + ") : " + data.map().getGrid()[fi][fj].get_accessible());
   	graphics.setColor(Color.ORANGE);
   	graphics.setStroke(new BasicStroke(5));
   	for (var coord : data.map().getHeroVisibleLine()) {
@@ -286,15 +284,9 @@ public record GameView(int width, int height, int grid_size) {
 	 */
 	private static void drawBG(Graphics2D graphics, GameData data) {
     // Put a background, FAIRE LA FONCTIION POUR INSERER UNE IMG
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File("data/BG/BG3.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		BufferedImage img = data.img_map().get("BG1");
 		var width = img.getWidth();
 		var height = img.getHeight();
-		IO.println(width + "" + height);
 		double scale = Math.max(width / data.screenInfo().width(), height / data.screenInfo().height());
 		var transform = new AffineTransform(scale, 0, 0, scale, (data.screenInfo().width() - scale * width) / 2, (data.screenInfo().height() - scale * height) / 2);
 		graphics.drawImage(img, transform, null);
@@ -304,7 +296,7 @@ public record GameView(int width, int height, int grid_size) {
 	 * Draw an image in the window
 	 * @param graphics	{@code Graphics2D} of the game
 	 * @param img				Image we wants to put
-   * @param x t				The x coordinate of the location in user space where
+   * @param x  				The x coordinate of the location in user space where
    * 									the upper left corner of the image is rendered
    * @param y 				The y coordinate of the location in user space where
    * 									the upper left corner of the image is rendered
@@ -326,7 +318,13 @@ public record GameView(int width, int height, int grid_size) {
 	  transform.translate(-width / 2.0, -height / 2.0);
 	  graphics.drawImage(img, transform, null);
 	}
-
+	
+	public static void drawItem(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
+		switch (item) {
+			case Sword c -> new SwordView(graphics, data, item.direction(), box.northWest().x(), box.northWest().y()).draw();
+			default -> throw new IllegalArgumentException("Unexpected value: " + item);
+		}
+	}
 	
   /**
    * Update the position of the weapon if we move an item
@@ -337,7 +335,8 @@ public record GameView(int width, int height, int grid_size) {
   public static void updateWeaponDraw(Graphics2D graphics, GameData data) {
 		Objects.requireNonNull(graphics);
 		Objects.requireNonNull(data);
-		drawWeaponGrid(graphics, data);
+		data.map_item().forEach((item, box) -> drawItem(graphics, data, item, box));
+		//drawWeaponGrid(graphics, data);
   }
   
   /**
@@ -368,9 +367,9 @@ public record GameView(int width, int height, int grid_size) {
 			if (data.mapOrBag()) {
 				drawGrid(graphics, data);
 				drawItemBag(graphics, data);
-				if (data.weapon() != null) {
-	  	    GameView.updateWeaponDraw(graphics, data);
-			  }
+				if(!data.map_item().isEmpty()) {
+					GameView.updateWeaponDraw(graphics, data);
+				}
 			} else {
 				drawMap(graphics, data);
 			}
