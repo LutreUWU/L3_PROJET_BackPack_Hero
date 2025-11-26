@@ -17,6 +17,7 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.Item;
 import model.XY;
+import model.map.LockedDoor;
 import model.monster.Chicken;
 import model.weapon.Sword;
 
@@ -80,6 +81,15 @@ public class GameController {
 		    		if (data.map().getHeroVisited().contains(coord)) {
 		    			data.map().setHero_pos(coord);
 		    		} else if (data.map().getHeroAccessible().contains(coord)) {
+		    			data.map().setHero_pos(coord);
+		    			data.map().addHeroVisited(coord);
+		    			data.map().updateHeroAccessible();
+		    			data.map().updateHeroVisible();
+		    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
+		    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {
+		    			var unlock_door = (LockedDoor) data.map().getGrid()[coord.y()][coord.x()];
+		    			unlock_door.unlock();
+		    			data.hero().sub("gold", 40);
 		    			data.map().setHero_pos(coord);
 		    			data.map().addHeroVisited(coord);
 		    			data.map().updateHeroAccessible();

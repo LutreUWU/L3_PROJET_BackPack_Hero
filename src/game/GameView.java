@@ -23,6 +23,7 @@ import model.BoundingBox;
 import model.Direction;
 import model.Item;
 import model.XY;
+import model.map.*;
 import model.monster.Enemy;
 import model.weapon.Sword;
 
@@ -131,13 +132,14 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawHeroStats(Graphics2D graphics, GameData data, int x, int y) {
   	int size = 14;
     Font font = new Font("Arial", Font.PLAIN, size);
-    graphics.setColor(Color.WHITE);
+    graphics.setColor(Color.BLUE);
 		graphics.setFont(font);
 	  graphics.drawString("PV : " + data.hero().getHP() + "/" + data.hero().getMax_HP(), x,	y + size);
 	  graphics.drawString("SHIELD : " + String.valueOf(data.hero().getCurrent_protection()), x,	y + size*2);
 	  graphics.drawString("AP : " + String.valueOf(data.hero().getEnergy_point()), x,	y + size*3);
 	  graphics.drawString("MANA : " + String.valueOf(data.hero().getMana_point()), x,	y + size*4);
 	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()) + "/" + String.valueOf(10 + ((data.hero().getLevel() - 1) * 2)), x,	y + size*5);
+	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size*6);
   }
   
   /**
@@ -226,13 +228,15 @@ public record GameView(int width, int height, int grid_size) {
 	    	final int fj = j;
 		  	var coordXY = new XY(fj, fi);
 		  	if (data.map().getHeroVisible().contains(coordXY)) {
-			  	switch(data.map().getGrid()[fi][fj].letterRoom()) {
-			  		case 'S' -> graphics.setColor(Color.YELLOW);
-			  		case 'O' -> graphics.setColor(Color.RED);
-			  		case 'T' -> graphics.setColor(Color.PINK);
-			  		case 'H' -> graphics.setColor(Color.GREEN);
-			  		case '$' -> graphics.setColor(Color.BLUE);
-			  		case 'E' -> graphics.setColor(Color.CYAN);
+			  	switch(data.map().getGrid()[fi][fj]) {
+			  		case Shop s -> graphics.setColor(Color.YELLOW);
+			  		case EnemyRoom o -> graphics.setColor(Color.RED);
+			  		case EventRoom e -> graphics.setColor(Color.PINK);
+			  		case Healer h -> graphics.setColor(Color.GREEN);
+			  		case Start start -> graphics.setColor(Color.BLUE);
+			  		case Exit exit -> graphics.setColor(Color.CYAN);
+			  		case LockedDoor l -> graphics.setColor(Color.BLACK);
+			  		case Treasure t -> graphics.setColor(Color.LIGHT_GRAY);
 			  		default ->  graphics.setColor(Color.GRAY);
 			  	}
 		  	} else graphics.setColor(Color.DARK_GRAY);

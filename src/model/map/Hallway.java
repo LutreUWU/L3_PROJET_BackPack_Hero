@@ -5,13 +5,8 @@ import java.util.List;
 
 import model.XY;
 
-public class Healer implements Room {
-	int floor;
+public class Hallway implements Room {
 	private List<XY> accessible = new ArrayList<>();
-
-	public Healer(int floor) {
-		this.floor = floor;
-	}
 	
 	public List<XY> get_accessible(){
 		return accessible;

@@ -1,7 +1,7 @@
 package model;
 
 public class Gold {
-	private int gold = 0;
+	private int gold = 30;
 	
 	public int getGold() {
 		return gold;

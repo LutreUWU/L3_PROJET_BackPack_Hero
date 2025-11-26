@@ -5,11 +5,11 @@ import java.util.List;
 
 import model.XY;
 
-public class Treasure implements Room {
-  int floor;
-  private List<XY> accessible = new ArrayList<>();
+public class EnemyRoom implements Room {
+	int floor;
+	private List<XY> accessible = new ArrayList<>();
 
-  public Treasure(int floor) {
+  public EnemyRoom(int floor) {
       this.floor = floor;
   }
   

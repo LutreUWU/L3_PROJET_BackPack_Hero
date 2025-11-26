@@ -5,11 +5,11 @@ import java.util.List;
 
 import model.XY;
 
-public class Healer implements Room {
+public class Start implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
-
-	public Healer(int floor) {
+	
+	public Start(int floor) {
 		this.floor = floor;
 	}
 	

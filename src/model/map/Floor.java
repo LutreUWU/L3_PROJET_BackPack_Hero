@@ -14,19 +14,13 @@ public class Floor {
   private final int LINE = 5;
 	
 	private Room[][] grid = new Room[LINE][ROW];
-	
-	// Count of each room
-	private final int SHOP_COUNT = 1;
-  private final int TREASURE_COUNT = 2;
-  private final int EXIT_COUNT = 1;
-  private final int ENEMY_COUNT = 3;
-  private final int HEALER_COUNT = 1;
   
   final private HashSet<XY> hero_visited = new HashSet<>();
   final private HashSet<XY> hero_accessible = new HashSet<>();
   final private HashSet<XY> hero_visible = new HashSet<>();
   final private HashSet<XY> hero_visible_for_line = new HashSet<>();
   private XY hero_pos;
+  
 
   
   public Floor(int floor) {
@@ -90,7 +84,7 @@ public class Floor {
   	for (int i = 0; i < LINE; i++) {
   		for (int j = 0; j < ROW; j++) {
   			if (grid[i][j] == null) {
-  				grid[i][j] = new Room(null, null, null, null, false, false);
+  				grid[i][j] = new Hallway();
   			}
   		}
   	}
@@ -103,15 +97,16 @@ public class Floor {
    * @param floor
    */
   private void createSpecialRoom(List<XY> list, int floor) {
-  	grid[list.get(0).y()][list.get(0).x()] = new Room(null, null, new Shop(floor), null, false, false); // Create shop
-  	grid[list.get(1).y()][list.get(1).x()] = new Room(null, new Treasure(floor), null, null, false, false); // Create treasure
-  	grid[list.get(2).y()][list.get(2).x()] = new Room(null, new Treasure(floor), null, null, false, false); // Create treasure
-  	grid[list.get(3).y()][list.get(3).x()] = new Room(null, null, null, null, true, false); // Create exit
-  	grid[list.get(4).y()][list.get(4).x()] = new Room(createEnemyList(floor), null, null, null, false, false); // Create Enemy
-  	grid[list.get(5).y()][list.get(5).x()] = new Room(createEnemyList(floor), null, null, null, false, false); // Create Enemy
-  	grid[list.get(6).y()][list.get(6).x()] = new Room(createEnemyList(floor), null, null, null, false, false); // Create Enemy
-  	grid[list.get(7).y()][list.get(7).x()] = new Room(null, null, null, new Healer(floor), false, false); // Create shop
-  	grid[list.get(8).y()][list.get(8).x()] = new Room(null, null, null, null, false, true); // Create start
+  	grid[list.get(0).y()][list.get(0).x()] = new Shop(floor); // Create shop
+  	grid[list.get(1).y()][list.get(1).x()] = new Treasure(floor); // Create treasure
+  	grid[list.get(2).y()][list.get(2).x()] = new Treasure(floor); // Create treasure
+  	grid[list.get(3).y()][list.get(3).x()] = new Exit(floor); // Create exit
+  	grid[list.get(4).y()][list.get(4).x()] = new EnemyRoom(floor); // Create Enemy
+  	grid[list.get(5).y()][list.get(5).x()] = new EnemyRoom(floor); // Create Enemy
+  	grid[list.get(6).y()][list.get(6).x()] = new EnemyRoom(floor); // Create Enemy
+  	grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
+  	grid[list.get(8).y()][list.get(8).x()] = new Start(floor); // Create start
+  	grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor
   }
   
   public Enemy[] createEnemyList(int floor) {
@@ -160,7 +155,14 @@ public class Floor {
   	hero_accessible.clear();
   	for (var coord : hero_visited) {
   		for (var coord_acc : grid[coord.y()][coord.x()].get_accessible()) {
-  			if (!hero_visited.contains(coord_acc)) hero_accessible.add(coord_acc);
+  			if (!hero_visited.contains(coord_acc)) {
+  				var maybe_locked = grid[coord_acc.y()][coord_acc.x()];
+  				if (maybe_locked instanceof LockedDoor) {
+    				var room_maybe_locked = (LockedDoor) maybe_locked;
+    				if (room_maybe_locked.getLock()) continue;
+    			}
+  				hero_accessible.add(coord_acc);
+  			}
   		}
   	}
   }
@@ -192,17 +194,4 @@ public class Floor {
   public XY get_heroPos() {
   	return hero_pos;
   }
-  
-  @Override
-  public String toString() {
-  	StringBuilder chaine = new StringBuilder();
-  	for (int i = 0; i < LINE; i++) {
-  		for (int j = 0; j < ROW; j++) {
-  			chaine.append(grid[i][j].letterRoom()).append(" ");
-  		}
-  		chaine.append("\n");
-  	}
-  	return chaine.toString();
-  }
-  
 }
