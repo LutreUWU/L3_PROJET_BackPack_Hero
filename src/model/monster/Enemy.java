@@ -44,15 +44,15 @@ public interface Enemy {
 	 * 
 	 * @return (String) path 
 	 */
-	String getUrl();
+	String getImg();
 	
 	/**
 	 * Get the size of the enemy
 	 * 
 	 * @return (int) enemy
 	 */
-	double getSize();
-	
+	double getSizeX();
+	double getSizeY();
 	/**
 	 * Get the XP drop by the enemy
 	 * 

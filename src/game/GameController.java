@@ -1,6 +1,7 @@
 package game;
 
 import java.awt.Color;
+import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,14 +12,15 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 
-import game.data.ClickType;
 import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.Item;
 import model.XY;
+import model.map.EnemyRoom;
 import model.map.LockedDoor;
 import model.monster.Chicken;
+import model.monster.Soldat;
 import model.weapon.Sword;
 
 /**
@@ -62,12 +64,12 @@ public class GameController {
 		    var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
 		    switch(res.type()) {
 		    	case ITEM -> {
-		    		data.setWeapon((Item) res.value());
+		    		data.setDragItem((Item) res.value());
 		    		GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-				  	GameDataClick.update_boundingBox(data.weapon(), pointerEvent.location().x(), pointerEvent.location().y());
+				  	GameDataClick.update_boundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 		    	}
 		    	case MAP_OR_BAG -> {	
-		    		if (!GameDataCombat.combat() && data.weapon() == null) {
+		    		if (!GameDataCombat.combat() && data.dragItem() == null) {
 		    			data.swapMapOrBag();
 		    		}
 		    	}
@@ -80,11 +82,17 @@ public class GameController {
 		    		var coord = (XY) res.value();
 		    		if (data.map().getHeroVisited().contains(coord)) {
 		    			data.map().setHero_pos(coord);
+		    			
 		    		} else if (data.map().getHeroAccessible().contains(coord)) {
 		    			data.map().setHero_pos(coord);
 		    			data.map().addHeroVisited(coord);
 		    			data.map().updateHeroAccessible();
 		    			data.map().updateHeroVisible();
+		    			var coordHero = new XY(data.map().get_heroPos().x(), data.map().get_heroPos().y());
+		    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EnemyRoom) {
+		    				data.swapMapOrBag();
+				  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
+		    			}
 		    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
 		    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {
 		    			var unlock_door = (LockedDoor) data.map().getGrid()[coord.y()][coord.x()];
@@ -99,24 +107,24 @@ public class GameController {
 		    	default -> {}
 		    }	
 		  }
-		  if (data.weapon() != null && pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
-		  	GameDataClick.move_item(data.weapon(), pointerEvent.location().x(), pointerEvent.location().y());
+		  if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
+		  	GameDataClick.move_item(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 		  	GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
 		  }
-		  if (data.weapon() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+		  if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
 		  	int x = pointerEvent.location().x();
 		  	int y = pointerEvent.location().y();
 		  	var res = GameDataClick.bag_click(x, y);
 		    if(res.x() != -1) {
-		    	data.weapon().setXY(GameDataClick.bag_click(x, y));
-		    	if(GameDataBackpack.add_ItemToBackpack(data.weapon())){
-						data.remove_itemMap(data.weapon());
+		    	data.dragItem().setXY(GameDataClick.bag_click(x, y));
+		    	if(GameDataBackpack.add_ItemToBackpack(data.dragItem())){
+						data.remove_itemMap(data.dragItem());
 				  }
 		    	else {
-		    		GameDataClick.add_item(data.weapon());
+		    		GameDataClick.add_item(data.dragItem());
 		    	}
 	    	}
-		    data.setWeapon(null);
+		    data.setDragItem(null);
 		  }
 		  GameView.draw(context, data);
 		  data.setMouse_coord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));	
@@ -126,21 +134,21 @@ public class GameController {
 		  switch(key.key()) {
 		    // A to add a weapon in the bag
 		  	case Key.A ->{ 
-		  	  if (data.weapon() == null && !GameDataCombat.combat() && data.mapOrBag()) {
+		  	  if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 		  	    GameDataClick.add_item(new Sword()); 
 		  	  }
 		  	}
 		  	// Start a combat against a RAT
 		  	case Key.I ->{ 
 		  		if(GameDataCombat.combat() == false) {
-		  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken())) , data);
+		  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())), data);
 		  		}
 		  	}
 		  	
 		  	case Key.R ->{
-		  		if (data.weapon() != null) {
-		  			GameData.rotate_item(data.weapon());
-				  	GameDataClick.update_boundingBox(data.weapon(), data.getMouse_coord().x(), data.getMouse_coord().y());
+		  		if (data.dragItem() != null) {
+		  			GameData.rotate_item(data.dragItem());
+				  	GameDataClick.update_boundingBox(data.dragItem(), data.getMouse_coord().x(), data.getMouse_coord().y());
 		  		}
 		  	}
 				// Leave the game

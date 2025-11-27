@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.XY;
+import model.monster.Chicken;
+import model.monster.Enemy;
 
 public class EnemyRoom implements Room {
 	int floor;
+	
 	private List<XY> accessible = new ArrayList<>();
 
   public EnemyRoom(int floor) {
@@ -20,4 +23,5 @@ public class EnemyRoom implements Room {
 	public void addAccessible(XY coord){
 		accessible.add(coord);
 	}
+	
 }

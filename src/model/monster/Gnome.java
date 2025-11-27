@@ -8,7 +8,7 @@ import game.data.GameDataHero;
 /**
  * Class of a Chicken
  */
-public class Chicken implements Enemy{
+public class Gnome implements Enemy{
 	/**
 	 * - HP :				 	When it reach 0, the enemy die
 	 * - Shield : 		Can mitigate damage received
@@ -16,15 +16,15 @@ public class Chicken implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
-	private int HP = 20;
+	private int HP = 15;
 	private int shield = 0;
 	private int xp = 4;
-	private List<String> lst_attack = List.of("Morsure", "Protection");
+	private List<String> lst_attack = List.of("Slash", "Abattage");
 	private String action;
 	// For graphism
-	private String img = "chicken";
-	private double sizeX = 0.8;
-	private double sizeY = 0.4;
+	private String img = "gnome";
+	private double sizeX = 1;
+	private double sizeY = 0.8;
 
 	
 	/**
@@ -45,8 +45,11 @@ public class Chicken implements Enemy{
 	@Override
 	public void action() {
 		switch(action) {
-			case "Morsure" -> GameDataHero.sub("HP", 3);
-			case "Protection" -> shield += 2;
+			case "Slash" -> GameDataHero.sub("HP", 5);
+			case "Abattage" -> {
+				GameDataHero.sub("HP", 10);
+				this.subHP(3);
+				}
 		}
 		pre_action();
 	}

@@ -41,7 +41,7 @@ public class GameData {
    * To know if we're adding an item.
    * null if we're not adding.
    */
-  private Item weapon = null; 
+  private Item dragItem = null; 
   /**
    * To know if we display map or bag
    * 
@@ -103,12 +103,12 @@ public class GameData {
   // ============
   
   /**
-   * Return the weapon we wants to move / add
+   * Return the weapon we drags
    * 
    * @return Item_Object weapon
    */
-  public Item weapon() {
-    return weapon;
+  public Item dragItem() {
+    return dragItem;
   }
   
   /**
@@ -127,8 +127,8 @@ public class GameData {
    * 
    * @param item
    */
-  public void setWeapon(Item item) {
-    this.weapon = item;
+  public void setDragItem(Item item) {
+    this.dragItem = item;
   }
   
   /**

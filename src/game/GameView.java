@@ -160,46 +160,7 @@ public record GameView(int width, int height, int grid_size) {
 		drawElement(graphics, img, data.screenInfo().width() * 0.20, data.screenInfo().height() * 0.50, size_x, size_y, Direction.UP);
 		drawHeroStats(graphics, data, (int) (data.screenInfo().width() * 0.20 + size_x/2),  (int) (data.screenInfo().height() * 0.50 + size_y));
   }
-  
-  /**
-   * Draws all the information about the enemy
-   * 
-   * @param graphics {@code Graphics2D} object for drawing.
-   * @param enemy 	 Data of the enemy.
-   * @param x				 Coordinate x where we wants to draw.
-   * @param y				 Coordinate y where we wants to draw.
-   */
-  private static void drawEnemyStats(Graphics2D graphics, Enemy enemy, int x, int y) {
-  	int size = 14;
-    Font font = new Font("Arial", Font.PLAIN, size);
-    graphics.setColor(Color.WHITE);
-		graphics.setFont(font);
-	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
-	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
-	  graphics.drawString("NEXT ATK : " + String.valueOf(enemy.getAction()), x,	y + size * 3);
-  }
-  
-  /**
-   * Draws the enemy in the windows
-   * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data    GameData containing the game data. 
-   * @param enemy 	Data of the enemy.
-   */
-  private static void drawEnemy(Graphics2D graphics, GameData data, Enemy enemy) {
-  	double size_x = data.hero().getSizeX() * enemy.getSize();
-  	double size_y = data.hero().getSizeY() * enemy.getSize();
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File(enemy.getUrl()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		drawElement(graphics, img, data.screenInfo().width() * 0.80 - size_x, data.screenInfo().height() * 0.5 + (data.hero().getSizeY() - size_y), size_x, size_y, Direction.UP);
-		drawEnemyStats(graphics, enemy, (int) (data.screenInfo().width() * 0.75 - size_x), (int) (data.screenInfo().height() * 0.5 + data.hero().getSizeY()));
-  	
-  }
-	
+
   /**
    * Draw the button for switching between map and bag
    * 
@@ -287,7 +248,10 @@ public record GameView(int width, int height, int grid_size) {
    * @param data			GameData containing the game data. 
 	 */
 	private static void drawBG(Graphics2D graphics, GameData data) {
-    // Put a background, FAIRE LA FONCTIION POUR INSERER UNE IMG
+    // A ENLEVER
+		graphics.setColor(Color.GRAY);
+		graphics.fill(new Rectangle2D.Double(0, 0, data.screenInfo().width(), data.screenInfo().height()));
+		/////////////
 		BufferedImage img = data.img_map().get("BG1");
 		var width = img.getWidth();
 		var height = img.getHeight();
@@ -336,11 +300,47 @@ public record GameView(int width, int height, int grid_size) {
    * @param graphics {@code ApplicationContext} of the game.
    * @param data     GameData containing the game data.
    */	
-  public static void updateWeaponDraw(Graphics2D graphics, GameData data) {
+  public static void updateDragItem(Graphics2D graphics, GameData data) {
 		Objects.requireNonNull(graphics);
 		Objects.requireNonNull(data);
 		data.map_item().forEach((item, box) -> drawItem(graphics, data, item, box));
 		//drawWeaponGrid(graphics, data);
+  }
+  
+  
+  
+  /**
+   * Draws all the information about the enemy
+   * 
+   * @param graphics {@code Graphics2D} object for drawing.
+   * @param enemy 	 Data of the enemy.
+   * @param x				 Coordinate x where we wants to draw.
+   * @param y				 Coordinate y where we wants to draw.
+   */
+  private static void drawEnemyStats(Graphics2D graphics, Enemy enemy, int x, int y) {
+  	int size = 14;
+    Font font = new Font("Arial", Font.PLAIN, size);
+    graphics.setColor(Color.WHITE);
+		graphics.setFont(font);
+	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
+	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
+	  graphics.drawString("ACTION : " + String.valueOf(enemy.getAction()), x,	y + size * 3);
+  }
+  
+  /**
+   * Draws the enemy in the windows
+   * 
+   * @param context {@code ApplicationContext} of the game.
+   * @param data    GameData containing the game data. 
+   * @param enemy 	Data of the enemy.
+   */
+  private static void drawEnemy(Graphics2D graphics, GameData data, Enemy enemy, int nb, int ind) {
+  	double size_x = data.hero().getSizeX() * enemy.getSizeX();
+  	double size_y = data.hero().getSizeY() * enemy.getSizeY();
+  	double NW_x =  data.screenInfo().width() * 0.80 - data.hero().getSizeX() + (ind - (nb - 1) / 2.0) * data.hero().getSizeX() ;
+  	double NW_y =  data.screenInfo().height() * (0.5 - (0.1 * (ind%2))) + (data.hero().getSizeY() - size_y);
+		drawElement(graphics, data.img_map().get(enemy.getImg()), NW_x, NW_y, size_x, size_y, Direction.UP);
+		drawEnemyStats(graphics, enemy, (int) NW_x, (int) (NW_y + size_y));
   }
   
   /**
@@ -354,7 +354,10 @@ public record GameView(int width, int height, int grid_size) {
   	Objects.requireNonNull(graphics);
   	Objects.requireNonNull(data);
   	Objects.requireNonNull(lst_enemy);
-  	lst_enemy.forEach(enemy -> drawEnemy(graphics, data, enemy));
+  	for (int i = 0; i < lst_enemy.size(); i++) {
+  		var enemy = lst_enemy.get(i);
+  		drawEnemy(graphics, data, enemy, lst_enemy.size(), i);
+  	}
   }
   
   /**
@@ -372,7 +375,7 @@ public record GameView(int width, int height, int grid_size) {
 				drawGrid(graphics, data);
 				drawItemBag(graphics, data);
 				if(!data.map_item().isEmpty()) {
-					GameView.updateWeaponDraw(graphics, data);
+					GameView.updateDragItem(graphics, data);
 				}
 			} else {
 				drawMap(graphics, data);
