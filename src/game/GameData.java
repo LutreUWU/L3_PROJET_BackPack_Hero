@@ -67,7 +67,7 @@ public class GameData {
 	  backpack = new Backpack(screenInfo_.height());
 	  hero = new Hero(); 
 	  floor = 1;
-	  map = new Floor(floor);
+	  map = new Floor(floor, hero);
 	  screenInfo = screenInfo_;
 	  itemAdd = new LinkedHashMap<>();
 	  img_map = ImageLoader.load_image();

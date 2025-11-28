@@ -22,10 +22,27 @@ public class NodeEvent {
 		choice2 = new_choice2;
 	}
 	
-	public void setConseqeunce(Consequence c) {
+	public NodeEvent getChoice1() {
+		return choice1;
+	}
+	
+	public NodeEvent getChoice2() {
+		return choice2;
+	}
+	
+	public void setConsequence(Consequence c) {
 		consequence = c;
 	}
 	
+	public Consequence getConsequence() {
+		return consequence;
+	}
+	
+	public String getText() {
+		return text;
+	}
+	
+
 	public boolean isLeaf() {
 		return (choice1 == null) && (choice2 == null);
 	}

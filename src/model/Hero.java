@@ -125,5 +125,9 @@ public class Hero {
 	public int getLevel() {
 		return level;
 	}
+	
+	public void setHP(int value) {
+		HP = value;
+	}
 
 }

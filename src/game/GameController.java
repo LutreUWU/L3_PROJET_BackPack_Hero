@@ -17,7 +17,10 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.Item;
 import model.XY;
+import model.EventManager.LinkedEvent;
+import model.EventManager.NodeEvent;
 import model.map.EnemyRoom;
+import model.map.EventRoom;
 import model.map.LockedDoor;
 import model.monster.Chicken;
 import model.monster.Soldat;
@@ -92,6 +95,16 @@ public class GameController {
 		    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EnemyRoom) {
 		    				data.swapMapOrBag();
 				  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
+		    			}
+		    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EventRoom event_room && !event_room.getAlreadyVisited()) {
+		    				event_room.visitedEvent();
+		    				var linked_event = event_room.getEvent();
+				  			var root = linked_event.getRoot();
+				  			IO.println(root.getText());
+				  			IO.println("Choix 1 : " + root.getChoice1().getText());
+				  			IO.println("Choix 2 : " + root.getChoice2().getText());
+				  			// CHOICE 1 pour test (a mettre avec des clicks)
+				  			linked_event.choose1(data.hero());
 		    			}
 		    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
 		    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {

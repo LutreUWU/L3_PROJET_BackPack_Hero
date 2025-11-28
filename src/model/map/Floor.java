@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import game.GameData;
+import model.Hero;
 import model.XY;
 import model.monster.Enemy;
 
@@ -23,8 +25,8 @@ public class Floor {
   
 
   
-  public Floor(int floor) {
-  	XY start = createAllRoom(1);
+  public Floor(int floor, Hero hero) {
+  	XY start = createAllRoom(1, hero);
   	HashSet<XY> visited = new HashSet<>();
   	hero_visited.add(start);
   	createWay(visited, start);
@@ -77,10 +79,10 @@ public class Floor {
    * @param floor
    * @return Starter Room
    */
-  private XY createAllRoom(int floor) {
+  private XY createAllRoom(int floor, Hero hero) {
   	List<XY> list1 = createXYList();
   	List<XY> list2 = shuffleList(list1);
-  	createSpecialRoom(list2, 1);
+  	createSpecialRoom(list2, 1, hero);
   	for (int i = 0; i < LINE; i++) {
   		for (int j = 0; j < ROW; j++) {
   			if (grid[i][j] == null) {
@@ -96,7 +98,7 @@ public class Floor {
    * @param list
    * @param floor
    */
-  private void createSpecialRoom(List<XY> list, int floor) {
+  private void createSpecialRoom(List<XY> list, int floor, Hero hero) {
   	grid[list.get(0).y()][list.get(0).x()] = new Shop(floor); // Create shop
   	grid[list.get(1).y()][list.get(1).x()] = new Treasure(floor); // Create treasure
   	grid[list.get(2).y()][list.get(2).x()] = new Treasure(floor); // Create treasure
@@ -107,6 +109,8 @@ public class Floor {
   	grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
   	grid[list.get(8).y()][list.get(8).x()] = new Start(floor); // Create start
   	grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor
+  	grid[list.get(10).y()][list.get(10).x()] = new EventRoom(floor, hero); // Create Event
+  	
   }
   
   public Enemy[] createEnemyList(int floor) {

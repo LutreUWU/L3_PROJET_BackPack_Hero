@@ -1,7 +1,7 @@
 package model;
 
 public class Gold {
-	private int gold = 30;
+	private int gold = 100;
 	
 	public int getGold() {
 		return gold;
@@ -16,6 +16,6 @@ public class Gold {
 	}
 	
 	public void subGold(int value) {
-		gold += value;
+		gold -= value;
 	}
 }
