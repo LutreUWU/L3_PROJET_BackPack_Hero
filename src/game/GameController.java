@@ -12,6 +12,7 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 
+import game.data.FontLoader;
 import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
@@ -72,7 +73,7 @@ public class GameController {
 				  	GameDataClick.update_boundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 		    	}
 		    	case MAP_OR_BAG -> {	
-		    		if (!GameDataCombat.combat() && data.dragItem() == null) {
+		    		if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
 		    			data.swapMapOrBag();
 		    		}
 		    	}
@@ -80,6 +81,17 @@ public class GameController {
 		    		if (data.mapOrBag() && GameDataCombat.combat()) {
 		    			GameDataCombat.hero_action(data, (XY) res.value());
 		    		}
+		    	}
+		    	case EVENT_CHOICE -> {
+		    		if ((int) res.value() == 1) {
+			  			data.event().choose1(data.hero());
+		    		}
+		    		if ((int) res.value() == 2) {
+			  			data.event().choose2(data.hero());
+		    		}
+		    		
+		    		// Met fin à l'event actuel, à retirer pour les LinkedEvents
+		    		data.outEvent();
 		    	}
 		    	case MAP ->{
 		    		var coord = (XY) res.value();
@@ -100,11 +112,8 @@ public class GameController {
 		    				event_room.visitedEvent();
 		    				var linked_event = event_room.getEvent();
 				  			var root = linked_event.getRoot();
-				  			IO.println(root.getText());
-				  			IO.println("Choix 1 : " + root.getChoice1().getText());
-				  			IO.println("Choix 2 : " + root.getChoice2().getText());
+		    				data.inEvent(linked_event);
 				  			// CHOICE 1 pour test (a mettre avec des clicks)
-				  			linked_event.choose1(data.hero());
 		    			}
 		    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
 		    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {
@@ -120,9 +129,11 @@ public class GameController {
 		    	default -> {}
 		    }	
 		  }
-		  if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
-		  	GameDataClick.move_item(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-		  	GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+		  if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
+		  	if (data.dragItem() != null) {
+		  		GameDataClick.move_item(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+			  	GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+		  	}
 		  }
 		  if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
 		  	int x = pointerEvent.location().x();
@@ -182,6 +193,7 @@ public class GameController {
   private static void memoryGame(ApplicationContext context) {
     var screenInfo = context.getScreenInfo();
     var data = new GameData(screenInfo);
+    FontLoader.load_font();
     GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().grid_size());
     GameView.draw(context, data);
     while (true) {

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.github.forax.zen.ScreenInfo;
 
 import game.GameData;
+import game.GameMath;
 import model.Backpack;
 import model.BoundingBox;
 import model.Item;
@@ -239,6 +240,21 @@ public class GameDataClick {
   	itemAdd.put(item, new BoundingBox(new_NW, new_SE));
   }
   
+  public static int EventChoice_click(int x, int y) {
+  	if (data.event() == null) {
+  		return -1;
+  	}
+  	for (int i = 0; i < 2; i++) {
+  		String key = "BG_CHOICE" + Integer.toString(i + 1);
+  		var boundingBox = GameMath.getMapEvent().get(key).box();
+    	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
+    		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
+    			return i + 1;
+    		}
+    	}
+  	}  	
+  	return -1;
+  }
   
   /**
    * Main function treating the click and returning information about what we clicks.
@@ -269,6 +285,11 @@ public class GameDataClick {
     if (mob != 0) {
         return new ClickResult(ClickType.MAP_OR_BAG, mob);
     }
+    int choiceNumber = EventChoice_click(x, y);
+    if (choiceNumber != -1) {
+    	return new ClickResult(ClickType.EVENT_CHOICE, choiceNumber);
+    }
+    
     return new ClickResult(ClickType.NOTHING, null);
   }
 }

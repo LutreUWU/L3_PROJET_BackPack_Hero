@@ -16,6 +16,8 @@ import model.Hero;
 import model.Item;
 import model.ItemRepository;
 import model.XY;
+import model.EventManager.LinkedEvent;
+import model.EventManager.NodeEvent;
 import model.map.Floor;
 import model.weapon.Sword;
 
@@ -42,6 +44,7 @@ public class GameData {
    * null if we're not adding.
    */
   private Item dragItem = null; 
+  private static LinkedHashMap<Item, BoundingBox> itemAdd;
   /**
    * To know if we display map or bag
    * 
@@ -49,7 +52,11 @@ public class GameData {
    * - true : bag
    */
   private boolean mapOrBag = true;
-  private static LinkedHashMap<Item, BoundingBox> itemAdd;
+  /**
+   * To know if we're wurrently in a event or no
+   * 
+   */
+  private LinkedEvent event;
   private XY mouse_coord;
   /**
    * Map used for drawing an image <br>
@@ -72,10 +79,13 @@ public class GameData {
 	  itemAdd = new LinkedHashMap<>();
 	  img_map = ImageLoader.load_image();
 	  ItemRepository.registerWeapon(new Sword());
+	  new GameMath(this);
 	  new GameDataBackpack(backpack);
     new GameDataHero(hero);
     new GameDataMap(map);
     new GameDataClick(this);
+
+    
 	}
 
   /**
@@ -160,6 +170,27 @@ public class GameData {
    */
   public Hero hero() {
     return hero;
+  }
+  
+  public void inEvent(LinkedEvent new_event) {
+  	event = new_event;
+  	if (!mapOrBag) {
+  		this.swapMapOrBag();
+  	}
+  }
+  
+  public void outEvent() {
+  	event = null;
+  }
+  
+  
+  /**
+   * Boolean to know if we're in a event or no
+   * 
+   * @return
+   */
+  public LinkedEvent event() {
+    return event;
   }
   
   /**

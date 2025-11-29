@@ -3,6 +3,7 @@ package game;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -23,7 +24,14 @@ import model.BoundingBox;
 import model.Direction;
 import model.Item;
 import model.XY;
-import model.map.*;
+import model.map.EnemyRoom;
+import model.map.EventRoom;
+import model.map.Exit;
+import model.map.Healer;
+import model.map.LockedDoor;
+import model.map.Shop;
+import model.map.Start;
+import model.map.Treasure;
 import model.monster.Enemy;
 import model.weapon.Sword;
 
@@ -100,26 +108,6 @@ public record GameView(int width, int height, int grid_size) {
 		  }
 		}
   }
-	
-  /**
-   * Draw a virtual weapon in the grid of the backpack.
-   * The weapon IS NOT in the bag.
-   * It's for helping the user to choose where he wants to place his weapon.
-   * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data	  Data of the game
-   */
-//  private static void drawWeaponGrid(Graphics2D graphics, GameData data) {
-//		var item = data.weapon();
-//		if (item == null) {
-//	        return;
-//	  }
-//		Block coordinate = item.shape()[0];
-//	  switch (item.id()) {
-//			case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).draw();
-//		  default ->{}
-//	  }
-//  }
 		
   /**
    * Draws all the information about the hero
@@ -360,6 +348,85 @@ public record GameView(int width, int height, int grid_size) {
   	}
   }
   
+  private static void drawBgEvent(Graphics2D graphics, GameData data) {
+  	BufferedImage img = data.img_map().get("BG_EVENT");
+    graphics.drawImage(img, GameMath.getMapEvent().get("BG_EVENT").transform(), null);
+  }
+  
+  private static void drawTextEvent(Graphics2D graphics, GameData data){
+  	int size = 30;
+  	double top = GameMath.getMapEvent().values().stream().findFirst().orElse(null).box().northWest().y();
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setColor(Color.WHITE);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    int textWidth = fm.stringWidth(data.event().getRoot().getText());
+		int x = data.screenInfo().width() / 2 - textWidth / 2;
+		int y = (int) (top * 1.05)  + fm.getAscent() ;
+	  graphics.drawString(data.event().getRoot().getText(), x,	y);
+  }
+  
+  private static void drawTextChoiceEvent(Graphics2D graphics, GameData data, String content, int x, int y) {
+    int size = 20;
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    graphics.setColor(Color.WHITE);
+    int maxCharsPerLine = 30;
+    String[] words = content.split(" ");
+    StringBuilder line = new StringBuilder();
+    int lineCount = 0;
+
+    for (String word : words) {
+        if (line.length() + word.length() + 1 > maxCharsPerLine) {
+            int lineWidth = fm.stringWidth(line.toString());
+            graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());
+            line = new StringBuilder(word);
+            lineCount++;
+        } else {
+            if (line.length() > 0) line.append(" ");
+            line.append(word);
+        }
+    }
+
+    if (line.length() > 0) {
+        int lineWidth = fm.stringWidth(line.toString());
+        graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());
+    }
+}
+
+  
+  private static void drawChoiceEvent(Graphics2D graphics, GameData data) {
+  	var img1 = data.img_map().get("BG_CHOICE1");
+  	var img2 = data.img_map().get("BG_CHOICE2");
+  	var event1 = GameMath.getMapEvent().get("BG_CHOICE1");
+  	var event2 = GameMath.getMapEvent().get("BG_CHOICE2");
+  	int width = event1.box().southEast().x() - event1.box().northWest().x();
+  	int height = event1.box().southEast().y() - event1.box().northWest().y();
+		graphics.drawImage(img1, event1.transform(), null);
+	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getText(), 
+	  															(int) event1.box().northWest().x() + width / 2, 
+	  															(int) (event1.box().northWest().y() + height * 0.5));
+		graphics.drawImage(img2, event2.transform(), null);
+	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getText(), 
+	  															(int) event2.box().northWest().x() + width / 2, 
+	  															(int) (event2.box().northWest().y() + height * 0.5));
+
+  }
+  
+  /**
+   * Draw an event and their choices
+   * 
+   * @param graphics {@code Graphics2D} of the game.
+   * @param data		 {@code GameData} containing all informations about the game
+   */
+  private static void drawEvent(Graphics2D graphics, GameData data) {
+  	drawBgEvent(graphics, data);
+  	drawTextEvent(graphics, data);
+  	drawChoiceEvent(graphics, data);
+  }
+
+  
   /**
    * Methods for drawing the game 
    * 
@@ -385,6 +452,9 @@ public record GameView(int width, int height, int grid_size) {
 			// Draw enemy if we're in combat
 			if (GameDataCombat.combat()) {
 				update_combat(graphics, data, GameDataCombat.lst_enemy());
+			}
+			if (data.event() != null) {
+				drawEvent(graphics, data);	
 			}
 	  });
   }
