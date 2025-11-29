@@ -24,25 +24,34 @@ public class Floor {
   private XY hero_pos;
   
 
-  
+  /**
+   * Constructor
+   * @param floor
+   * @param hero
+   */
   public Floor(int floor, Hero hero) {
   	XY start = createAllRoom(1, hero);
   	HashSet<XY> visited = new HashSet<>();
-  	hero_visited.add(start);
   	createWay(visited, start);
   	hero_pos = start;
-  	updateHeroAccessible();
-  	updateHeroVisible();
+  	updateMap(start);
   }
 
-
+  /**
+   * Setters for hero position
+   * @param hero_pos
+   */
 	public void setHero_pos(XY hero_pos) {
 		this.hero_pos = hero_pos;
 	}
 
 
 
-
+	/**
+	 * Create all way between rooms
+	 * @param visited
+	 * @param start
+	 */
 	private void createWay(HashSet<XY> visited, XY start) {
     List<XY> accessible = new ArrayList<>(); addAcc(accessible, start.x(), start.y());
     for (var coord : accessible) {
@@ -54,7 +63,12 @@ public class Floor {
         }
     }
   }
-  
+  /**
+   * Add accessible room of each room
+   * @param listacc
+   * @param x
+   * @param y
+   */
   private void addAcc(List<XY> listacc, int x, int y) {
   	if (x > 0) listacc.add(new XY(x - 1, y));
   	if (y > 0) listacc.add(new XY(x, y - 1));
@@ -62,17 +76,6 @@ public class Floor {
   	if (y < LINE - 1) listacc.add(new XY(x, y + 1));
   	Collections.shuffle(listacc);
   }
-  
-  /*
-  public void createAndRandomAccessible() {
-  	for (int i = 0; i < LINE; i++) {
-  		for (int j = 0; j < ROW; j++) {
-  			List<XY> listacc = new ArrayList<>();
-  			addAcc(listacc, j, i);
-  			grid[i][j].setAccessible(listacc);
-  		}
-  	}
-  }*/
   
   /**
    * Create All Room
@@ -113,11 +116,6 @@ public class Floor {
   	
   }
   
-  public Enemy[] createEnemyList(int floor) {
-  	// Classe a faire quand on aura bien organisé et a mettre dans la classe Enemy
-  	return new Enemy[floor];
-  }
-  
   /**
    * @return a list of 55 XY
    */
@@ -141,60 +139,108 @@ public class Floor {
   	return list2;
   }
   
-  public void updateHeroVisible() {
-  	for (var coord : hero_accessible) {
-  		hero_visible.add(coord);
-  		
-  		for (var coord_acc : grid[coord.y()][coord.x()].get_accessible()) {
-  			hero_visible.add(coord_acc);
-  			hero_visible_for_line.add(coord_acc);
-  			for (var coord_acc2 : grid[coord_acc.y()][coord_acc.x()].get_accessible()) {
-  				hero_visible.add(coord_acc2);
-  			}
-  		}
+  /**
+   * Update the map
+   * @param coord
+   */
+  public void updateMap(XY coord) {
+  	updateAll(coord);
+  	addTwoVisible();
+  }
+  
+  /**
+   * Add two more visible for each accessible room (not for the "LockedDoor")
+   */
+  public void addTwoVisible() {
+	  for (var coord : hero_accessible) {
+	  	var room = grid[coord.y()][coord.x()];
+	  	if (!(room instanceof LockedDoor)) {
+	  		hero_visible.add(coord);
+	  		for (var coord_acc : room.get_accessible()) {
+	  			hero_visible.add(coord_acc);
+	  			var room2 = grid[coord_acc.y()][coord_acc.x()];
+	  			if (!(room2 instanceof LockedDoor)) {
+	  				hero_visible_for_line.add(coord_acc);
+	    			for (var coord_acc2 : room2.get_accessible()) {
+	      			hero_visible.add(coord_acc2);
+	    			}
+	  			}
+	  		}
+	  	}
   	}
   }
   
-  public void updateHeroAccessible() {
-  	hero_accessible.clear();
-  	for (var coord : hero_visited) {
-  		for (var coord_acc : grid[coord.y()][coord.x()].get_accessible()) {
-  			if (!hero_visited.contains(coord_acc)) {
-  				var maybe_locked = grid[coord_acc.y()][coord_acc.x()];
-  				if (maybe_locked instanceof LockedDoor) {
-    				var room_maybe_locked = (LockedDoor) maybe_locked;
-    				if (room_maybe_locked.getLock()) continue;
-    			}
-  				hero_accessible.add(coord_acc);
-  			}
-  		}
+  
+  /**
+   * Update All hashMap: visited, visible, accessible, and accessible for line
+   * @param coord
+   */
+  public void updateAll(XY coord) {
+  	if (!hero_visited.contains(coord)) {
+  		hero_accessible.remove(coord);
+  		hero_visible_for_line.add(coord);
+	  	hero_visited.add(coord);
+	  	hero_visible.add(coord);
+	  	var room = grid[coord.y()][coord.x()];
+	  	for (var coord_ac : room.get_accessible()) {
+	  		var room_acc = grid[coord_ac.y()][coord_ac.x()];
+	  		if (room_acc instanceof Hallway) {
+	  			updateAll(coord_ac);
+	  		} else {
+	  			if (!hero_visited.contains(coord_ac)) {
+	  				hero_visible.add(coord_ac);
+		  			hero_accessible.add(coord_ac);
+	  			}
+	  			
+	  		}
+	  	}
   	}
   }
   
+  /**
+   * Getter for grid
+   * @return
+   */
   public Room[][] getGrid() {
     return grid;
-  }
+  }  
   
-  public void addHeroVisited(XY coord) {
-  	hero_visited.add(coord);
-  }
-  
+  /**
+   * Getter for hero visited
+   * @return
+   */
   public HashSet<XY> getHeroVisited() {
     return hero_visited;
   }
   
+  /**
+   * Getter for hero visible
+   * @return
+   */
   public HashSet<XY> getHeroVisible() {
     return hero_visible;
   }
   
+  /**
+   * Getter for hero vsible line
+   * @return
+   */
   public HashSet<XY> getHeroVisibleLine() {
     return hero_visible_for_line;
   }
   
+  /**
+   * Getter for hero accessible
+   * @return
+   */
   public HashSet<XY> getHeroAccessible() {
     return hero_accessible;
   }
   
+  /**
+   * Getter for hero position
+   * @return
+   */
   public XY get_heroPos() {
   	return hero_pos;
   }

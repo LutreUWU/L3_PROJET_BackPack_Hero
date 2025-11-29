@@ -95,35 +95,43 @@ public class GameController {
 		    	}
 		    	case MAP ->{
 		    		var coord = (XY) res.value();
-		    		if (data.map().getHeroVisited().contains(coord)) {
-		    			data.map().setHero_pos(coord);
-		    			
-		    		} else if (data.map().getHeroAccessible().contains(coord)) {
-		    			data.map().setHero_pos(coord);
-		    			data.map().addHeroVisited(coord);
-		    			data.map().updateHeroAccessible();
-		    			data.map().updateHeroVisible();
-		    			var coordHero = new XY(data.map().get_heroPos().x(), data.map().get_heroPos().y());
-		    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EnemyRoom) {
-		    				data.swapMapOrBag();
-				  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
-		    			}
-		    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EventRoom event_room && !event_room.getAlreadyVisited()) {
-		    				event_room.visitedEvent();
-		    				var linked_event = event_room.getEvent();
-				  			var root = linked_event.getRoot();
-		    				data.inEvent(linked_event);
-				  			// CHOICE 1 pour test (a mettre avec des clicks)
-		    			}
-		    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
-		    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {
-		    			var unlock_door = (LockedDoor) data.map().getGrid()[coord.y()][coord.x()];
-		    			unlock_door.unlock();
-		    			data.hero().sub("gold", 40);
-		    			data.map().setHero_pos(coord);
-		    			data.map().addHeroVisited(coord);
-		    			data.map().updateHeroAccessible();
-		    			data.map().updateHeroVisible();
+		    		if (coord.x() != -1 && coord.y() != -1) {
+			    		if (data.map().getHeroVisited().contains(coord)) {
+			    			data.map().setHero_pos(coord);
+			    			
+			    		} else if (data.map().getHeroAccessible().contains(coord)) {
+			    			data.map().setHero_pos(coord);
+			    			/*
+			    			data.map().addHeroVisited(coord);
+			    			data.map().updateHeroAccessible();
+			    			data.map().updateHeroVisible();
+			    			*/
+			    			data.map().updateMap(coord);
+			    			var coordHero = new XY(data.map().get_heroPos().x(), data.map().get_heroPos().y());
+			    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EnemyRoom) {
+			    				data.swapMapOrBag();
+					  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
+			    			}
+			    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EventRoom event_room && !event_room.getAlreadyVisited()) {
+			    				event_room.visitedEvent();
+			    				var linked_event = event_room.getEvent();
+					  			var root = linked_event.getRoot();
+			    				data.inEvent(linked_event);
+					  			// CHOICE 1 pour test (a mettre avec des clicks)
+			    			}
+			    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
+			    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {
+			    			var unlock_door = (LockedDoor) data.map().getGrid()[coord.y()][coord.x()];
+			    			unlock_door.unlock();
+			    			data.hero().sub("gold", 40);
+			    			data.map().setHero_pos(coord);
+			    			/*
+			    			data.map().addHeroVisited(coord);
+			    			data.map().updateHeroAccessible();
+			    			data.map().updateHeroVisible();
+			    			*/
+			    			data.map().updateMap(coord);
+			    		}
 		    		}
 		    	}
 		    	default -> {}
