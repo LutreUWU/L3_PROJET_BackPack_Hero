@@ -65,25 +65,20 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawGrid(Graphics2D graphics, GameData data) {
     int size = data.bag().grid_size();
 		int [][] grid = data.bag().grid();
-		drawElement(graphics, data.img_map().get("bag"), data.screenInfo().width() * 0.5 - size * 4.5, 10, size * 9, size * 6, Direction.UP);
+		BufferedImage imgBackpack = data.img_map().get("bag");
+		BoundingBox boundingBox = GameMath.getMapEvent().get("BG_BACKPACK").box(); 
+		graphics.drawImage(imgBackpack, GameMath.getMapEvent().get("BG_BACKPACK").transform(), null);
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 7; j++) {
 	    	final int fi = i;
 	    	final int fj = j;				  
-	    		// TO DO (David) : instead of rectangle, change image of the grid
-			  	if (grid[fi][fj] >= -1) {
-			  		graphics.setColor(Color.GRAY);
-			  		graphics.fill(new Rectangle2D.Double((data.screenInfo().width() / 2) - 3.5 * size + (size * fj), 
-																				    	   (data.screenInfo().height()/4.5) - 2.5*size + (size * fi), 
-																									size, size));
-			  		graphics.setColor(Color.BLACK);
-			  	}
-			  	if (grid[fi][fj] == -2) {
-			  		graphics.setColor(Color.RED);
-			  	}
-			    graphics.draw(new Rectangle2D.Double((data.screenInfo().width() / 2) - 3.5 * size + (size * fj), 
-																			    	   (data.screenInfo().height()/4.5) - 2.5*size + (size * fi), 
-																								size, size));
+		  	if (grid[fi][fj] >= -1) {
+		  		graphics.drawImage(data.img_map().get("BG_BAG_UNLOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
+		  		
+		  	}
+		  	if (grid[fi][fj] == -2) {
+		  		graphics.drawImage(data.img_map().get("BG_BAG_LOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
+		  	}
 			}
     }
   }
@@ -139,12 +134,7 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawHero(Graphics2D graphics, GameData data) {
   	double size_x = data.hero().getSizeX();
   	double size_y = data.hero().getSizeY();
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(new File("data/Roland.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		BufferedImage img = data.img_map().get("Roland");
 		drawElement(graphics, img, data.screenInfo().width() * 0.20, data.screenInfo().height() * 0.50, size_x, size_y, Direction.UP);
 		drawHeroStats(graphics, data, (int) (data.screenInfo().width() * 0.20 + size_x/2),  (int) (data.screenInfo().height() * 0.50 + size_y));
   }
@@ -241,11 +231,7 @@ public record GameView(int width, int height, int grid_size) {
 		graphics.fill(new Rectangle2D.Double(0, 0, data.screenInfo().width(), data.screenInfo().height()));
 		/////////////
 		BufferedImage img = data.img_map().get("BG1");
-		var width = img.getWidth();
-		var height = img.getHeight();
-		double scale = Math.max(width / data.screenInfo().width(), height / data.screenInfo().height());
-		var transform = new AffineTransform(scale, 0, 0, scale, (data.screenInfo().width() - scale * width) / 2, (data.screenInfo().height() - scale * height) / 2);
-		graphics.drawImage(img, transform, null);
+		graphics.drawImage(img, GameMath.getMapEvent().get("BG1").transform(), null);
 	}
 	
 	/**
@@ -355,7 +341,7 @@ public record GameView(int width, int height, int grid_size) {
   
   private static void drawTextEvent(Graphics2D graphics, GameData data){
   	int size = 30;
-  	double top = GameMath.getMapEvent().values().stream().findFirst().orElse(null).box().northWest().y();
+	  double top = GameMath.getMapEvent().get("BG_EVENT").box().northWest().y();
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setColor(Color.WHITE);
     graphics.setFont(font);
@@ -376,7 +362,6 @@ public record GameView(int width, int height, int grid_size) {
     String[] words = content.split(" ");
     StringBuilder line = new StringBuilder();
     int lineCount = 0;
-
     for (String word : words) {
         if (line.length() + word.length() + 1 > maxCharsPerLine) {
             int lineWidth = fm.stringWidth(line.toString());
@@ -388,7 +373,6 @@ public record GameView(int width, int height, int grid_size) {
             line.append(word);
         }
     }
-
     if (line.length() > 0) {
         int lineWidth = fm.stringWidth(line.toString());
         graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());

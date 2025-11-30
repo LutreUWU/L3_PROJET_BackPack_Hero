@@ -84,8 +84,6 @@ public class GameData {
     new GameDataHero(hero);
     new GameDataMap(map);
     new GameDataClick(this);
-
-    
 	}
 
   /**

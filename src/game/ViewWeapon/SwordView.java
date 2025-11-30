@@ -1,14 +1,11 @@
 package game.ViewWeapon;
 
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import game.GameData;
+import game.GameMath;
 import game.GameView;
+import model.BoundingBox;
 import model.Direction;
 
 /**
@@ -37,10 +34,11 @@ public record SwordView(Graphics2D graphics, GameData data, Direction direction,
 	}
 	
 	public void drawInBag(){
+		BoundingBox coord = GameMath.getMapEvent().get("BG_BACKPACK").box();
 		int size = data.bag().grid_size();
 		GameView.drawElement(graphics, data.img_map().get("sword"), 
-																	 data.screenInfo().width() / 2 - 3.5 * size + (size * x),
-																	 data.screenInfo().height()/4.5 - 2.5 * size + (size * (y - 1)), 
+																	 coord.northWest().x() + (size * x),
+																	 coord.northWest().y() + (size * (y - 1)), 
 																	 size, size * 3, direction);
 	}
 }
