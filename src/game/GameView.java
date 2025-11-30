@@ -346,10 +346,10 @@ public record GameView(int width, int height, int grid_size) {
     graphics.setColor(Color.WHITE);
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
-    int textWidth = fm.stringWidth(data.event().getRoot().getText());
+    int textWidth = fm.stringWidth(data.event().getRoot().getQuestion());
 		int x = data.screenInfo().width() / 2 - textWidth / 2;
 		int y = (int) (top * 1.05)  + fm.getAscent() ;
-	  graphics.drawString(data.event().getRoot().getText(), x,	y);
+	  graphics.drawString(data.event().getRoot().getQuestion(), x,	y);
   }
   
   private static void drawTextChoiceEvent(Graphics2D graphics, GameData data, String content, int x, int y) {
@@ -388,11 +388,11 @@ public record GameView(int width, int height, int grid_size) {
   	int width = event1.box().southEast().x() - event1.box().northWest().x();
   	int height = event1.box().southEast().y() - event1.box().northWest().y();
 		graphics.drawImage(img1, event1.transform(), null);
-	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getText(), 
+	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
 	  															(int) event1.box().northWest().x() + width / 2, 
 	  															(int) (event1.box().northWest().y() + height * 0.5));
 		graphics.drawImage(img2, event2.transform(), null);
-	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getText(), 
+	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
 	  															(int) event2.box().northWest().x() + width / 2, 
 	  															(int) (event2.box().northWest().y() + height * 0.5));
 

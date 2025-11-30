@@ -3,15 +3,16 @@ package model.EventManager;
 import java.util.Objects;
 
 public class NodeEvent {
-	private String text;
+	private String question;
+	private String answer;
 	private NodeEvent choice1 = null;
 	private NodeEvent choice2 = null;
 	private Consequence consequence = null;
 	
 	
-	public NodeEvent(String text) {
-		Objects.requireNonNull(text);
-		this.text = text;
+	public NodeEvent(String question, String answer) {
+		this.question = question;
+		this.answer = answer;
 	}
 	
 	public void setChoice1(NodeEvent new_choice1) {
@@ -38,8 +39,12 @@ public class NodeEvent {
 		return consequence;
 	}
 	
-	public String getText() {
-		return text;
+	public String getQuestion() {
+		return question;
+	}
+	
+	public String getAnswer() {
+		return answer;
 	}
 	
 

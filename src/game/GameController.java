@@ -91,7 +91,7 @@ public class GameController {
 		    		}
 		    		
 		    		// Met fin à l'event actuel, à retirer pour les LinkedEvents
-		    		data.outEvent();
+		    		// J'ai commenté ici : data.outEvent();
 		    	}
 		    	case MAP ->{
 		    		var coord = (XY) res.value();

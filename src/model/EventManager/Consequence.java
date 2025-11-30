@@ -5,16 +5,20 @@ import model.Hero;
 import java.util.Random;
 
 public class Consequence {
+	private String final_answer;
 	private String consequence_string;
 	private boolean is_good;
 	private int floor;
+	private double bonus; // OR **MALUS**
 	
 	final private int GOOD_COUNT = 2;
 	final private int BAD_COUNT = 2;
 	
-	public Consequence(int floor, boolean is_good) {
+	public Consequence(int floor, boolean is_good, double bonus, String final_answer) {
 		this.is_good = is_good;
 		this.floor = floor;
+		this.bonus = bonus;
+		this.final_answer = final_answer;
 	}
 	
 	public void apply(Hero hero) {
@@ -26,10 +30,10 @@ public class Consequence {
 		Random rand = new Random();
 		var x = rand.nextInt(GOOD_COUNT) + 1;
 		switch (x) {
-			case 1 -> {consequence_string = "Très bonne réponse !\nVoici de l'or (" + floor*5 + ") !";
-			  				hero.add("gold", floor * 5);}
-			case 2 -> {consequence_string = "J'en étais sûre que tu étais d'accord avec moi ! Tu mérites bien une arme!";
-								}// Ajouter l'arme
+			case 1 -> {consequence_string = final_answer + "\nVoici de l'or (" + (int) (floor*5*bonus) + ") !";
+			  				hero.add("gold", (int) (floor * 5 * bonus));}
+			case 2 -> {consequence_string = final_answer + "\nTu mérites bien une arme!";
+								}// Ajouter l'arme et raojuter le bonus
 		}
 	}
 	
@@ -37,10 +41,10 @@ public class Consequence {
 		Random rand = new Random();
 		var x = rand.nextInt(BAD_COUNT) + 1;
 		switch (x) {
-			case 1 -> {consequence_string = "T'es complètement marteau ? *Vous vous battez et perdez de la vie*";
-								hero.sub("hp", floor * 2);
+			case 1 -> {consequence_string = final_answer + "\n*Vous vous battez et perdez de la vie*";
+								hero.sub("hp", (int) (floor * 2 * bonus));
 								if (hero.getHP() <= 0) hero.setHP(1);}
-			case 2 -> {consequence_string = "Ca va pas la tête ? *On te force à mettre linux (aucun effet c'est gratuit)*";
+			case 2 -> {consequence_string = final_answer + "\n*On te force à mettre linux (aucun effet c'est gratuit)*";
 								}
 		}
 	}
