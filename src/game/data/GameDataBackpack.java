@@ -63,7 +63,7 @@ public class GameDataBackpack {
     if (check_place(item)) {
       var b = item.shape();
       for (var block : b) {
-        backpack.grid()[block.y()][block.x()] = item.id();
+        backpack.grid()[block.y()][block.x()] = item.getID();
       }
       backpack.item_lst().add(item);
       return true;

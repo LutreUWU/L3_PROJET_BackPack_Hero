@@ -1,7 +1,6 @@
 package game;
 
 import java.awt.Color;
-import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,14 +17,12 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.Item;
 import model.XY;
-import model.EventManager.LinkedEvent;
-import model.EventManager.NodeEvent;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.LockedDoor;
 import model.monster.Chicken;
 import model.monster.Soldat;
-import model.weapon.Sword;
+import model.weapon.Axe;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
@@ -89,9 +86,11 @@ public class GameController {
 		    		if ((int) res.value() == 2) {
 			  			data.event().choose2(data.hero());
 		    		}
+		    		if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
+		    			// Ajouter les conséquences de fin d'event
+		    			data.outEvent();
+		    		};
 		    		
-		    		// Met fin à l'event actuel, à retirer pour les LinkedEvents
-		    		// J'ai commenté ici : data.outEvent();
 		    	}
 		    	case MAP ->{
 		    		var coord = (XY) res.value();
@@ -164,10 +163,9 @@ public class GameController {
 		// If event button is pressed 
 		if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
 		  switch(key.key()) {
-		    // A to add a weapon in the bag
 		  	case Key.A ->{ 
 		  	  if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-		  	    GameDataClick.add_item(new Sword()); 
+		  	    GameDataClick.add_item(new Axe()); 
 		  	  }
 		  	}
 		  	// Start a combat against a RAT

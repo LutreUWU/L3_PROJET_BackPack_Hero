@@ -91,6 +91,7 @@ public class GameMath {
 	private static void getEventValue() {
 		getEventBackgroundValue();
 		getEventChoiceValue();
+		getEventChoiceEndValue();
 	}
 	
 	private static void getEventBackgroundValue() {
@@ -127,6 +128,19 @@ public class GameMath {
 	  transform2.scale(scale, scale);
 	  boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
 	  renderDataGame.put("BG_CHOICE2", new RenderData(transform2, boundingBox));
+	}
+	
+	private static void getEventChoiceEndValue() {
+		var img = data.img_map().get("BG_CHOICE_END");
+		int width = img.getWidth(), height = img.getHeight();;
+		var scale = (screenWidth * 0.20) / width;
+	  AffineTransform transform = new AffineTransform();
+	  double posX = screenWidth * 0.5 - (width * scale) / 2;
+	  double posY = renderDataGame.get("BG_EVENT").box().northWest().y() * 1.15;
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
+	  renderDataGame.put("BG_CHOICE_END", new RenderData(transform, boundingBox));
 	}
 	
 	// Getter Event

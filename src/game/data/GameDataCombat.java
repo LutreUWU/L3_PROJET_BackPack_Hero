@@ -55,7 +55,7 @@ public class GameDataCombat {
 		int id = data.bag().grid()[coord.y()][coord.x()];
 		Enemy targetEnemy = lst_enemy.get(target); 
 		Optional<Item> weapon = data.bag().item_lst().stream()
-																											 .filter(item -> item.id() == id)
+																											 .filter(item -> item.getID() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
 			item.use(targetEnemy);

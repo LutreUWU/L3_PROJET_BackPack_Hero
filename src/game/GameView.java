@@ -8,16 +8,11 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import javax.imageio.ImageIO;
-
 import com.github.forax.zen.ApplicationContext;
 
-import game.ViewWeapon.SwordView;
 import game.data.GameDataCombat;
 import model.Block;
 import model.BoundingBox;
@@ -97,12 +92,37 @@ public record GameView(int width, int height, int grid_size) {
 		var item_list = data.bag().item_lst();
 		for (var item : item_list) {
 			Block coordinate = item.shape()[0];
-		  switch (item.id()) {
-				case 1 -> new SwordView(graphics, data, item.direction(), coordinate.x(), coordinate.y()).drawInBag();
-			  default ->{}
+		  switch (item.getID()) {
+				case 1 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("sword")); 
+				case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().grid_size(), 2, 2, item.direction(), data.img_map().get("despairShield")); 
+				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("mimicry")); 
+				case 4 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("massue")); 
+				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().grid_size(), 1, 2, item.direction(), data.img_map().get("gant")); 
+				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 2, 3, item.direction(), data.img_map().get("axe")); 
+
+				default ->{}
 		  }
 		}
   }
+  
+	private static void drawInBag(Graphics2D graphics, XY pos, int size, int width, int height, Direction direction, BufferedImage img){
+		BoundingBox coord = GameMath.getMapEvent().get("BG_BACKPACK").box();
+		double centerX = 0, centerY = 0;
+		if (((width + height) % 2 == 0) && width % 2 == 0 || height % 2 == 0) {
+			if (direction == Direction.RIGHT){
+				centerX = size / 2;
+				centerY = size / 2;
+			}
+			if (direction == Direction.LEFT){
+				centerX = - size / 2;
+				centerY = size / 2;
+			}
+		}
+		GameView.drawElement(graphics, img, 
+																	 coord.northWest().x() + (size * pos.x()) + centerX,
+																	 coord.northWest().y() + (size * pos.y()) - centerY, 
+																	 size * width, size * height, direction);
+	}
 		
   /**
    * Draws all the information about the hero
@@ -261,12 +281,7 @@ public record GameView(int width, int height, int grid_size) {
 	  graphics.drawImage(img, transform, null);
 	}
 	
-	public static void drawItem(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
-		switch (item) {
-			case Sword c -> new SwordView(graphics, data, item.direction(), box.northWest().x(), box.northWest().y()).draw();
-			default -> throw new IllegalArgumentException("Unexpected value: " + item);
-		}
-	}
+	
 	
   /**
    * Update the position of the weapon if we move an item
@@ -278,10 +293,34 @@ public record GameView(int width, int height, int grid_size) {
 		Objects.requireNonNull(graphics);
 		Objects.requireNonNull(data);
 		data.map_item().forEach((item, box) -> drawItem(graphics, data, item, box));
-		//drawWeaponGrid(graphics, data);
   }
   
+  private static void drawItem(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
+	  switch (item.getID()) {
+			case 1 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("sword")); 
+			case 2 -> draw(graphics, box.northWest(), data.bag().grid_size(), 2, 2, item.direction(), data.img_map().get("despairShield")); 
+			case 3 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("mimicry")); 
+			case 4 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("massue")); 
+			case 5 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 2, item.direction(), data.img_map().get("gant")); 
+			case 6 -> draw(graphics, box.northWest(), data.bag().grid_size(), 2, 3, item.direction(), data.img_map().get("axe")); 
+
+			default ->{}
+	  }
+	}
   
+  private static void draw(Graphics2D graphics, XY coord, int size, int width, int height, Direction direction, BufferedImage img){
+		double centerX, centerY;
+		double x = coord.x(), y = coord.y();
+		double dimX = size*width, dimY = size*height;
+	  if (direction == Direction.LEFT || direction == Direction.RIGHT) {
+	  	centerX = x + dimY / 2.0;
+			centerY = y + dimX / 2.0;
+			x = centerX - dimX / 2.0;
+			y = centerY - dimY / 2.0;
+		}
+		
+		GameView.drawElement(graphics, img, x, y, dimX, dimY, direction);
+	}
   
   /**
    * Draws all the information about the enemy
@@ -387,15 +426,24 @@ public record GameView(int width, int height, int grid_size) {
   	var event2 = GameMath.getMapEvent().get("BG_CHOICE2");
   	int width = event1.box().southEast().x() - event1.box().northWest().x();
   	int height = event1.box().southEast().y() - event1.box().northWest().y();
-		graphics.drawImage(img1, event1.transform(), null);
-	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
-	  															(int) event1.box().northWest().x() + width / 2, 
-	  															(int) (event1.box().northWest().y() + height * 0.5));
-		graphics.drawImage(img2, event2.transform(), null);
-	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
-	  															(int) event2.box().northWest().x() + width / 2, 
-	  															(int) (event2.box().northWest().y() + height * 0.5));
-
+  	if (data.event().getRoot().getChoice2() == null){
+  		var img3 = data.img_map().get("BG_CHOICE_END");
+  		var event3 = GameMath.getMapEvent().get("BG_CHOICE_END");
+  		graphics.drawImage(img3, event3.transform(), null);
+		  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+		  															(int) event3.box().northWest().x() + width / 2, 
+		  															(int) (event3.box().northWest().y() + height * 0.5));
+  	}
+  	else {
+  		graphics.drawImage(img1, event1.transform(), null);
+  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+  	  															(int) event1.box().northWest().x() + width / 2, 
+  	  															(int) (event1.box().northWest().y() + height * 0.5));
+  		graphics.drawImage(img2, event2.transform(), null);
+  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
+  	  															(int) event2.box().northWest().x() + width / 2, 
+  	  															(int) (event2.box().northWest().y() + height * 0.5));
+  	}
   }
   
   /**

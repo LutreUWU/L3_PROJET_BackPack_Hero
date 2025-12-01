@@ -11,20 +11,20 @@ import model.monster.Enemy;
 /**
  * Class for the Sword item
  */
-public class Sword implements Item{
+public class Massue implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
 	private Block[] b = new Block[3]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.COMMON; 
-	private int id = 1;
+	private Rarity rarity = Rarity.SUPERARE; 
+	private int id = 4;
 	private int score = 10;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
 	 */
-	public Sword() {
+	public Massue() {
 		setXY(new XY(0, 0));
 	}
 	
@@ -62,7 +62,7 @@ public class Sword implements Item{
 	@Override
 	public void use(Enemy enemy) {
 		GameDataHero.sub("energy", 1);
-		enemy.subHP(3);
+		enemy.subHP(8);
 	}
 	
   @Override

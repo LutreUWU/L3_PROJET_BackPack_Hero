@@ -11,20 +11,20 @@ import model.monster.Enemy;
 /**
  * Class for the Sword item
  */
-public class Sword implements Item{
+public class Axe implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
-	private Block[] b = new Block[3]; 
+	private Block[] b = new Block[4]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.COMMON; 
-	private int id = 1;
-	private int score = 10;
+	private Rarity rarity = Rarity.LEGENDARY; 
+	private int id = 6;
+	private int score = 15;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
 	 */
-	public Sword() {
+	public Axe() {
 		setXY(new XY(0, 0));
 	}
 	
@@ -43,13 +43,15 @@ public class Sword implements Item{
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
 			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x(), coord.y() - 1);
-			b[2] = new Block(coord.x(), coord.y() + 1);
+			b[1] = new Block(coord.x(), coord.y() + 1);
+			b[2] = new Block(coord.x(), coord.y() - 1);
+			b[3] = new Block(coord.x() + 1, coord.y() - 1);
 		}
 		else {
 			b[0] = new Block(coord.x(), coord.y());
 			b[1] = new Block(coord.x() - 1, coord.y());
 			b[2] = new Block(coord.x() + 1, coord.y());
+			b[3] = new Block(coord.x() + 1, coord.y() + 1);
 		}
 	}
 	
@@ -62,7 +64,7 @@ public class Sword implements Item{
 	@Override
 	public void use(Enemy enemy) {
 		GameDataHero.sub("energy", 1);
-		enemy.subHP(3);
+		enemy.subHP(10);
 	}
 	
   @Override

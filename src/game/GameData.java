@@ -78,7 +78,7 @@ public class GameData {
 	  screenInfo = screenInfo_;
 	  itemAdd = new LinkedHashMap<>();
 	  img_map = ImageLoader.load_image();
-	  ItemRepository.registerWeapon(new Sword());
+	  ItemRepository.createItemRepository();
 	  new GameMath(this);
 	  new GameDataBackpack(backpack);
     new GameDataHero(hero);
