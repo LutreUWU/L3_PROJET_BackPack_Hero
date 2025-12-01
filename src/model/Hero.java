@@ -46,7 +46,7 @@ public class Hero {
 			case "armor" -> current_armor += value;
 			case "energy" -> energy_point += value;
 			case "mana" -> mana_point += value;
-			case "gold" -> money.addGold(value);
+			case "gold" -> {money.addGold(value); money.updateGoldSize();}
 			case "xp" -> {xp += value; if (xp >= MAX_XP()) {xp -= MAX_XP(); level++;}}
 		}
 	}
@@ -65,7 +65,7 @@ public class Hero {
 			case "armor" -> current_armor -= value;
 			case "energy" -> energy_point -= value;
 			case "mana" -> mana_point -= value;
-			case "gold" -> money.subGold(value);
+			case "gold" -> {money.subGold(value); money.updateGoldSize();}
 		}
 	}
 	

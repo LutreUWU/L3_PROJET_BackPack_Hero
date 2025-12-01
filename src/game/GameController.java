@@ -81,10 +81,10 @@ public class GameController {
 		    	}
 		    	case EVENT_CHOICE -> {
 		    		if ((int) res.value() == 1) {
-			  			data.event().choose1(data.hero());
+			  			data.event().choose1(data.hero(), data.bag().item_lst());
 		    		}
 		    		if ((int) res.value() == 2) {
-			  			data.event().choose2(data.hero());
+			  			data.event().choose2(data.hero(), data.bag().item_lst());
 		    		}
 		    		if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
 		    			// Ajouter les conséquences de fin d'event

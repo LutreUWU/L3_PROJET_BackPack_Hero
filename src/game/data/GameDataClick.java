@@ -252,7 +252,7 @@ public class GameDataClick {
   	}
   	for (int i = 0; i < 2; i++) {
   		String key = "BG_CHOICE" + Integer.toString(i + 1);
-  		var boundingBox = GameMath.getMapEvent().get(key).box();
+  		boundingBox = GameMath.getMapEvent().get(key).box();
     	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
     		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
     			return i + 1;
@@ -286,6 +286,7 @@ public class GameDataClick {
     if (mapPos.x() != -1) {
         return new ClickResult(ClickType.MAP, mapPos);
     }
+    
 
     int mob = mapOrBag_click(x, y);
     if (mob != 0) {
@@ -297,5 +298,9 @@ public class GameDataClick {
     }
     
     return new ClickResult(ClickType.NOTHING, null);
+  }
+  
+  public static LinkedHashMap<Item, BoundingBox> getItemAdd() {
+  	return itemAdd;
   }
 }

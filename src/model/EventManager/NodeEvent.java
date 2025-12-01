@@ -10,7 +10,7 @@ public class NodeEvent {
 	private Consequence consequence = null;
 	
 	
-	public NodeEvent(String question, String answer) {
+	public NodeEvent(String answer, String question) {
 		this.question = question;
 		this.answer = answer;
 	}
@@ -47,8 +47,11 @@ public class NodeEvent {
 		return answer;
 	}
 	
-
-	public boolean isLeaf() {
-		return (choice1 == null) && (choice2 == null);
+	/**
+	 * Is it the last choice before the end ?
+	 * @return
+	 */
+	public boolean isLastChoice() {
+		return choice2 == null;
 	}
 }
