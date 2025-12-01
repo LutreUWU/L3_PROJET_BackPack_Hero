@@ -202,7 +202,7 @@ public class Floor {
    * @return
    */
   public Room[][] getGrid() {
-    return grid;
+  	return grid;
   }  
   
   /**

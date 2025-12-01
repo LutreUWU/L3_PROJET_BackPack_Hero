@@ -3,6 +3,7 @@ package model.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Hero;
 import model.XY;
 
 public class Healer implements Room {
@@ -19,5 +20,10 @@ public class Healer implements Room {
 	
 	public void addAccessible(XY coord){
 		accessible.add(coord);
+	}
+	
+	public void healerUse(Hero hero) {
+		hero.add("gold", floor * 3);
+		hero.add("hp", floor * 6);
 	}
 }

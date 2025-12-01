@@ -47,7 +47,6 @@ public class Sword extends AbstractItem{
 			b[1] = new Block(coord.x() - 1, coord.y());
 			b[2] = new Block(coord.x() + 1, coord.y());
 		}
-		
 	}
 	
 	/**
