@@ -245,10 +245,12 @@ public class GameDataClick {
   		return -1;
   	}
   	var boundingBox = GameMath.getMapEvent().get("BG_CHOICE_END").box();
-  	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
-  		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
-  			return 3;
-  		}
+  	if (data.event().getRoot().getChoice2() == null) {
+    	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
+    		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
+    			return 3;
+    		}
+    	}
   	}
   	for (int i = 0; i < 2; i++) {
   		String key = "BG_CHOICE" + Integer.toString(i + 1);
