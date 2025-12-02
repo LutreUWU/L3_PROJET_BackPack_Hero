@@ -31,7 +31,7 @@ public class GameDataBackpack {
    * @param item Item we wants to check
    * @return true if we can, else false if we can't
    */
-  private static boolean check_place(Item item) {
+  private static boolean checkPlace(Item item) {
 		if (item == null) {
 		  return false;
 		}
@@ -56,16 +56,16 @@ public class GameDataBackpack {
    * @param item Item we wants to check
    * @return true if we can add it, else false if we can't
    */
-  public static boolean add_ItemToBackpack(Item item) {
+  public static boolean addItemToBackpack(Item item) {
     if (item == null) {
       return false;
     }
-    if (check_place(item)) {
+    if (checkPlace(item)) {
       var b = item.shape();
       for (var block : b) {
         backpack.grid()[block.y()][block.x()] = item.getID();
       }
-      backpack.item_lst().add(item);
+      backpack.bagItemLst().add(item);
       return true;
     }
     return false;
@@ -77,12 +77,12 @@ public class GameDataBackpack {
    * @param item Item we wants to remove
    * @throws Objects.requireNonNull if item is null
    */
-  public static void remove_itemFromBackpack(Item item) {
+  public static void removeItemFromBackpack(Item item) {
     Objects.requireNonNull(item);
     var b = item.shape();
     for (var block : b) {
       backpack.grid()[block.y()][block.x()] = -1;
     }
-    backpack.item_lst().remove(item);
+    backpack.bagItemLst().remove(item);
   }
 }

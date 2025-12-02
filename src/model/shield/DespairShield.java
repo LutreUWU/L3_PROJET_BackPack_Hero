@@ -17,9 +17,9 @@ public class DespairShield implements Item{
 	 */
 	private Block[] b = new Block[4]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.EPIC; 
-	private int id = 2;
-	private int score = 10;
+	private final Rarity rarity = Rarity.EPIC; 
+	private final int id = 2;
+	private final int score = 10;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually

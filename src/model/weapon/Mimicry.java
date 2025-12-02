@@ -17,9 +17,9 @@ public class Mimicry implements Item{
 	 */
 	private Block[] b = new Block[3]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.MYTHIC; 
-	private int id = 3;
-	private int score = 100;
+	private final Rarity rarity = Rarity.MYTHIC; 
+	private final int id = 3;
+	private final int score = 100;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually

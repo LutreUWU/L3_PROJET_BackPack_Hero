@@ -16,8 +16,8 @@ import model.weapon.Sword;
 public class ItemRepository {
 
     // Stocke les armes par ID
-    private static final Map<Integer, Item> item_map = new HashMap<>();
-    private static List<Item> itemRank_lst;
+    private static final Map<Integer, Item> itemRepositoryMap = new HashMap<>();
+    private static List<Item> itemRankLst;
 
     
     // Trier du moins rare au plus rare
@@ -33,23 +33,22 @@ public class ItemRepository {
     
     // Méthode pour enregistrer une arme
     private static void registerWeapon(Item item) {
-        item_map.put(item.getID(), item);
+        itemRepositoryMap.put(item.getID(), item);
     }
     
     private static void createRankingWeapon() {
-    	Collection<Item> items = item_map.values();
-    	itemRank_lst = new ArrayList<>(items);
-    	itemRank_lst.sort((a, b) -> Integer.compare(a.final_score(), b.final_score()));
-    	IO.println(itemRank_lst);
+    	Collection<Item> items = itemRepositoryMap.values();
+    	itemRankLst = new ArrayList<>(items);
+    	itemRankLst.sort((a, b) -> Integer.compare(a.final_score(), b.final_score()));
     }
 
     // Récupérer une arme par ID
     public static Item getWeapon(int id) {
-        return item_map.get(id);
+        return itemRepositoryMap.get(id);
     }
     
     public static List<Item> getItemrankLst() {
-			return itemRank_lst;
+			return itemRankLst;
 		}
 
 

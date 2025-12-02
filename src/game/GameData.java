@@ -44,7 +44,7 @@ public class GameData {
    * null if we're not adding.
    */
   private Item dragItem = null; 
-  private static LinkedHashMap<Item, BoundingBox> itemAdd;
+  private static LinkedHashMap<Item, BoundingBox> dragItemLst;
   /**
    * To know if we display map or bag
    * 
@@ -57,13 +57,13 @@ public class GameData {
    * 
    */
   private LinkedEvent event;
-  private XY mouse_coord;
+  private XY mouseCoord;
   /**
    * Map used for drawing an image <br>
    * The keys are the name of the image and the value his {@code BufferedImage}
    * 
    */
-  private Map<String, BufferedImage> img_map;
+  private final Map<String, BufferedImage> imgMap;
 
   /**
    * Initialize data of the game 
@@ -76,8 +76,8 @@ public class GameData {
 	  floor = 1;
 	  map = new Floor(floor, hero);
 	  screenInfo = screenInfo_;
-	  itemAdd = new LinkedHashMap<>();
-	  img_map = ImageLoader.load_image();
+	  dragItemLst = new LinkedHashMap<>();
+	  imgMap = ImageLoader.loadAllImage();
 	  ItemRepository.createItemRepository();
 	  new GameMath(this);
 	  new GameDataBackpack(backpack);
@@ -99,11 +99,11 @@ public class GameData {
   	}
   }
   
-  public void remove_itemMap(Item item) {
-  	itemAdd.remove(item);
+  public void removeItemFromDrag(Item item) {
+  	dragItemLst.remove(item);
   }
   
-  public static void rotate_item(Item item) {
+  public static void rotateItem(Item item) {
   	item.rotateXY();
   }
   // ============
@@ -200,19 +200,19 @@ public class GameData {
     return screenInfo;
   }
   
-  public LinkedHashMap<Item, BoundingBox> map_item(){
-  	return itemAdd;
+  public LinkedHashMap<Item, BoundingBox> dragItemLst(){
+  	return dragItemLst;
   }
   
-  public Map<String, BufferedImage> img_map(){
-  	return img_map;
+  public Map<String, BufferedImage> imgMap(){
+  	return imgMap;
   }
 
-	public XY getMouse_coord() {
-		return mouse_coord;
+	public XY getMouseCoord() {
+		return mouseCoord;
 	}
 
-	public void setMouse_coord(XY mouse_coord) {
-		this.mouse_coord = mouse_coord;
+	public void setMouseCoord(XY mouse_coord) {
+		this.mouseCoord = mouse_coord;
 	}
 }

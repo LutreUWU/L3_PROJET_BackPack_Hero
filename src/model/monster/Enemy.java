@@ -37,7 +37,7 @@ public interface Enemy {
 	 * 
 	 * @return String of the attack we choose
 	 */
-	String pre_action();
+	String preAction();
 	
 	/**
 	 * Get the path to the enemy image

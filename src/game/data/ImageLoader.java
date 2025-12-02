@@ -9,9 +9,9 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 public class ImageLoader {	
-	private static Map<String, BufferedImage> bgImages = new HashMap<>();
+	private final static Map<String, BufferedImage> bgImages = new HashMap<>();
 	
-	private static BufferedImage load_img(File name) {
+	private static BufferedImage loadImg(File name) {
     try {
 			BufferedImage img = ImageIO.read(name);
 			return img;
@@ -22,7 +22,7 @@ public class ImageLoader {
     return null;
 	}
 	
-	private static void add_folder(String pathFolder) {
+	private static void addFolder(String pathFolder) {
 		File folder = new File(pathFolder);
 		File[] files = folder.listFiles((dir, name) -> {
 		    String lower = name.toLowerCase();
@@ -33,18 +33,17 @@ public class ImageLoader {
 		        String fileName = f.getName();
 		        // Retirer l'extension
 		        String key = fileName.substring(0, fileName.lastIndexOf('.'));
-		        bgImages.put(key, load_img(f));
+		        bgImages.put(key, loadImg(f));
 		    }
 		}
 	}
 	
-	
-	public static Map<String, BufferedImage> load_image() {
-		add_folder("data/BG");
-		add_folder("data/monster");
-		add_folder("data/weapon");
-		bgImages.put("bag", load_img(new File("data/bag.png")));
-		bgImages.put("Roland", load_img(new File("data/Roland.png")));
+	public static Map<String, BufferedImage> loadAllImage() {
+		addFolder("data/BG");
+		addFolder("data/monster");
+		addFolder("data/weapon");
+		bgImages.put("bag", loadImg(new File("data/bag.png")));
+		bgImages.put("Roland", loadImg(new File("data/Roland.png")));
 		return bgImages;
 	}
 }

@@ -8,7 +8,7 @@ import model.XY;
 public class Hallway implements Room {
 	private List<XY> accessible = new ArrayList<>();
 	
-	public List<XY> get_accessible(){
+	public List<XY> getAccessible(){
 		return accessible;
 	}
 	

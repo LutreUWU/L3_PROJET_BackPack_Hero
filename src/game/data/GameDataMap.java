@@ -18,9 +18,9 @@ public class GameDataMap {
    * @param data_hero Hero's data from GameData
    * @throws Objects.requireNonNull if no hero is initialize
    */
-	public GameDataMap(Floor data_map) { 
-		Objects.requireNonNull(data_map);
-		map = data_map;
+	public GameDataMap(Floor mapData) { 
+		Objects.requireNonNull(mapData);
+		map = mapData;
   }
 	
 	/**

@@ -66,8 +66,8 @@ public class GameController {
 		    switch(res.type()) {
 		    	case ITEM -> {
 		    		data.setDragItem((Item) res.value());
-		    		GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-				  	GameDataClick.update_boundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+		    		GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+				  	GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 		    	}
 		    	case MAP_OR_BAG -> {	
 		    		if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
@@ -76,15 +76,15 @@ public class GameController {
 		    	}
 		    	case BAG -> {
 		    		if (data.mapOrBag() && GameDataCombat.combat()) {
-		    			GameDataCombat.hero_action(data, (XY) res.value());
+		    			GameDataCombat.heroAction(data, (XY) res.value());
 		    		}
 		    	}
 		    	case EVENT_CHOICE -> {
 		    		if ((int) res.value() == 1) {
-			  			data.event().choose1(data.hero(), data.bag().item_lst());
+			  			data.event().choose1(data.hero(), data.bag().bagItemLst());
 		    		}
 		    		if ((int) res.value() == 2) {
-			  			data.event().choose2(data.hero(), data.bag().item_lst());
+			  			data.event().choose2(data.hero(), data.bag().bagItemLst());
 		    		}
 		    		if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
 		    			// Ajouter les conséquences de fin d'event
@@ -96,20 +96,20 @@ public class GameController {
 		    		var coord = (XY) res.value();
 		    		if (coord.x() != -1 && coord.y() != -1) {
 			    		if (data.map().getHeroVisited().contains(coord)) {
-			    			data.map().setHero_pos(coord);
+			    			data.map().setHeroPos(coord);
 			    			
 			    		} else if (data.map().getHeroAccessible().contains(coord)) {
-			    			data.map().setHero_pos(coord);
+			    			data.map().setHeroPos(coord);
 			    			/*
 			    			data.map().addHeroVisited(coord);
 			    			data.map().updateHeroAccessible();
 			    			data.map().updateHeroVisible();
 			    			*/
 			    			data.map().updateMap(coord);
-			    			var coordHero = new XY(data.map().get_heroPos().x(), data.map().get_heroPos().y());
+			    			var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
 			    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EnemyRoom) {
 			    				data.swapMapOrBag();
-					  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
+					  			GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
 			    			}
 			    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EventRoom event_room && !event_room.getAlreadyVisited()) {
 			    				event_room.visitedEvent();
@@ -123,7 +123,7 @@ public class GameController {
 			    			var unlock_door = (LockedDoor) data.map().getGrid()[coord.y()][coord.x()];
 			    			unlock_door.unlock();
 			    			data.hero().sub("gold", 40);
-			    			data.map().setHero_pos(coord);
+			    			data.map().setHeroPos(coord);
 			    			/*
 			    			data.map().addHeroVisited(coord);
 			    			data.map().updateHeroAccessible();
@@ -138,47 +138,47 @@ public class GameController {
 		  }
 		  if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
 		  	if (data.dragItem() != null) {
-		  		GameDataClick.move_item(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-			  	GameDataClick.set_oldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+		  		GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+			  	GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
 		  	}
 		  }
 		  if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
 		  	int x = pointerEvent.location().x();
 		  	int y = pointerEvent.location().y();
-		  	var res = GameDataClick.bag_click(x, y);
+		  	var res = GameDataClick.bagClick(x, y);
 		    if(res.x() != -1) {
-		    	data.dragItem().setXY(GameDataClick.bag_click(x, y));
-		    	if(GameDataBackpack.add_ItemToBackpack(data.dragItem())){
-						data.remove_itemMap(data.dragItem());
+		    	data.dragItem().setXY(GameDataClick.bagClick(x, y));
+		    	if(GameDataBackpack.addItemToBackpack(data.dragItem())){
+						data.removeItemFromDrag(data.dragItem());
 				  }
 		    	else {
-		    		GameDataClick.add_item(data.dragItem());
+		    		GameDataClick.addDragItem(data.dragItem());
 		    	}
 	    	}
 		    data.setDragItem(null);
 		  }
 		  GameView.draw(context, data);
-		  data.setMouse_coord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));	
+		  data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));	
 		}
 		// If event button is pressed 
 		if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
 		  switch(key.key()) {
 		  	case Key.A ->{ 
 		  	  if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-		  	    GameDataClick.add_item(new Axe()); 
+		  	    GameDataClick.addDragItem(new Axe()); 
 		  	  }
 		  	}
 		  	// Start a combat against a RAT
 		  	case Key.I ->{ 
 		  		if(GameDataCombat.combat() == false) {
-		  			GameDataCombat.start_combat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())), data);
+		  			GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())), data);
 		  		}
 		  	}
 		  	
 		  	case Key.R ->{
 		  		if (data.dragItem() != null) {
-		  			GameData.rotate_item(data.dragItem());
-				  	GameDataClick.update_boundingBox(data.dragItem(), data.getMouse_coord().x(), data.getMouse_coord().y());
+		  			GameData.rotateItem(data.dragItem());
+				  	GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
 		  		}
 		  	}
 				// Leave the game
@@ -200,7 +200,7 @@ public class GameController {
     var screenInfo = context.getScreenInfo();
     var data = new GameData(screenInfo);
     FontLoader.load_font();
-    GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().grid_size());
+    GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
     GameView.draw(context, data);
     while (true) {
       if (!gameLoop(context, data)) {

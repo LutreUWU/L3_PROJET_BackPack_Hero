@@ -17,11 +17,11 @@ public class Floor {
 	
 	private Room[][] grid = new Room[LINE][ROW];
   
-  final private HashSet<XY> hero_visited = new HashSet<>();
-  final private HashSet<XY> hero_accessible = new HashSet<>();
-  final private HashSet<XY> hero_visible = new HashSet<>();
-  final private HashSet<XY> hero_visible_for_line = new HashSet<>();
-  private XY hero_pos;
+  final private HashSet<XY> heroVisited = new HashSet<>();
+  final private HashSet<XY> heroAccessible = new HashSet<>();
+  final private HashSet<XY> heroVisible = new HashSet<>();
+  final private HashSet<XY> heroVisibleForLine = new HashSet<>();
+  private XY heroPos;
   
 
   /**
@@ -33,7 +33,7 @@ public class Floor {
   	XY start = createAllRoom(1, hero);
   	HashSet<XY> visited = new HashSet<>();
   	createWay(visited, start);
-  	hero_pos = start;
+  	heroPos = start;
   	updateMap(start);
   }
 
@@ -41,8 +41,8 @@ public class Floor {
    * Setters for hero position
    * @param hero_pos
    */
-	public void setHero_pos(XY hero_pos) {
-		this.hero_pos = hero_pos;
+	public void setHeroPos(XY hero_pos) {
+		this.heroPos = hero_pos;
 	}
 
 
@@ -152,17 +152,17 @@ public class Floor {
    * Add two more visible for each accessible room (not for the "LockedDoor")
    */
   public void addTwoVisible() {
-	  for (var coord : hero_accessible) {
+	  for (var coord : heroAccessible) {
 	  	var room = grid[coord.y()][coord.x()];
 	  	if (!(room instanceof LockedDoor)) {
-	  		hero_visible.add(coord);
-	  		for (var coord_acc : room.get_accessible()) {
-	  			hero_visible.add(coord_acc);
+	  		heroVisible.add(coord);
+	  		for (var coord_acc : room.getAccessible()) {
+	  			heroVisible.add(coord_acc);
 	  			var room2 = grid[coord_acc.y()][coord_acc.x()];
 	  			if (!(room2 instanceof LockedDoor)) {
-	  				hero_visible_for_line.add(coord_acc);
-	    			for (var coord_acc2 : room2.get_accessible()) {
-	      			hero_visible.add(coord_acc2);
+	  				heroVisibleForLine.add(coord_acc);
+	    			for (var coord_acc2 : room2.getAccessible()) {
+	      			heroVisible.add(coord_acc2);
 	    			}
 	  			}
 	  		}
@@ -176,20 +176,20 @@ public class Floor {
    * @param coord
    */
   public void updateAll(XY coord) {
-  	if (!hero_visited.contains(coord)) {
-  		hero_accessible.remove(coord);
-  		hero_visible_for_line.add(coord);
-	  	hero_visited.add(coord);
-	  	hero_visible.add(coord);
+  	if (!heroVisited.contains(coord)) {
+  		heroAccessible.remove(coord);
+  		heroVisibleForLine.add(coord);
+	  	heroVisited.add(coord);
+	  	heroVisible.add(coord);
 	  	var room = grid[coord.y()][coord.x()];
-	  	for (var coord_ac : room.get_accessible()) {
+	  	for (var coord_ac : room.getAccessible()) {
 	  		var room_acc = grid[coord_ac.y()][coord_ac.x()];
 	  		if (room_acc instanceof Hallway) {
 	  			updateAll(coord_ac);
 	  		} else {
-	  			if (!hero_visited.contains(coord_ac)) {
-	  				hero_visible.add(coord_ac);
-		  			hero_accessible.add(coord_ac);
+	  			if (!heroVisited.contains(coord_ac)) {
+	  				heroVisible.add(coord_ac);
+		  			heroAccessible.add(coord_ac);
 	  			}
 	  			
 	  		}
@@ -210,7 +210,7 @@ public class Floor {
    * @return
    */
   public HashSet<XY> getHeroVisited() {
-    return hero_visited;
+    return heroVisited;
   }
   
   /**
@@ -218,7 +218,7 @@ public class Floor {
    * @return
    */
   public HashSet<XY> getHeroVisible() {
-    return hero_visible;
+    return heroVisible;
   }
   
   /**
@@ -226,7 +226,7 @@ public class Floor {
    * @return
    */
   public HashSet<XY> getHeroVisibleLine() {
-    return hero_visible_for_line;
+    return heroVisibleForLine;
   }
   
   /**
@@ -234,14 +234,14 @@ public class Floor {
    * @return
    */
   public HashSet<XY> getHeroAccessible() {
-    return hero_accessible;
+    return heroAccessible;
   }
   
   /**
    * Getter for hero position
    * @return
    */
-  public XY get_heroPos() {
-  	return hero_pos;
+  public XY getHeroPos() {
+  	return heroPos;
   }
 }

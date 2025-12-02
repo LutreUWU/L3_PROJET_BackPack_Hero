@@ -20,19 +20,19 @@ public class GameDataClick {
    * Has a record {@code XY} containing the mouse coordinate before moving the cursor.
    * 
    */
-  private static XY old_position;
+  private static XY oldPosition;
 	/**
    * Contains all items movable in the screen.<br>
    * For exemple, if there's one item, we can only only move this item. <br>
    * If {@code itemAdd} is empty, no items can be move
    */
-  private static LinkedHashMap<Item, BoundingBox> itemAdd;
+  private static LinkedHashMap<Item, BoundingBox> dragItemMap;
 	
-	public GameDataClick(GameData data_) {
-		data = data_;
+	public GameDataClick(GameData dataGame) {
+		data = dataGame;
 		backpack = data.bag();
 		screenInfo = data.screenInfo();
-		itemAdd = data.map_item();
+		dragItemMap = data.dragItemLst();
 	}
 	
 	/**
@@ -43,21 +43,21 @@ public class GameDataClick {
    * @return -2 if we click a lock case, -1 if we click a free case else, ID of the weapon
    * 				  0 if we click outside of the bag.
    */
-  public static XY bag_click(int x, int y) {
-  	int grid_size = backpack.grid_size();
-  	double left_grid = (screenInfo.width() / 2) - 3.5 * grid_size;
-  	double up_grid = (screenInfo.height() / 4.5) - 2.5 * grid_size;
+  public static XY bagClick(int x, int y) {
+  	int size = backpack.getGridSize();
+  	double coordLeftGrid = (screenInfo.width() / 2) - 3.5 * size;
+  	double coordTopGrid = (screenInfo.height() / 4.5) - 2.5 * size;
   	if (data.mapOrBag() == false) {
   	  return new XY(-1, -1);
   	}
-  	if(x < left_grid || x > (left_grid + 7 * grid_size) ||
-  		 y < up_grid   || y > (up_grid + 5 * grid_size)
+  	if(x < coordLeftGrid || x > (coordLeftGrid + 7 * size) ||
+  		 y < coordTopGrid   || y > (coordTopGrid + 5 * size)
   		) {
   		return new XY(-1, -1);
   	}
-  	int new_x = (int) (x - left_grid) / grid_size;
-  	int new_y = (int) (y - up_grid) / grid_size;
-  	return new XY(new_x, new_y);
+  	int newX = (int) (x - coordLeftGrid) / size;
+  	int newY = (int) (y - coordTopGrid) / size;
+  	return new XY(newX, newY);
   }
   
   
@@ -67,22 +67,22 @@ public class GameDataClick {
 	 * <p>The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.</br>
 	 * This method determines in which row the x-coordinate of a mouse click falls.</p>
 	 * 
-	 * @param left_grid The x-coordinate of the top of the grid.
-	 * @param grid_size The height of each grid cell.
+	 * @param leftGrid The x-coordinate of the top of the grid.
+	 * @param gridSize The height of each grid cell.
 	 * @param gap       The horizontal gap between two grid cells.
 	 * @param x         The x-coordinate of the click.
 	
 	 * @return The column index (0 to 11), or -1 if the click is outside the grid cells.
 	 */
-	private static int check_mapXclick(double left_grid, double grid_size, double gap, int x) {
-		double positionX = left_grid;
+	private static int checkMapAbsClick(double leftGrid, double gridSize, double gap, int x) {
+		double positionX = leftGrid;
 		int newX = -1;
 		for (var i = 0; i < 11; i++) {
-			if (positionX <= x && x <= positionX + grid_size) {
+			if (positionX <= x && x <= positionX + gridSize) {
 				newX = i;
 				break;
 			}
-			positionX += gap + grid_size;
+			positionX += gap + gridSize;
 		}
 		return newX;
 	}
@@ -93,43 +93,43 @@ public class GameDataClick {
 	 * <p>The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.</br>
 	 * This method determines in which row the y-coordinate of a mouse click falls.</p>
 	 * 
-	 * @param left_grid The y-coordinate of the top of the grid.
-	 * @param grid_size The height of each grid cell.
+	 * @param topGrid   The y-coordinate of the top of the grid.
+	 * @param gridSize The height of each grid cell.
 	 * @param gap       The horizontal gap between two grid cells.
 	 * @param xy        The y-coordinate of the click.
 	
 	 * @return The column index (0 to 11), or -1 if the click is outside the grid cells.
 	 */
-	private static int check_mapYclick(double up_grid, double grid_size, double gap, int y) {
-		double positionY = up_grid;
+	private static int checkMapOrdClick(double topGrid, double gridSize, double gap, int y) {
+		double positionY = topGrid;
 		int newY = -1;
 		for (var i = 0; i < 5; i++) {
-			if (positionY <= y && y <= positionY + grid_size) {
+			if (positionY <= y && y <= positionY + gridSize) {
 				newY = i;
 				break;
 			}
-			positionY += gap + grid_size;
+			positionY += gap + gridSize;
 		}
 		return newY;
 	}
 	
   /**
-   * Methods to check if we click inside the map
+   * Methods to check if we click inside the floor map
    * 
    * @param x					 Coordinate x we click
    * @param y 				 Coordinate y we click
    */
-  private static XY map_click(int x, int y) {
-  	int grid_size = backpack.grid_size();
-  	var gap = grid_size * 0.1;
-  	double left_grid = (screenInfo.width() / 2) - 5.5 * grid_size;
-  	double up_grid = (screenInfo.height() / 5.5) - 2.5 * grid_size;
-  	if(x < left_grid || x > (left_grid + 11 * grid_size + 10 * gap) ||
-   		 y < up_grid   || y > (up_grid + 5 * grid_size + 4 * gap)
+  private static XY floorClick(int x, int y) {
+  	int size = backpack.getGridSize();
+  	var gap = size * 0.1;
+  	double leftGrid = (screenInfo.width() / 2) - 5.5 * size;
+  	double topGrid = (screenInfo.height() / 5.5) - 2.5 * size;
+  	if(x < leftGrid || x > (leftGrid + 11 * size + 10 * gap) ||
+   		 y < topGrid   || y > (topGrid + 5 * size + 4 * gap)
    		) {
    		return new XY(-1, -1);
    	}
-  	return new XY(check_mapXclick(left_grid, grid_size, gap, x), check_mapYclick(up_grid, grid_size, gap, y));
+  	return new XY(checkMapAbsClick(leftGrid, size, gap, x), checkMapOrdClick(topGrid, size, gap, y));
   }
   
   
@@ -141,10 +141,10 @@ public class GameDataClick {
    * 
    * @return 1 if we click in the button, else 0
    */
-  private static int mapOrBag_click(int x, int y) {
-  	int grid_size = backpack.grid_size();
-  	if (x < screenInfo.width() - grid_size / 2 || x > screenInfo.width() ||
-  			y < screenInfo.height()/3.5 - 2.5* grid_size || y > screenInfo.height()/3.5 - 2.5*grid_size + grid_size / 2) {
+  private static int mapOrBagClick(int x, int y) {
+  	int size = backpack.getGridSize();
+  	if (x < screenInfo.width() - size / 2 || x > screenInfo.width() ||
+  			y < screenInfo.height()/3.5 - 2.5* size || y > screenInfo.height()/3.5 - 2.5*size + size / 2) {
   		return 0;
   	}	
   	return 1;
@@ -158,12 +158,12 @@ public class GameDataClick {
    * 
    * @return {@code Item} 
    */
-  private static Item item_click(int x, int y) {
+  private static Item itemClick(int x, int y) {
   	if (GameDataCombat.combat()) {
   		return null;
   	}
   	Item item;
-  	for (Map.Entry<Item, BoundingBox> entry : itemAdd.entrySet()) {
+  	for (Map.Entry<Item, BoundingBox> entry : dragItemMap.entrySet()) {
       item = entry.getKey();
       BoundingBox box = entry.getValue();
       if (x >= box.northWest().x() && x <= box.southEast().x() &&
@@ -171,13 +171,13 @@ public class GameDataClick {
           return item;
       }
   	}
-  	var res = bag_click(x,y);
+  	var res = bagClick(x,y);
   	if (res.x() != -1 && res.y() != -1) {
-  		if ((item = backpack.get_item(res.x(), res.y())) == null) {
+  		if ((item = backpack.getItem(res.x(), res.y())) == null) {
   	    return null;
   		}
-  		GameDataBackpack.remove_itemFromBackpack(item);
-  		add_itemFromBag(item, res.x(), res.y());
+  		GameDataBackpack.removeItemFromBackpack(item);
+  		addDragItemFromBag(item, res.x(), res.y());
   		return item;
   	}
   	return null;
@@ -189,8 +189,8 @@ public class GameDataClick {
    * @param x	Old coordinate x before we move
    * @param y Old coordinate y before we move
    */
-  public static void set_oldPosition(int x, int y) {
-  	old_position = new XY(x, y);
+  public static void setOldPosition(int x, int y) {
+  	oldPosition = new XY(x, y);
   }
   
   /**
@@ -198,19 +198,19 @@ public class GameDataClick {
    * 
    * @param item item we wants to move
    */
-  public static void add_item(Item item) {
-  	itemAdd.put(item, new BoundingBox(
-											new XY(screenInfo.width() / 2 - (item.getWidth() * backpack.grid_size() / 2) , screenInfo.height() / 2 - (item.getHeight() * backpack.grid_size() / 2) ),
-											new XY(screenInfo.width() / 2 + (item.getWidth() * backpack.grid_size() / 2) , screenInfo.height() / 2 + (item.getHeight() * backpack.grid_size() / 2) ))
+  public static void addDragItem(Item item) {
+  	dragItemMap.put(item, new BoundingBox(
+											new XY(screenInfo.width() / 2 - (item.getWidth() * backpack.getGridSize() / 2) , screenInfo.height() / 2 - (item.getHeight() * backpack.getGridSize() / 2) ),
+											new XY(screenInfo.width() / 2 + (item.getWidth() * backpack.getGridSize() / 2) , screenInfo.height() / 2 + (item.getHeight() * backpack.getGridSize() / 2) ))
 							 );
   }
   
-  public static void update_boundingBox(Item item, int x, int y) {
-  	int minX = x - (item.getWidth() * backpack.grid_size() / 2);
-    int minY = y - (item.getHeight() * backpack.grid_size() / 2);
-  	int maxX = x + (item.getWidth() * backpack.grid_size() / 2);
-    int maxY = y + (item.getHeight() * backpack.grid_size() / 2);
-    itemAdd.put(item, new BoundingBox(new XY(minX, minY), new XY(maxX, maxY)));
+  public static void updateBoundingBox(Item item, int x, int y) {
+  	int minX = x - (item.getWidth() * backpack.getGridSize() / 2);
+    int minY = y - (item.getHeight() * backpack.getGridSize() / 2);
+  	int maxX = x + (item.getWidth() * backpack.getGridSize() / 2);
+    int maxY = y + (item.getHeight() * backpack.getGridSize() / 2);
+    dragItemMap.put(item, new BoundingBox(new XY(minX, minY), new XY(maxX, maxY)));
   }
   
   /**
@@ -218,11 +218,11 @@ public class GameDataClick {
    * 
    * @param item item we wants to move
    */
-  public static void add_itemFromBag(Item item, int x, int y) {
-  	var size = backpack.grid_size();
-  	var NW = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)), (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * (y - 1))));
-  	var SE = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + item.getWidth() * size, (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * y) + item.getHeight() * size));
-  	itemAdd.put(item, new BoundingBox(NW, SE));
+  public static void addDragItemFromBag(Item item, int x, int y) {
+  	var size = backpack.getGridSize();
+  	var northWest = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)), (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * (y - 1))));
+  	var southEast = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + item.getWidth() * size, (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * y) + item.getHeight() * size));
+  	dragItemMap.put(item, new BoundingBox(northWest, southEast));
   }
   
   /**
@@ -232,15 +232,15 @@ public class GameDataClick {
    * @param x	New coordinate x when moving. 
    * @param y New coordinate y when moving.
    */
-  public static void move_item(Item item, int x, int y) {
-  	int addX = x - old_position.x();
-  	int addY = y - old_position.y();
-  	var new_NW = new XY(itemAdd.get(item).northWest().x() + addX, itemAdd.get(item).northWest().y() + addY);
-  	var new_SE = new XY(itemAdd.get(item).southEast().x() + addX, itemAdd.get(item).southEast().y() + addY);
-  	itemAdd.put(item, new BoundingBox(new_NW, new_SE));
+  public static void moveDragItem(Item item, int x, int y) {
+  	int addX = x - oldPosition.x();
+  	int addY = y - oldPosition.y();
+  	var newNorthWest = new XY(dragItemMap.get(item).northWest().x() + addX, dragItemMap.get(item).northWest().y() + addY);
+  	var newSouthEast = new XY(dragItemMap.get(item).southEast().x() + addX, dragItemMap.get(item).southEast().y() + addY);
+  	dragItemMap.put(item, new BoundingBox(newNorthWest, newSouthEast));
   }
   
-  public static int EventChoice_click(int x, int y) {
+  public static int eventChoiceClick(int x, int y) {
   	if (data.event() == null) {
   		return -1;
   	}
@@ -274,27 +274,27 @@ public class GameDataClick {
    */
   public static ClickResult click(int x, int y) {
   	// Here we add other click info
-  	Item item = item_click(x, y);
+  	Item item = itemClick(x, y);
     if (item != null) {
         return new ClickResult(ClickType.ITEM, item);
     }
 
-    XY bag = bag_click(x, y);
+    XY bag = bagClick(x, y);
     if (bag.x() != -1) {
         return new ClickResult(ClickType.BAG, bag);
     }
 
-    XY mapPos = map_click(x, y);
+    XY mapPos = floorClick(x, y);
     if (mapPos.x() != -1) {
         return new ClickResult(ClickType.MAP, mapPos);
     }
     
 
-    int mob = mapOrBag_click(x, y);
+    int mob = mapOrBagClick(x, y);
     if (mob != 0) {
         return new ClickResult(ClickType.MAP_OR_BAG, mob);
     }
-    int choiceNumber = EventChoice_click(x, y);
+    int choiceNumber = eventChoiceClick(x, y);
     if (choiceNumber != -1) {
     	return new ClickResult(ClickType.EVENT_CHOICE, choiceNumber);
     }
@@ -302,7 +302,7 @@ public class GameDataClick {
     return new ClickResult(ClickType.NOTHING, null);
   }
   
-  public static LinkedHashMap<Item, BoundingBox> getItemAdd() {
-  	return itemAdd;
+  public static LinkedHashMap<Item, BoundingBox> getDragItemMap() {
+  	return dragItemMap;
   }
 }

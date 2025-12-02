@@ -12,7 +12,7 @@ public class EventRoom implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
 	private LinkedEvent event;
-	private boolean already_visited = false;
+	private boolean alreadyVisited = false;
 
   public EventRoom(int floor, Hero hero) {
       this.floor = floor;
@@ -23,7 +23,7 @@ public class EventRoom implements Room {
   	return event;
   }
   
-  public List<XY> get_accessible(){
+  public List<XY> getAccessible(){
 		return accessible;
 	}
 	
@@ -32,10 +32,10 @@ public class EventRoom implements Room {
 	}
 	
 	public void visitedEvent() {
-		already_visited = true;
+		alreadyVisited = true;
 	}
 	
 	public boolean getAlreadyVisited() {
-		return already_visited;
+		return alreadyVisited;
 	}
 }

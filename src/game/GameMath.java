@@ -19,8 +19,8 @@ public class GameMath {
 	
 	private static LinkedHashMap<String, RenderData> renderDataGame = new LinkedHashMap<>();
 	
-	public GameMath(GameData data_) {
-		data = data_;
+	public GameMath(GameData dataGame) {
+		data = dataGame;
 		screenWidth = data.screenInfo().width();
 		screenHeight = data.screenInfo().height();
 		getBGValue();
@@ -36,7 +36,7 @@ public class GameMath {
 	}
 	
 	private static void getBGimgValue(String BG_name) {
-		BufferedImage img = data.img_map().get(BG_name);
+		BufferedImage img = data.imgMap().get(BG_name);
 		var width = img.getWidth();
 		var height = img.getHeight();
 		double scale = width / screenWidth;
@@ -56,12 +56,12 @@ public class GameMath {
 	
 // =============== Backpack ===================
 	private static void getBackpackValue() {
-		var size = data.bag().grid_size();
+		var size = data.bag().getGridSize();
 		var dimX = size * 8.0;
 		var dimY = size * 6.0;
 		XY NW = new XY((int) (screenWidth / 2 - dimX/2 + size/2), (int) (size / 2  + screenHeight * 0.02));
 		XY SE = new XY((int) (screenWidth / 2 + dimX/2), (int) (size / 2  + screenHeight * 0.02 + dimY));
-		BufferedImage img = data.img_map().get("bag");
+		BufferedImage img = data.imgMap().get("bag");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		var scaleX = dimX / width;
@@ -95,7 +95,7 @@ public class GameMath {
 	}
 	
 	private static void getEventBackgroundValue() {
-		BufferedImage img = data.img_map().get("BG_EVENT");
+		BufferedImage img = data.imgMap().get("BG_EVENT");
     int imgW = img.getWidth();
     int imgH = img.getHeight();
     double scaleY = (double) (0.40 * screenHeight) / imgH;
@@ -110,7 +110,7 @@ public class GameMath {
 	
 	private static void getEventChoiceValue() {
 		// Choice 1
-		var img = data.img_map().get("BG_CHOICE1");
+		var img = data.imgMap().get("BG_CHOICE1");
 		int width = img.getWidth(), height = img.getHeight();;
 		var scale = (screenWidth * 0.20) / width;
 	  AffineTransform transform1 = new AffineTransform();
@@ -121,7 +121,7 @@ public class GameMath {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
 	  renderDataGame.put("BG_CHOICE1", new RenderData(transform1, boundingBox));
 	  // Choice 2
-	  img = data.img_map().get("BG_CHOICE2");
+	  img = data.imgMap().get("BG_CHOICE2");
 	  AffineTransform transform2 = new AffineTransform();
 	  posX = screenWidth * (0.5 + 0.23) - (width * scale);
 	  transform2.translate(posX, posY);
@@ -131,7 +131,7 @@ public class GameMath {
 	}
 	
 	private static void getEventChoiceEndValue() {
-		var img = data.img_map().get("BG_CHOICE_END");
+		var img = data.imgMap().get("BG_CHOICE_END");
 		int width = img.getWidth(), height = img.getHeight();;
 		var scale = (screenWidth * 0.20) / width;
 	  AffineTransform transform = new AffineTransform();

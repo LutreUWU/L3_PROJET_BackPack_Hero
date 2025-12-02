@@ -23,7 +23,7 @@ public class GameDataCombat {
 	 */
 	private static boolean combat = false;
 	private static int target;
-  private static ArrayList<Enemy> lst_enemy;
+  private static ArrayList<Enemy> lstEnemy;
 
 	/**
 	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
@@ -31,14 +31,14 @@ public class GameDataCombat {
 	 * @param monster The data of the monster we fight
 	 * @param data		The data of the game
 	 */
-	public static void start_combat(ArrayList<Enemy> monsters, GameData data) {
+	public static void startCombat(ArrayList<Enemy> monsters, GameData data) {
 		if (combat) {
 			return;
 		}
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
-		lst_enemy = monsters;
-		lst_enemy.forEach(monster -> monster.pre_action());
+		lstEnemy = monsters;
+		lstEnemy.forEach(monster -> monster.preAction());
 		target = 0;
 		combat = true;
 	}
@@ -50,26 +50,27 @@ public class GameDataCombat {
 	 * @param data		The data of the game.
 	 * @param object			The ID of the item we click in the backpack.
 	 */
-	public static void hero_action(GameData data, XY coord) {
+	public static void heroAction(GameData data, XY coord) {
 		Objects.requireNonNull(data);
 		int id = data.bag().grid()[coord.y()][coord.x()];
-		Enemy targetEnemy = lst_enemy.get(target); 
-		Optional<Item> weapon = data.bag().item_lst().stream()
+		Enemy targetEnemy = lstEnemy.get(target); 
+		// A changer, pas ouf je pense
+		Optional<Item> weapon = data.bag().bagItemLst().stream()
 																											 .filter(item -> item.getID() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
 			item.use(targetEnemy);
 			if (targetEnemy.getHP() <= 0) {
-				lst_enemy.remove(target);
+				lstEnemy.remove(target);
 				GameDataHero.add("xp", targetEnemy.getXP());
 			}
-			if (lst_enemy.isEmpty()) {
+			if (lstEnemy.isEmpty()) {
 				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
 				combat = false;
 			}
 			else {
 				if(data.hero().getEnergy_point() <= 0) {
-					lst_enemy.forEach(enemy -> enemy.action());
+					lstEnemy.forEach(enemy -> enemy.action());
 					if(data.hero().getHP() == 0) {
 						// TO DO 
 					}
@@ -88,7 +89,7 @@ public class GameDataCombat {
 		return combat;
 	}
 	
-	public static ArrayList<Enemy> lst_enemy(){
-		return lst_enemy;
+	public static ArrayList<Enemy> getLstEnemy(){
+		return lstEnemy;
 	}
 }

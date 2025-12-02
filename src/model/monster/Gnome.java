@@ -18,13 +18,13 @@ public class Gnome implements Enemy{
 	 */
 	private int HP = 15;
 	private int shield = 0;
-	private int xp = 4;
-	private List<String> lst_attack = List.of("Slash", "Abattage");
+	private final int xp = 4;
+	private final List<String> lstAttack = List.of("Slash", "Abattage");
 	private String action;
 	// For graphism
-	private String img = "gnome";
-	private double sizeX = 1;
-	private double sizeY = 0.8;
+	private final String img = "gnome";
+	private final double sizeX = 1;
+	private final double sizeY = 0.8;
 
 	
 	/**
@@ -33,9 +33,9 @@ public class Gnome implements Enemy{
 	 * @return Action he'll do 
 	 */
 	@Override
-	public String pre_action() {
+	public String preAction() {
 		Random randomNumbers = new Random();
-		action = lst_attack.get(randomNumbers.nextInt(2));
+		action = lstAttack.get(randomNumbers.nextInt(2));
 		return action;
 	}
 	
@@ -51,7 +51,7 @@ public class Gnome implements Enemy{
 				this.subHP(3);
 				}
 		}
-		pre_action();
+		preAction();
 	}
 	
 	/**

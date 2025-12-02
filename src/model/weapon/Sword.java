@@ -17,9 +17,9 @@ public class Sword implements Item{
 	 */
 	private Block[] b = new Block[3]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.COMMON; 
-	private int id = 1;
-	private int score = 10;
+	private final Rarity rarity = Rarity.COMMON; 
+	private final int id = 1;
+	private final int score = 10;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually

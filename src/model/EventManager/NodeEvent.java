@@ -1,7 +1,5 @@
 package model.EventManager;
 
-import java.util.Objects;
-
 public class NodeEvent {
 	private String question;
 	private String answer;
@@ -15,12 +13,12 @@ public class NodeEvent {
 		this.answer = answer;
 	}
 	
-	public void setChoice1(NodeEvent new_choice1) {
-		choice1 = new_choice1;
+	public void setChoice1(NodeEvent newChoice1) {
+		choice1 = newChoice1;
 	}
 	
-	public void setChoice2(NodeEvent new_choice2) {
-		choice2 = new_choice2;
+	public void setChoice2(NodeEvent newChoice2) {
+		choice2 = newChoice2;
 	}
 	
 	public NodeEvent getChoice1() {

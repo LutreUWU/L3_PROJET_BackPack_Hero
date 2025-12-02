@@ -52,15 +52,145 @@ public record GameView(int width, int height, int grid_size) {
   	return new GameView(width, height, grid_size);
   }
   
+  /**
+	 * Draw the background of the game
+	 * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+	 */
+	private static void drawBG(Graphics2D graphics, GameData data) {
+    // A ENLEVER
+		graphics.setColor(Color.GRAY);
+		graphics.fill(new Rectangle2D.Double(0, 0, data.screenInfo().width(), data.screenInfo().height()));
+		/////////////
+		BufferedImage img = data.imgMap().get("BG1");
+		graphics.drawImage(img, GameMath.getMapEvent().get("BG1").transform(), null);
+	}
+	
+	/**
+	 * Draw an image in the window
+	 * 
+	 * @param graphics	{@code Graphics2D} of the game
+	 * @param img				Image we wants to put
+   * @param x  				The x coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+   * @param y 				The y coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+	 * @param dimX			Width of the image
+	 * @param dimY			Height of the image
+	 * @param direction Direction we wants to draw it
+	 */
+	public static void drawElement(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction) {
+		double angle = Math.toRadians(90 * direction.ordinal());
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = Math.min(dimX / width, dimY / height);
+	  AffineTransform transform = new AffineTransform();
+	  double centerX = x + dimX / 2.0;
+	  double centerY = y + dimY / 2.0;
+	  transform.translate(centerX, centerY);
+	  transform.rotate(angle);
+	  transform.scale(scale, scale);
+	  transform.translate(-width / 2, -height / 2);
+	  graphics.drawImage(img, transform, null);
+	}
+	
+	/**
+   * <p>
+   * Draw an image but with a specifity.<br>
+   * Initially, the other method {@code drawElement} draw the element base of the center of the image.
+   * </p>
+   * 
+   * <p>
+   * But since we're using .png image, it can happens that the center of the image is empty.<br>
+   * In consequence, we need to change the "center" of the image to draw properly the image.
+   * </p>
+   * 
+   * <p>
+   * We're adding two new parameters marginX and marginY to help drawing this item.<br>
+   * For example, if we wants the center to be at the left center of the image, marginX = 0 and marginY = 0.5 
+   * </p>
+	 * 
+	 * @param graphics	{@code Graphics2D} of the game
+	 * @param img				Image we wants to put
+   * @param x  				The x coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+   * @param y 				The y coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+	 * @param dimX			Width of the image
+	 * @param dimY			Height of the image
+	 * @param direction Direction we wants to draw it
+   * @param marginX		Value between 0.0 and 1.0, the margeX of the item (If we wants the centerX, marginX = 0.5)
+   * @param marginY	  Value between 0.0 and 1.0, the margeY of the item (If we wants the centerY, marginY = 0.5)
+	 */
+	public static void drawSpecialElement(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction, double marginX, double marginY) {
+		double angle = Math.toRadians(90 * direction.ordinal());
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = Math.min(dimX / width, dimY / height);
+	  AffineTransform transform = new AffineTransform();
+	  double centerX = x + dimX / 2.0;
+	  double centerY = y + dimY / 2.0;
+	  // J'ai aucune idée pq ça marche, mais ça a l'air de marché ???
+	  transform.translate(centerX, centerY);
+	  transform.rotate(angle);
+	  transform.scale(scale, scale);
+	  transform.translate(-width * marginX, -height * marginY); 
+	  graphics.drawImage(img, transform, null);
+	}
+	
+	/**
+   * <p>
+   * Draw an item in the bag but with a specifity.<br>
+   * Initially, the other method {@code drawElement} draw the element base of the center of the image.
+   * </p>
+   * 
+   * <p>
+   * But since we're using .png image, it can happens that the center of the image is empty.<br>
+   * In consequence, we need to change the "center" of the image to draw properly the image.
+   * </p>
+   * 
+   * <p>
+   * We're adding two new parameters marginX and marginY to help drawing this item.<br>
+   * For example, if we wants the center to be at the left center of the image, marginX = 0 and marginY = 0.5 
+   * </p>
+	 * 
+	 * @param graphics	{@code Graphics2D} of the game
+	 * @param img				Image we wants to put
+   * @param x  				The x coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+   * @param y 				The y coordinate of the location in user space where
+   * 									the upper left corner of the image is rendered
+	 * @param dimX			Width of the image
+	 * @param dimY			Height of the image
+	 * @param direction Direction we wants to draw it
+   * @param marginX		Value between 0.0 and 1.0, the margeX of the item (If we wants the centerX, marginX = 0.5)
+   * @param marginY	  Value between 0.0 and 1.0, the margeY of the item (If we wants the centerY, marginY = 0.5)
+	 */
+	public static void drawSpecialElementInBag(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction, double marginX, double marginY) {
+		double angle = Math.toRadians(90 * direction.ordinal());
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = Math.min(dimX / width, dimY / height);
+	  AffineTransform transform = new AffineTransform();
+	  double centerX = x + dimX * marginX;
+	  double centerY = y + dimY * marginY;
+	  transform.translate(centerX, centerY);
+	  transform.rotate(angle);
+	  transform.scale(scale, scale);
+	  transform.translate(-width * marginX, -height * marginY); // We modify this
+	  graphics.drawImage(img, transform, null);
+	}
+	
   /** 
    * Draw the grid of the Backpack
    * @param context Which window to draw
    * @param data	  Data of the game
    */	
   private static void drawGrid(Graphics2D graphics, GameData data) {
-    int size = data.bag().grid_size();
+    int size = data.bag().getGridSize();
 		int [][] grid = data.bag().grid();
-		BufferedImage imgBackpack = data.img_map().get("bag");
+		BufferedImage imgBackpack = data.imgMap().get("bag");
 		BoundingBox boundingBox = GameMath.getMapEvent().get("BG_BACKPACK").box(); 
 		graphics.drawImage(imgBackpack, GameMath.getMapEvent().get("BG_BACKPACK").transform(), null);
 		for (int i = 0; i < 5; i++) {
@@ -68,62 +198,96 @@ public record GameView(int width, int height, int grid_size) {
 	    	final int fi = i;
 	    	final int fj = j;				  
 		  	if (grid[fi][fj] >= -1) {
-		  		graphics.drawImage(data.img_map().get("BG_BAG_UNLOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
+		  		graphics.drawImage(data.imgMap().get("BG_BAG_UNLOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
 		  		
 		  	}
 		  	if (grid[fi][fj] == -2) {
-		  		graphics.drawImage(data.img_map().get("BG_BAG_LOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
+		  		graphics.drawImage(data.imgMap().get("BG_BAG_LOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
 		  	}
 			}
     }
   }
   
   /**
+   * Check the id int the bag we wants to draw and calls the appropriate method.<br>
+   * This method use a switch on the item id to know which item we wants to draw.
    * 
-   * 
-   */
-  /**
-   * Draw all items inside the bag.
-   * 
-   * @param context Which window to draw
-   * @param data	  Data of the game
+   * @param graphics {@Code Graphics2D} of the game
+   * @param data	   Data of the game
    */
   private static void drawItemBag(Graphics2D graphics, GameData data) {
-		var item_list = data.bag().item_lst();
-		for (var item : item_list) {
+		var itemLst = data.bag().bagItemLst();
+		for (var item : itemLst) {
 			Block coordinate = item.shape()[0];
 		  switch (item.getID()) {
-				case 1 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("sword")); 
-				case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().grid_size(), 2, 2, item.direction(), data.img_map().get("despairShield")); 
-				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("mimicry")); 
-				case 4 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("massue")); 
-				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().grid_size(), 1, 2, item.direction(), data.img_map().get("gant")); 
-				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().grid_size(), 2, 3, item.direction(), data.img_map().get("axe")); 
+				case 1 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("sword")); 
+				case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 2, 2, item.direction(), data.imgMap().get("despairShield")); 
+				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
+				case 4 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("massue")); 
+				case 5 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
+				case 6 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
 
 				default ->{}
 		  }
 		}
   }
   
+  /**
+   * Draw an item in the backpack
+   * 
+   * @param graphics	{@code Graphics2D} of the game
+   * @param pos				{@code XY} containing the coordinate NorthWest (x, y) of image on the screen.
+   * @param size			Size of a tile in the backpack
+   * @param width			Number of tile horizontally
+   * @param height		Number of tile vertically
+   * @param direction	Direction the img aim
+   * @param img				{@code BufferedImage} of the item
+   */
 	private static void drawInBag(Graphics2D graphics, XY pos, int size, int width, int height, Direction direction, BufferedImage img){
 		BoundingBox coord = GameMath.getMapEvent().get("BG_BACKPACK").box();
 		double centerX = 0, centerY = 0;
-		if (((width + height) % 2 == 0) && width % 2 == 0 || height % 2 == 0) {
-			if (direction == Direction.RIGHT){
-				centerX = size / 2;
-				centerY = size / 2;
-			}
-			if (direction == Direction.LEFT){
-				centerX = - size / 2;
-				centerY = size / 2;
-			}
-		}
 		GameView.drawElement(graphics, img, 
 																	 coord.northWest().x() + (size * pos.x()) + centerX,
 																	 coord.northWest().y() + (size * pos.y()) - centerY, 
 																	 size * width, size * height, direction);
 	}
-		
+	
+	/**
+   * Draw an item with a special shape in the backpack
+   * 
+   * @param graphics	{@code Graphics2D} of the game
+   * @param pos				{@code XY} containing the coordinate NorthWest (x, y) of image on the screen.
+   * @param size			Size of a tile in the backpack
+   * @param width			Number of tile horizontally
+   * @param height		Number of tile vertically
+   * @param direction	Direction the img aim
+   * @param img				{@code BufferedImage} of the item
+   * @param marginX		Value between 0.0 and 1.0 indicating the gap horizontally
+   * @param marginY		Value between 0.0 and 1.0 indicating the gap vertically
+   */
+	private static void drawInBagSpecial(Graphics2D graphics, XY pos, int size, int width, int height, Direction direction, BufferedImage img, double marginX, double marginY){
+		BoundingBox coord = GameMath.getMapEvent().get("BG_BACKPACK").box();
+		double centerX = 0, centerY = 0;
+		GameView.drawSpecialElementInBag(graphics, img, 
+																	 coord.northWest().x() + (size * pos.x()) + centerX,
+																	 coord.northWest().y() + (size * pos.y()) - centerY, 
+																	 size * width, size * height, direction, marginX, marginY);
+	}
+	
+	/**
+   * Draws the hero in the windows
+   * 
+   * @param context {@code ApplicationContext} of the game.
+   * @param data    GameData containing the game data. 
+   */
+  private static void drawHero(Graphics2D graphics, GameData data) {
+  	double size_x = data.hero().getSizeX();
+  	double size_y = data.hero().getSizeY();
+		BufferedImage img = data.imgMap().get("Roland");
+		drawElement(graphics, img, data.screenInfo().width() * 0.20, data.screenInfo().height() * 0.50, size_x, size_y, Direction.UP);
+		drawHeroStats(graphics, data, (int) (data.screenInfo().width() * 0.20 + size_x/2),  (int) (data.screenInfo().height() * 0.50 + size_y));
+  }
+  
   /**
    * Draws all the information about the hero
    * 
@@ -146,20 +310,6 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   /**
-   * Draws the hero in the windows
-   * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data    GameData containing the game data. 
-   */
-  private static void drawHero(Graphics2D graphics, GameData data) {
-  	double size_x = data.hero().getSizeX();
-  	double size_y = data.hero().getSizeY();
-		BufferedImage img = data.img_map().get("Roland");
-		drawElement(graphics, img, data.screenInfo().width() * 0.20, data.screenInfo().height() * 0.50, size_x, size_y, Direction.UP);
-		drawHeroStats(graphics, data, (int) (data.screenInfo().width() * 0.20 + size_x/2),  (int) (data.screenInfo().height() * 0.50 + size_y));
-  }
-
-  /**
    * Draw the button for switching between map and bag
    * 
    * @param context		{@code ApplicationContext} of the game.
@@ -168,8 +318,8 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawButton(Graphics2D graphics, GameData data) {
 		graphics.setColor(Color.RED);  		
 		graphics.setColor(data.mapOrBag() ? Color.ORANGE : Color.CYAN);
-    graphics.fill(new Rectangle2D.Double(data.screenInfo().width() - data.bag().grid_size() / 2, data.screenInfo().height()/3.5 - 2.5*data.bag().grid_size(), 
-    																		 data.bag().grid_size() / 2,data.bag().grid_size() / 2));
+    graphics.fill(new Rectangle2D.Double(data.screenInfo().width() - data.bag().getGridSize() / 2, data.screenInfo().height()/3.5 - 2.5*data.bag().getGridSize(), 
+    																		 data.bag().getGridSize() / 2,data.bag().getGridSize() / 2));
   }
   
   /**
@@ -179,7 +329,7 @@ public record GameView(int width, int height, int grid_size) {
    * @param data			GameData containing the game data. 
    */
   private static void drawMap(Graphics2D graphics, GameData data) {
-  	var size = data.bag().grid_size();  	
+  	var size = data.bag().getGridSize();  	
   	var gap = size * 0.1;
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 11; j++) {
@@ -188,14 +338,14 @@ public record GameView(int width, int height, int grid_size) {
 		  	var coordXY = new XY(fj, fi);
 		  	if (data.map().getHeroVisible().contains(coordXY)) {
 			  	switch(data.map().getGrid()[fi][fj]) {
-			  		case Shop s -> graphics.setColor(Color.YELLOW);
-			  		case EnemyRoom o -> graphics.setColor(Color.RED);
-			  		case EventRoom e -> graphics.setColor(Color.PINK);
-			  		case Healer h -> graphics.setColor(Color.GREEN);
-			  		case Start start -> graphics.setColor(Color.BLUE);
-			  		case Exit exit -> graphics.setColor(Color.CYAN);
-			  		case LockedDoor l -> graphics.setColor(Color.BLACK);
-			  		case Treasure t -> graphics.setColor(Color.LIGHT_GRAY);
+			  		case Shop _ -> graphics.setColor(Color.YELLOW);
+			  		case EnemyRoom _ -> graphics.setColor(Color.RED);
+			  		case EventRoom _ -> graphics.setColor(Color.PINK);
+			  		case Healer _ -> graphics.setColor(Color.GREEN);
+			  		case Start _ -> graphics.setColor(Color.BLUE);
+			  		case Exit _ -> graphics.setColor(Color.CYAN);
+			  		case LockedDoor _ -> graphics.setColor(Color.BLACK);
+			  		case Treasure _ -> graphics.setColor(Color.LIGHT_GRAY);
 			  		default ->  graphics.setColor(Color.GRAY);
 			  	}
 		  	} else graphics.setColor(Color.DARK_GRAY);
@@ -223,7 +373,7 @@ public record GameView(int width, int height, int grid_size) {
   	graphics.setColor(Color.ORANGE);
   	graphics.setStroke(new BasicStroke(5));
   	for (var coord : data.map().getHeroVisibleLine()) {
-  		for (var coord_acc : data.map().getGrid()[coord.y()][coord.x()].get_accessible()) {
+  		for (var coord_acc : data.map().getGrid()[coord.y()][coord.x()].getAccessible()) {
   			graphics.drawLine((int) ((gap * coord.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
 													(int) ((gap * coord.y()) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y() + size/2)), 
 													(int) ((gap * coord_acc.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord_acc.x()) + size/2), 
@@ -232,59 +382,16 @@ public record GameView(int width, int height, int grid_size) {
   	}
 		
 		graphics.setColor(Color.WHITE);
-		var coord = data.map().get_heroPos();
+		var coord = data.map().getHeroPos();
     graphics.fill(new Rectangle2D.Double(((gap * coord.x()) + data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x()) + size/4, 
 																		  	 ((gap * coord.y()) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y()) + size/4, 
 																					size/2, size/2));
 		///////////////////////////////////
   }
-  
-	/**
-	 * Draw the background of the game
-	 * 
-   * @param context		{@code ApplicationContext} of the game.
-   * @param data			GameData containing the game data. 
-	 */
-	private static void drawBG(Graphics2D graphics, GameData data) {
-    // A ENLEVER
-		graphics.setColor(Color.GRAY);
-		graphics.fill(new Rectangle2D.Double(0, 0, data.screenInfo().width(), data.screenInfo().height()));
-		/////////////
-		BufferedImage img = data.img_map().get("BG1");
-		graphics.drawImage(img, GameMath.getMapEvent().get("BG1").transform(), null);
-	}
-	
-	/**
-	 * Draw an image in the window
-	 * @param graphics	{@code Graphics2D} of the game
-	 * @param img				Image we wants to put
-   * @param x  				The x coordinate of the location in user space where
-   * 									the upper left corner of the image is rendered
-   * @param y 				The y coordinate of the location in user space where
-   * 									the upper left corner of the image is rendered
-	 * @param dimX			Width of the image
-	 * @param dimY			Height of the image
-	 * @param direction Direction we wants to draw it
-	 */
-	public static void drawElement(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction) {
-		double angle = Math.toRadians(90 * direction.ordinal());
-		var width = img.getWidth();
-		var height = img.getHeight();
-		var scale = Math.min(dimX / width, dimY / height);
-	  AffineTransform transform = new AffineTransform();
-	  double centerX = x + dimX / 2.0;
-	  double centerY = y + dimY / 2.0;
-	  transform.translate(centerX, centerY);
-	  transform.rotate(angle);
-	  transform.scale(scale, scale);
-	  transform.translate(-width / 2.0, -height / 2.0);
-	  graphics.drawImage(img, transform, null);
-	}
-	
-	
+
 	
   /**
-   * Update the position of the weapon if we move an item
+   * Update the position of each weapons we can move in the screen.
    * 
    * @param graphics {@code ApplicationContext} of the game.
    * @param data     GameData containing the game data.
@@ -292,23 +399,82 @@ public record GameView(int width, int height, int grid_size) {
   public static void updateDragItem(Graphics2D graphics, GameData data) {
 		Objects.requireNonNull(graphics);
 		Objects.requireNonNull(data);
-		data.map_item().forEach((item, box) -> drawItem(graphics, data, item, box));
+		data.dragItemLst().forEach((item, box) -> drawDrag(graphics, data, item, box));
   }
   
-  private static void drawItem(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
+  /**
+   * Check the id of the item we're dragging and calls the appropriate method.<br>
+   * This method use a switch on the item id to know which item we wants to draw.
+   * 
+   * @param graphics {@code ApplicationContext} of the game.
+   * @param data		 {@code GameData} containing the game data.
+   * @param item		 The Item we're currently dragging.
+   * @param box		 	 The boundingbox (border) of the item.
+   */
+  private static void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
 	  switch (item.getID()) {
-			case 1 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("sword")); 
-			case 2 -> draw(graphics, box.northWest(), data.bag().grid_size(), 2, 2, item.direction(), data.img_map().get("despairShield")); 
-			case 3 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("mimicry")); 
-			case 4 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 3, item.direction(), data.img_map().get("massue")); 
-			case 5 -> draw(graphics, box.northWest(), data.bag().grid_size(), 1, 2, item.direction(), data.img_map().get("gant")); 
-			case 6 -> draw(graphics, box.northWest(), data.bag().grid_size(), 2, 3, item.direction(), data.img_map().get("axe")); 
-
+			case 1 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("sword")); 
+			case 2 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 2, 2, item.direction(), data.imgMap().get("despairShield")); 
+			case 3 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
+			case 4 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("massue")); 
+			case 5 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.9); 
+			case 6 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
 			default ->{}
 	  }
 	}
   
-  private static void draw(Graphics2D graphics, XY coord, int size, int width, int height, Direction direction, BufferedImage img){
+  /**
+   * Draw the current item we're dragging.
+   * 
+   * @param graphics  {@code ApplicationContext} of the game.
+   * @param coord		  {@code XY} containing the coordinate NorthWest (x, y) of image on the screen.
+   * @param size		  Size of a tile.
+   * @param width		  Number of tile horizontally. 
+   * @param height 	  Number of tile vertically.
+   * @param direction {@code Direction} the item will aim.
+   * @param img				{@code BufferedImage} of the item.
+   */
+  private static void drawDragItem(Graphics2D graphics, XY coord, int size, int width, int height, Direction direction, BufferedImage img){
+		double centerX, centerY;
+		double x = coord.x(), y = coord.y();
+		double dimX = size*width, dimY = size*height;
+		// If direction is left or right, the North West coordinate need to be update in order to draw correctly
+	  if (direction == Direction.LEFT || direction == Direction.RIGHT) { 
+	  	centerX = x + dimY / 2.0;
+			centerY = y + dimX / 2.0;
+			x = centerX - dimX / 2.0;
+			y = centerY - dimY / 2.0;
+		}
+		GameView.drawElement(graphics, img, x, y, dimX, dimY, direction);
+	}
+  
+  /**
+   * <p>
+   * Draw the current item we're dragging but with a specifity.<br>
+   * Initially, the other method {@code drawDragItem} draw the item base of the center of the image.
+   * </p>
+   * 
+   * <p>
+   * But since we're using .png image, it can happens that the center of the image is empty.<br>
+   * In consequence, we need to change the "center" of the image to draw properly the image.
+   * </p>
+   * 
+   * <p>
+   * We're adding two new parameters marginX and marginY to help drawing this item.<br>
+   * For example, if we wants the center to be at the left center of the image, marginX = 0 and marginY = 0.5
+   * </p>
+   * 
+   * @param graphics  {@code ApplicationContext} of the game.
+   * @param coord		  {@code XY} containing the coordinate NorthWest (x, y) of image on the screen.
+   * @param size		  Size of a tile.
+   * @param width		  Number of tile horizontally. 
+   * @param height 	  Number of tile vertically.
+   * @param direction {@code Direction} the item will aim.
+   * @param img				{@code BufferedImage} of the item.
+   * @param marginX		Value between 0.0 and 1.0, the margeX of the item (If we wants the centerX, marginX = 0.5)
+   * @param marginY	  Value between 0.0 and 1.0, the margeY of the item (If we wants the centerY, marginY = 0.5)
+   */
+  private static void drawDragSpecialItem(Graphics2D graphics, XY coord, int size, int width, int height, Direction direction, BufferedImage img, double marginX, double marginY){
 		double centerX, centerY;
 		double x = coord.x(), y = coord.y();
 		double dimX = size*width, dimY = size*height;
@@ -318,9 +484,41 @@ public record GameView(int width, int height, int grid_size) {
 			x = centerX - dimX / 2.0;
 			y = centerY - dimY / 2.0;
 		}
-		
-		GameView.drawElement(graphics, img, x, y, dimX, dimY, direction);
+		GameView.drawSpecialElement(graphics, img, x, y, dimX, dimY, direction, marginX, marginY);
 	}
+  
+  /**
+   * Update the state of the combat.
+   * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   * @param lstEnemy List of all enemy we fight
+   */
+  public static void updateEnemy(Graphics2D graphics, GameData data,  ArrayList<Enemy> lstEnemy) {
+  	Objects.requireNonNull(graphics);
+  	Objects.requireNonNull(data);
+  	Objects.requireNonNull(lstEnemy);
+  	for (int i = 0; i < lstEnemy.size(); i++) {
+  		var enemy = lstEnemy.get(i);
+  		drawEnemy(graphics, data, enemy, lstEnemy.size(), i);
+  	}
+  }
+  
+  /**
+   * Draws the enemy in the windows
+   * 
+   * @param context {@code ApplicationContext} of the game.
+   * @param data    GameData containing the game data. 
+   * @param enemy 	Data of the enemy.
+   */
+  private static void drawEnemy(Graphics2D graphics, GameData data, Enemy enemy, int nb, int ind) {
+  	double sizeX = data.hero().getSizeX() * enemy.getSizeX();
+  	double sizeY = data.hero().getSizeY() * enemy.getSizeY();
+  	double northWestX =  data.screenInfo().width() * 0.80 - data.hero().getSizeX() + (ind - (nb - 1) / 2.0) * data.hero().getSizeX() ;
+  	double northWestY =  data.screenInfo().height() * (0.5 - (0.1 * (ind%2))) + (data.hero().getSizeY() - sizeY);
+		drawElement(graphics, data.imgMap().get(enemy.getImg()), northWestX, northWestY, sizeX, sizeY, Direction.UP);
+		drawEnemyStats(graphics, enemy, (int) northWestX, (int) (northWestY + sizeY));
+  }
   
   /**
    * Draws all the information about the enemy
@@ -341,40 +539,25 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   /**
-   * Draws the enemy in the windows
+   * Draw an event and their choices
    * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data    GameData containing the game data. 
-   * @param enemy 	Data of the enemy.
+   * @param graphics {@code Graphics2D} of the game.
+   * @param data		 {@code GameData} containing all informations about the game
    */
-  private static void drawEnemy(Graphics2D graphics, GameData data, Enemy enemy, int nb, int ind) {
-  	double size_x = data.hero().getSizeX() * enemy.getSizeX();
-  	double size_y = data.hero().getSizeY() * enemy.getSizeY();
-  	double NW_x =  data.screenInfo().width() * 0.80 - data.hero().getSizeX() + (ind - (nb - 1) / 2.0) * data.hero().getSizeX() ;
-  	double NW_y =  data.screenInfo().height() * (0.5 - (0.1 * (ind%2))) + (data.hero().getSizeY() - size_y);
-		drawElement(graphics, data.img_map().get(enemy.getImg()), NW_x, NW_y, size_x, size_y, Direction.UP);
-		drawEnemyStats(graphics, enemy, (int) NW_x, (int) (NW_y + size_y));
+  private static void drawEvent(Graphics2D graphics, GameData data) {
+  	drawBgEvent(graphics, data);
+  	drawTextEvent(graphics, data);
+  	drawChoiceEvent(graphics, data);
   }
   
   /**
-   * Update the state of the combat.
+   * Draw the background image of the event
    * 
-   * @param context		{@code ApplicationContext} of the game.
-   * @param data			GameData containing the game data. 
-   * @param lst_enemy List of all enemy we fight
+   * @param graphics {@code Graphics2D} of the game.
+   * @param data		 {@code GameData} containing all informations about the game
    */
-  public static void update_combat(Graphics2D graphics, GameData data,  ArrayList<Enemy> lst_enemy) {
-  	Objects.requireNonNull(graphics);
-  	Objects.requireNonNull(data);
-  	Objects.requireNonNull(lst_enemy);
-  	for (int i = 0; i < lst_enemy.size(); i++) {
-  		var enemy = lst_enemy.get(i);
-  		drawEnemy(graphics, data, enemy, lst_enemy.size(), i);
-  	}
-  }
-  
   private static void drawBgEvent(Graphics2D graphics, GameData data) {
-  	BufferedImage img = data.img_map().get("BG_EVENT");
+  	BufferedImage img = data.imgMap().get("BG_EVENT");
     graphics.drawImage(img, GameMath.getMapEvent().get("BG_EVENT").transform(), null);
   }
   
@@ -416,18 +599,17 @@ public record GameView(int width, int height, int grid_size) {
         int lineWidth = fm.stringWidth(line.toString());
         graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());
     }
-}
+  }
 
-  
   private static void drawChoiceEvent(Graphics2D graphics, GameData data) {
-  	var img1 = data.img_map().get("BG_CHOICE1");
-  	var img2 = data.img_map().get("BG_CHOICE2");
+  	var img1 = data.imgMap().get("BG_CHOICE1");
+  	var img2 = data.imgMap().get("BG_CHOICE2");
   	var event1 = GameMath.getMapEvent().get("BG_CHOICE1");
   	var event2 = GameMath.getMapEvent().get("BG_CHOICE2");
   	int width = event1.box().southEast().x() - event1.box().northWest().x();
   	int height = event1.box().southEast().y() - event1.box().northWest().y();
   	if (data.event().getRoot().getChoice2() == null){
-  		var img3 = data.img_map().get("BG_CHOICE_END");
+  		var img3 = data.imgMap().get("BG_CHOICE_END");
   		var event3 = GameMath.getMapEvent().get("BG_CHOICE_END");
   		graphics.drawImage(img3, event3.transform(), null);
 		  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
@@ -447,19 +629,6 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   /**
-   * Draw an event and their choices
-   * 
-   * @param graphics {@code Graphics2D} of the game.
-   * @param data		 {@code GameData} containing all informations about the game
-   */
-  private static void drawEvent(Graphics2D graphics, GameData data) {
-  	drawBgEvent(graphics, data);
-  	drawTextEvent(graphics, data);
-  	drawChoiceEvent(graphics, data);
-  }
-
-  
-  /**
    * Methods for drawing the game 
    * 
    * @param context		{@code ApplicationContext} of the game.
@@ -473,7 +642,7 @@ public record GameView(int width, int height, int grid_size) {
 			if (data.mapOrBag()) {
 				drawGrid(graphics, data);
 				drawItemBag(graphics, data);
-				if(!data.map_item().isEmpty()) {
+				if(!data.dragItemLst().isEmpty()) {
 					GameView.updateDragItem(graphics, data);
 				}
 			} else {
@@ -483,7 +652,7 @@ public record GameView(int width, int height, int grid_size) {
 			drawButton(graphics, data);
 			// Draw enemy if we're in combat
 			if (GameDataCombat.combat()) {
-				update_combat(graphics, data, GameDataCombat.lst_enemy());
+				updateEnemy(graphics, data, GameDataCombat.getLstEnemy());
 			}
 			if (data.event() != null) {
 				drawEvent(graphics, data);	

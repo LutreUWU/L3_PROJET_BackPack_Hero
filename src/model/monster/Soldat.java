@@ -18,13 +18,13 @@ public class Soldat implements Enemy{
 	 */
 	private int HP = 25;
 	private int shield = 0;
-	private int xp = 6;
+	private final int xp = 6;
 	private List<String> lst_attack = List.of("Coup", "Bouclier");
 	private String action;
 	// For graphism
-	private String img = "soldat";
-	private double sizeX = 1;
-	private double sizeY = 1;
+	private final String img = "soldat";
+	private final double sizeX = 1;
+	private final double sizeY = 1;
 
 	
 	/**
@@ -33,7 +33,7 @@ public class Soldat implements Enemy{
 	 * @return Action he'll do 
 	 */
 	@Override
-	public String pre_action() {
+	public String preAction() {
 		Random randomNumbers = new Random();
 		action = lst_attack.get(randomNumbers.nextInt(2));
 		return action;
@@ -48,7 +48,7 @@ public class Soldat implements Enemy{
 			case "Coup" -> GameDataHero.sub("HP", 5);
 			case "Bouclier" -> shield += 10;
 		}
-		pre_action();
+		preAction();
 	}
 	
 	/**

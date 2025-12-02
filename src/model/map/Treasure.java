@@ -17,7 +17,7 @@ public class Treasure implements Room {
       reward = createReward();
   }
   
-  public List<XY> get_accessible(){
+  public List<XY> getAccessible(){
 		return accessible;
 	}
 	
@@ -25,10 +25,10 @@ public class Treasure implements Room {
 		accessible.add(coord);
 	}
 	
-	private Item addItem(int random) {
-		Random rand = new Random();
-		var rarity = rand.nextInt(1);
-	}
+//	private Item addItem(int random) {
+//		Random rand = new Random();
+//		var rarity = rand.nextInt(1);
+//	}
 	
 	private ArrayList<Item> createReward() {
 		var list = new ArrayList<Item>();

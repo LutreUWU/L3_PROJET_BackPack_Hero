@@ -17,9 +17,9 @@ public class Axe implements Item{
 	 */
 	private Block[] b = new Block[4]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.LEGENDARY; 
-	private int id = 6;
-	private int score = 15;
+	private final Rarity rarity = Rarity.LEGENDARY; 
+	private final int id = 6;
+	private final int score = 15;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually

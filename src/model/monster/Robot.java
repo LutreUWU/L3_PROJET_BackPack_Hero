@@ -18,13 +18,13 @@ public class Robot implements Enemy{
 	 */
 	private int HP = 50;
 	private int shield = 0;
-	private int xp = 20;
-	private List<String> lst_attack = List.of("Hoo...", "HOHOHOH", "HEHEHEH");
+	private final int xp = 20;
+	private final List<String> lst_attack = List.of("Hoo...", "HOHOHOH", "HEHEHEH");
 	private String action;
 	// For graphism
-	private String img = "robot";
-	private double sizeX = 1.2;
-	private double sizeY = 1.2;
+	private final String img = "robot";
+	private final double sizeY = 1.2;
+	private final double sizeX = 1.2;
 
 	
 	/**
@@ -33,7 +33,7 @@ public class Robot implements Enemy{
 	 * @return Action he'll do 
 	 */
 	@Override
-	public String pre_action() {
+	public String preAction() {
 		Random randomNumbers = new Random();
 		action = lst_attack.get(randomNumbers.nextInt(2));
 		return action;
@@ -49,7 +49,7 @@ public class Robot implements Enemy{
 			case "HOHOHOH" -> GameDataHero.sub("HP", 15);
 			case "HEHEHEH" -> shield = 20;
 		}
-		pre_action();
+		preAction();
 	}
 	
 	/**

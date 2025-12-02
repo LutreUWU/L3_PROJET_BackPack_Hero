@@ -18,13 +18,13 @@ public class Chicken implements Enemy{
 	 */
 	private int HP = 20;
 	private int shield = 0;
-	private int xp = 4;
-	private List<String> lst_attack = List.of("Morsure", "Protection");
+	private final int xp = 4;
+	private final List<String> lst_attack = List.of("Morsure", "Protection");
 	private String action;
 	// For graphism
-	private String img = "chicken";
-	private double sizeX = 0.8;
-	private double sizeY = 0.4;
+	private final String img = "chicken";
+	private final double sizeX = 0.8;
+	private final double sizeY = 0.4;
 
 	
 	/**
@@ -33,7 +33,7 @@ public class Chicken implements Enemy{
 	 * @return Action he'll do 
 	 */
 	@Override
-	public String pre_action() {
+	public String preAction() {
 		Random randomNumbers = new Random();
 		action = lst_attack.get(randomNumbers.nextInt(2));
 		return action;
@@ -48,7 +48,7 @@ public class Chicken implements Enemy{
 			case "Morsure" -> GameDataHero.sub("HP", 3);
 			case "Protection" -> shield += 2;
 		}
-		pre_action();
+		preAction();
 	}
 	
 	/**

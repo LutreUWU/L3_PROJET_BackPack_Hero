@@ -17,9 +17,9 @@ public class Massue implements Item{
 	 */
 	private Block[] b = new Block[3]; 
 	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.SUPERARE; 
-	private int id = 4;
-	private int score = 10;
+	private final Rarity rarity = Rarity.SUPERARE; 
+	private final int id = 4;
+	private final int score = 10;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually

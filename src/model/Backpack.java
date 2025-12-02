@@ -17,11 +17,11 @@ public class Backpack {
 											    {-2, -1, -1, -1, -1, -1, -2},
 											    {-2, -2, -1, -1, -1, -2, -2}
 											};
-	private int grid_size;
-	private static ArrayList<Item> items_list = new ArrayList<>(); // List of items I have (Index = ID)
+	private int gridSize;
+	private static ArrayList<Item> bagItemLst = new ArrayList<>(); // List of items I have (Index = ID)
 	
-	public Item get_item(int x, int y) {
-		var itemFromBag = items_list.stream().filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
+	public Item getItem(int x, int y) {
+		var itemFromBag = bagItemLst.stream().filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
 		return itemFromBag;
 	}
 	
@@ -31,7 +31,7 @@ public class Backpack {
 	 * @param gridSize
 	 */
 	public Backpack(int screenHeight) {
-		grid_size = screenHeight / 15;
+		gridSize = screenHeight / 15;
 	}
 	
 	/**
@@ -48,8 +48,8 @@ public class Backpack {
 	 * 
 	 * @return ArrayList<Item_Object>
 	 */
-	public ArrayList<Item> item_lst(){
-		return items_list;
+	public ArrayList<Item> bagItemLst(){
+		return bagItemLst;
 	}
 	
 	/**
@@ -57,15 +57,15 @@ public class Backpack {
 	 * 
 	 * @return ArrayList<Item_Object>
 	 */
-	public int grid_size(){
-		return grid_size;
+	public int getGridSize(){
+		return gridSize;
 	}
 	
 	@Override
 	public String toString(){
 		var builder = new StringBuilder();
 		builder.append("Liste items : \n");
-		for (var item : items_list) {
+		for (var item : bagItemLst) {
 			builder.append(item);
 		}
 		return builder.toString();

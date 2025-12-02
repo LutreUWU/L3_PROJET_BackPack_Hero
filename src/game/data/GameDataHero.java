@@ -14,12 +14,12 @@ public class GameDataHero {
   private static Hero hero;
   /**
    * Link the hero with the one in GameData
-   * @param data_hero Hero's data from GameData
+   * @param heroData Hero's data from GameData
    * @throws Objects.requireNonNull if no hero is initialize
    */
-  public GameDataHero(Hero data_hero) {
-  	Objects.requireNonNull(data_hero);
-    hero = data_hero;
+  public GameDataHero(Hero heroData) {
+  	Objects.requireNonNull(heroData);
+    hero = heroData;
   }
 
   /**

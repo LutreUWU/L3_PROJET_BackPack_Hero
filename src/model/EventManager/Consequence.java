@@ -1,30 +1,27 @@
 package model.EventManager;
-import game.GameData;
-import game.data.GameDataBackpack;
+import java.util.ArrayList;
+
 import game.data.GameDataClick;
 import model.Hero;
 import model.Item;
 import model.weapon.Axe;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 public class Consequence {
 	private int floor;
 	private double bonus; // OR *MALUS* !
-	private String id_consequence;
+	private String idConsequence;
 	
-	public Consequence(String id_consequence2, int floor2, double bonus2) {
+	public Consequence(String idConsequence2, int floor2, double bonus2) {
 		floor = floor2;
-		id_consequence = id_consequence2;
+		idConsequence = idConsequence2;
 		bonus = bonus2;
 	}
 	
-	public void applyConsequence(Hero hero, ArrayList<Item> item_list) {
-		switch(id_consequence) {
+	public void applyConsequence(Hero hero, ArrayList<Item> itemLst) {
+		switch(idConsequence) {
 			case "sub_hp" -> conseqSubHP(hero);
 			case "add_gold" -> hero.add("gold", (int) (floor * 5 * bonus));
-			case "add_weapon" -> GameDataClick.add_item(new Axe());
+			case "add_weapon" -> GameDataClick.addDragItem(new Axe());
 			default -> {} // Nothing
 		}
 	}

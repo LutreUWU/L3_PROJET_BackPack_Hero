@@ -16,7 +16,7 @@ public class EnemyRoom implements Room {
       this.floor = floor;
   }
   
-  public List<XY> get_accessible(){
+  public List<XY> getAccessible(){
 		return accessible;
 	}
 	
