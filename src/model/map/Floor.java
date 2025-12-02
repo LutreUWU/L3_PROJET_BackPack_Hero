@@ -22,6 +22,7 @@ public class Floor {
   final private HashSet<XY> heroVisible = new HashSet<>();
   final private HashSet<XY> heroVisibleForLine = new HashSet<>();
   private XY heroPos;
+  private boolean haveKey = false;
   
 
   /**
@@ -199,7 +200,7 @@ public class Floor {
   
   /**
    * Getter for grid
-   * @return
+   * @return Room[][]
    */
   public Room[][] getGrid() {
   	return grid;
@@ -207,7 +208,7 @@ public class Floor {
   
   /**
    * Getter for hero visited
-   * @return
+   * @return HashSet<XY>
    */
   public HashSet<XY> getHeroVisited() {
     return heroVisited;
@@ -215,7 +216,7 @@ public class Floor {
   
   /**
    * Getter for hero visible
-   * @return
+   * @return HashSet<XY>
    */
   public HashSet<XY> getHeroVisible() {
     return heroVisible;
@@ -223,7 +224,7 @@ public class Floor {
   
   /**
    * Getter for hero vsible line
-   * @return
+   * @return HashSet<XY>
    */
   public HashSet<XY> getHeroVisibleLine() {
     return heroVisibleForLine;
@@ -231,7 +232,7 @@ public class Floor {
   
   /**
    * Getter for hero accessible
-   * @return
+   * @return HashSet<XY>
    */
   public HashSet<XY> getHeroAccessible() {
     return heroAccessible;
@@ -239,9 +240,17 @@ public class Floor {
   
   /**
    * Getter for hero position
-   * @return
+   * @return XY
    */
   public XY getHeroPos() {
   	return heroPos;
+  }
+  
+  /**
+   * Gettet for haveKey
+   * @return boolean
+   */
+  public boolean getHaveKey() {
+  	return haveKey;
   }
 }

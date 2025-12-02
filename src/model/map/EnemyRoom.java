@@ -7,7 +7,7 @@ import model.XY;
 import model.monster.Chicken;
 import model.monster.Enemy;
 
-public class EnemyRoom implements Room {
+public final class EnemyRoom implements Room {
 	int floor;
 	
 	private List<XY> accessible = new ArrayList<>();

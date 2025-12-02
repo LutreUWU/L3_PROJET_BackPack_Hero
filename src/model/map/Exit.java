@@ -5,7 +5,7 @@ import java.util.List;
 
 import model.XY;
 
-public class Exit implements Room {
+public final class Exit implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
 	

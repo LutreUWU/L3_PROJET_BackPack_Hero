@@ -29,194 +29,201 @@ import model.weapon.Axe;
  * retrieving raw user actions, sending them for analysis to the GameView and
  * GameData, and dealing with time events.
  * 
- * GUIDE : 
+ * GUIDE :
  * 
- * Key.A to create an Item in the bag (It's just for testing, it'll be useless for the end)
- * - Key.(ZQSD) to move the item in the grid
- * - Key.R to rotate the item clockwise
- * - Key.ESCAPE (esc) to confirm and add the item in the backpack
+ * Key.A to create an Item in the bag (It's just for testing, it'll be useless
+ * for the end) - Key.(ZQSD) to move the item in the grid - Key.R to rotate the
+ * item clockwise - Key.ESCAPE (esc) to confirm and add the item in the backpack
  * 
- * Key.I to initiate a combat
- * - Using an item cost 1 AP, when it reach 0, enemy play.
- * - Click on a item to use it
+ * Key.I to initiate a combat - Using an item cost 1 AP, when it reach 0, enemy
+ * play. - Click on a item to use it
  * 
- * TO DO :
- * - LA MAP ZEBI
+ * TO DO : - LA MAP ZEBI
  */
 public class GameController {
-  /**
-   * Default constructor, which does basically nothing.
-   */
-  public GameController() {}
-  
-  /**
-   * Goes once in the game loop, which consists in retrieving user actions,
-   * transmitting it to the GameView and GameData, and dealing with time events.
-   * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data 	GameData of the game.
-   * @return True if the game continue, False if we press the button to stop
-   */
-  private static boolean gameLoop(ApplicationContext context, GameData data) {
-		Event event = context.pollOrWaitEvent(10); 
-		if (event instanceof PointerEvent pointerEvent) {
-			// If we click down on the screen
-		  if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) { 
-		    var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
-		    switch(res.type()) {
-		    	case ITEM -> {
-		    		data.setDragItem((Item) res.value());
-		    		GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-				  	GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-		    	}
-		    	case MAP_OR_BAG -> {	
-		    		if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
-		    			data.swapMapOrBag();
-		    		}
-		    	}
-		    	case BAG -> {
-		    		if (data.mapOrBag() && GameDataCombat.combat()) {
-		    			GameDataCombat.heroAction(data, (XY) res.value());
-		    		}
-		    	}
-		    	case EVENT_CHOICE -> {
-		    		if ((int) res.value() == 1) {
-			  			data.event().choose1(data.hero(), data.bag().bagItemLst());
-		    		}
-		    		if ((int) res.value() == 2) {
-			  			data.event().choose2(data.hero(), data.bag().bagItemLst());
-		    		}
-		    		if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
-		    			// Ajouter les conséquences de fin d'event
-		    			data.outEvent();
-		    		};
-		    		
-		    	}
-		    	case MAP ->{
-		    		var coord = (XY) res.value();
-		    		if (coord.x() != -1 && coord.y() != -1) {
-			    		if (data.map().getHeroVisited().contains(coord)) {
-			    			data.map().setHeroPos(coord);
-			    			
-			    		} else if (data.map().getHeroAccessible().contains(coord)) {
-			    			data.map().setHeroPos(coord);
-			    			/*
-			    			data.map().addHeroVisited(coord);
-			    			data.map().updateHeroAccessible();
-			    			data.map().updateHeroVisible();
-			    			*/
-			    			data.map().updateMap(coord);
-			    			var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
-			    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EnemyRoom) {
-			    				data.swapMapOrBag();
-					  			GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())) , data);
-			    			}
-			    			if (data.map().getGrid()[coordHero.y()][coordHero.x()] instanceof EventRoom event_room && !event_room.getAlreadyVisited()) {
-			    				event_room.visitedEvent();
-			    				var linked_event = event_room.getEvent();
-					  			var root = linked_event.getRoot();
-			    				data.inEvent(linked_event);
-					  			// CHOICE 1 pour test (a mettre avec des clicks)
-			    			}
-			    		// PARTIE A SUPRIMER/MODIFIER PAR LA SUITE
-			    		} else if (data.hero().getGold() >= 40 && data.map().getGrid()[coord.y()][coord.x()] instanceof LockedDoor) {
-			    			var unlock_door = (LockedDoor) data.map().getGrid()[coord.y()][coord.x()];
-			    			unlock_door.unlock();
-			    			data.hero().sub("gold", 40);
-			    			data.map().setHeroPos(coord);
-			    			/*
-			    			data.map().addHeroVisited(coord);
-			    			data.map().updateHeroAccessible();
-			    			data.map().updateHeroVisible();
-			    			*/
-			    			data.map().updateMap(coord);
-			    		}
-		    		}
-		    	}
-		    	default -> {}
-		    }	
-		  }
-		  if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
-		  	if (data.dragItem() != null) {
-		  		GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-			  	GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-		  	}
-		  }
-		  if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-		  	int x = pointerEvent.location().x();
-		  	int y = pointerEvent.location().y();
-		  	var res = GameDataClick.bagClick(x, y);
-		    if(res.x() != -1) {
-		    	data.dragItem().setXY(GameDataClick.bagClick(x, y));
-		    	if(GameDataBackpack.addItemToBackpack(data.dragItem())){
-						data.removeItemFromDrag(data.dragItem());
-				  }
-		    	else {
-		    		GameDataClick.addDragItem(data.dragItem());
-		    	}
-	    	}
-		    data.setDragItem(null);
-		  }
-		  GameView.draw(context, data);
-		  data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));	
+	/**
+	 * Default constructor, which does basically nothing.
+	 */
+	public GameController() {
+	}
+
+	/**
+	 * Goes once in the game loop, which consists in retrieving user actions,
+	 * transmitting it to the GameView and GameData, and dealing with time events.
+	 * 
+	 * @param context {@code ApplicationContext} of the game.
+	 * @param data    GameData of the game.
+	 * @return True if the game continue, False if we press the button to stop
+	 */
+	private static boolean gameLoop(ApplicationContext context, GameData data) {
+		Event event = context.pollOrWaitEvent(10);
+		if (event != null) switch(event) {
+			case PointerEvent pointerEvent -> {
+		// If we click down on the screen
+					if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) {
+						var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
+						switch (res.type()) {
+						case ITEM -> {
+							data.setDragItem((Item) res.value());
+							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+							GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+						}
+						case MAP_OR_BAG -> {
+							if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
+								data.swapMapOrBag();
+							}
+						}
+						case BAG -> {
+							if (data.mapOrBag() && GameDataCombat.combat()) {
+								GameDataCombat.heroAction(data, (XY) res.value());
+							}
+						}
+						case EVENT_CHOICE -> {
+							if ((int) res.value() == 1) {
+								data.event().choose1(data.hero(), data.bag().bagItemLst());
+							}
+							if ((int) res.value() == 2) {
+								data.event().choose2(data.hero(), data.bag().bagItemLst());
+							}
+							if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
+								// Ajouter les conséquences de fin d'event
+								data.outEvent();
+							}
+							;
+
+						}
+						case MAP -> {
+							var coord = (XY) res.value();
+							if (coord.x() != -1 && coord.y() != -1) {
+								if (data.map().getHeroVisited().contains(coord)) {
+									data.map().setHeroPos(coord);
+
+								} else if (data.map().getHeroAccessible().contains(coord)) {
+									data.map().setHeroPos(coord);
+
+									var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
+									switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
+									case EnemyRoom room -> {
+										data.swapMapOrBag();
+										GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())), data);
+										data.map().updateMap(coord);
+									}
+									case EventRoom eventRoom -> {
+										if (!eventRoom.getAlreadyVisited()) {
+											var linkedEvent = eventRoom.getEvent();
+											var root = linkedEvent.getRoot();
+											data.inEvent(linkedEvent);
+											data.map().updateMap(coord);
+										}
+									}
+									case LockedDoor room -> {
+										if (data.map().getHaveKey()) {
+											IO.println("OK3");
+											room.unlock();
+											data.map().setHeroPos(coord);
+											data.map().updateMap(coord);
+											data.map().updateMap(coord);
+										}
+									}
+									default -> IO.println(coord);
+									}
+								}
+							}
+						}
+						}
+					}
+
+					if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
+						if (data.dragItem() != null) {
+							GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+						}
+					}
+					if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+						int x = pointerEvent.location().x();
+						int y = pointerEvent.location().y();
+						var res = GameDataClick.bagClick(x, y);
+						if (res.x() != -1) {
+							data.dragItem().setXY(GameDataClick.bagClick(x, y));
+							if (GameDataBackpack.addItemToBackpack(data.dragItem())) {
+								data.removeItemFromDrag(data.dragItem());
+							} else {
+								GameDataClick.addDragItem(data.dragItem());
+							}
+						}
+						data.setDragItem(null);
+					}
+					GameView.draw(context, data);
+					data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
 		}
-		// If event button is pressed 
-		if (event instanceof KeyboardEvent key && key.action() == KeyboardEvent.Action.KEY_RELEASED) {
-		  switch(key.key()) {
-		  	case Key.A ->{ 
-		  	  if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-		  	    GameDataClick.addDragItem(new Axe()); 
-		  	  }
-		  	}
-		  	// Start a combat against a RAT
-		  	case Key.I ->{ 
-		  		if(GameDataCombat.combat() == false) {
-		  			GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())), data);
-		  		}
-		  	}
-		  	
-		  	case Key.R ->{
-		  		if (data.dragItem() != null) {
-		  			GameData.rotateItem(data.dragItem());
-				  	GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
-		  		}
-		  	}
+		default -> IO.println(event);
+		}
+		// If event button is pressed
+		
+		if (event != null) switch (event) {
+		case KeyboardEvent key -> {
+			if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
+				switch (key.key()) {
+				case Key.A -> {
+					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
+						GameDataClick.addDragItem(new Axe());
+					}
+				}
+				// Start a combat against a RAT
+				case Key.I -> {
+					if (GameDataCombat.combat() == false) {
+						GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())),
+								data);
+					}
+				}
+
+				case Key.R -> {
+					if (data.dragItem() != null) {
+						GameData.rotateItem(data.dragItem());
+						GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
+					}
+				}
 				// Leave the game
 				case Key.E -> {
-		      return false;
+					return false;
 				}
-				default -> {}
-			}	  
-		  GameView.draw(context, data);
-	  }
+				default -> {
+				}
+				}
+				GameView.draw(context, data);
+			}
+		}
+		default -> {}
+		}
 		return true;
-  }
-  /**
-   * Sets up the game, then launches the game loop.
-   * 
-   * @param context {@code ApplicationContext} of the game.
-   */
-  private static void memoryGame(ApplicationContext context) {
-    var screenInfo = context.getScreenInfo();
-    var data = new GameData(screenInfo);
-    FontLoader.load_font();
-    GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
-    GameView.draw(context, data);
-    while (true) {
-      if (!gameLoop(context, data)) {
-        System.out.println("Thank you for quitting!");
-        context.dispose();
-        return;
-      }
-    }
-  }
-  
-  /**
-   * Executable program.
-   * 
-   * @param args Spurious arguments.
-   */
-  public static void main(String[] args) {
-    Application.run(Color.WHITE, GameController::memoryGame);
-  }
+	}
+
+	/**
+	 * Sets up the game, then launches the game loop.
+	 * 
+	 * @param context {@code ApplicationContext} of the game.
+	 */
+	private static void memoryGame(ApplicationContext context) {
+		var screenInfo = context.getScreenInfo();
+		var data = new GameData(screenInfo);
+		FontLoader.load_font();
+		GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
+		GameView.draw(context, data);
+		while (true) {
+			if (!gameLoop(context, data)) {
+				System.out.println("Thank you for quitting!");
+				context.dispose();
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Executable program.
+	 * 
+	 * @param args Spurious arguments.
+	 */
+	public static void main(String[] args) {
+		Application.run(Color.WHITE, GameController::memoryGame);
+	}
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import model.XY;
 
-public class LockedDoor implements Room {
+public final class LockedDoor implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
 	private boolean lock = true;

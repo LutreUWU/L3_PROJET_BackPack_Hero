@@ -7,7 +7,7 @@ import java.util.Random;
 import model.Item;
 import model.XY;
 
-public class Treasure implements Room {
+public final class Treasure implements Room {
   int floor;
   private List<XY> accessible = new ArrayList<>();
   List<Item> reward;

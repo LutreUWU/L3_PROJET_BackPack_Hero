@@ -6,7 +6,7 @@ import java.util.List;
 import model.Hero;
 import model.XY;
 
-public class Healer implements Room {
+public final class Healer implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
 

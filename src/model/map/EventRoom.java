@@ -8,7 +8,7 @@ import game.GameData;
 import model.Hero;
 import model.XY;
 
-public class EventRoom implements Room {
+public final class EventRoom implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
 	private LinkedEvent event;

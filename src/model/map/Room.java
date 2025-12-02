@@ -4,7 +4,7 @@ import java.util.List;
 
 import model.XY;
 
-public interface Room {
+public sealed interface Room permits Exit, EnemyRoom, EventRoom, Hallway, Healer, LockedDoor, Shop, Start, Treasure {
 	public abstract List<XY> getAccessible();
 	public abstract void addAccessible(XY coord);
 }
