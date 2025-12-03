@@ -18,7 +18,7 @@ public class Axe implements Item{
 	private Block[] b = new Block[4]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.LEGENDARY; 
-	private final int id = 6;
+	private final int id = 8;
 	private final int score = 15;
 	/**
 	 * Initialize a sword. 
@@ -40,6 +40,7 @@ public class Axe implements Item{
 	 *  @param x Coordinate X
 	 *  @param y Coordinate Y
 	 */
+	@Override
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
 			b[0] = new Block(coord.x(), coord.y());

@@ -22,7 +22,6 @@ public class Floor {
   final private HashSet<XY> heroVisible = new HashSet<>();
   final private HashSet<XY> heroVisibleForLine = new HashSet<>();
   private XY heroPos;
-  private boolean haveKey = false;
   
 
   /**
@@ -108,12 +107,12 @@ public class Floor {
   	grid[list.get(2).y()][list.get(2).x()] = new Treasure(floor); // Create treasure
   	grid[list.get(3).y()][list.get(3).x()] = new Exit(floor); // Create exit
   	grid[list.get(4).y()][list.get(4).x()] = new EnemyRoom(floor); // Create Enemy
-  	grid[list.get(5).y()][list.get(5).x()] = new EventRoom(floor, hero); // Create Enemy
-  	grid[list.get(6).y()][list.get(6).x()] = new EventRoom(floor, hero); // Create Enemy
+  	grid[list.get(5).y()][list.get(5).x()] = new EnemyRoom(floor); // Create Enemy
+  	grid[list.get(6).y()][list.get(6).x()] = new EnemyRoom(floor); // Create Enemy
   	grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
   	grid[list.get(8).y()][list.get(8).x()] = new Start(floor); // Create start
   	grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor
-  	grid[list.get(10).y()][list.get(10).x()] = new EventRoom(floor, hero); // Create Event
+  	grid[list.get(10).y()][list.get(10).x()] = new EventRoom(floor); // Create Event
   	
   }
   
@@ -244,13 +243,5 @@ public class Floor {
    */
   public XY getHeroPos() {
   	return heroPos;
-  }
-  
-  /**
-   * Gettet for haveKey
-   * @return boolean
-   */
-  public boolean getHaveKey() {
-  	return haveKey;
   }
 }

@@ -154,6 +154,14 @@ public class GameData {
   }
   
   /**
+   * Go up one floor
+   */
+  public void newFloor() {
+  	floor++;
+    map = new Floor(floor, hero);
+  }
+  
+  /**
    * Return the current floor of the player from data
    * @return int floor
    */

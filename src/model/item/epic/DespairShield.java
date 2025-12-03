@@ -18,7 +18,7 @@ public class DespairShield implements Item{
 	private Block[] b = new Block[4]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.EPIC; 
-	private final int id = 2;
+	private final int id = 4;
 	private final int score = 10;
 	/**
 	 * Initialize a sword. 
@@ -40,6 +40,7 @@ public class DespairShield implements Item{
 	 *  @param x Coordinate X
 	 *  @param y Coordinate Y
 	 */
+	@Override
 	public void setXY(XY coord) {
 		b[0] = new Block(coord.x(), coord.y());
 		b[1] = new Block(coord.x(), coord.y() + 1);

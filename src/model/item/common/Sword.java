@@ -18,7 +18,7 @@ public class Sword implements Item{
 	private Block[] b = new Block[3]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.COMMON; 
-	private final int id = 1;
+	private final int id = 3;
 	private final int score = 10;
 	/**
 	 * Initialize a sword. 
@@ -40,6 +40,7 @@ public class Sword implements Item{
 	 *  @param x Coordinate X
 	 *  @param y Coordinate Y
 	 */
+	@Override
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
 			b[0] = new Block(coord.x(), coord.y());

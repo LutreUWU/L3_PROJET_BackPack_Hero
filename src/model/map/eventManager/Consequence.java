@@ -1,6 +1,7 @@
 package model.map.eventManager;
 import java.util.ArrayList;
 
+import game.GameData;
 import game.data.GameDataClick;
 import model.Hero;
 import model.Item;
@@ -17,11 +18,14 @@ public class Consequence {
 		bonus = bonus2;
 	}
 	
-	public void applyConsequence(Hero hero, ArrayList<Item> itemLst) {
+	public void applyConsequence(GameData data) {
+		var hero = data.hero();
 		switch(idConsequence) {
 			case "sub_hp" -> conseqSubHP(hero);
 			case "add_gold" -> hero.add("gold", (int) (floor * 5 * bonus));
 			case "add_weapon" -> GameDataClick.addDragItem(new Massue());
+			case "fight" -> {IO.println("FAUT QU'ON SE BATTE ICI !!!"); data.newFloor();}
+			case "nothing" -> {}
 			default -> {} // Nothing
 		}
 	}

@@ -15,11 +15,16 @@ import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
+import model.Gold;
 import model.Item;
+import model.KeyDoor;
 import model.XY;
+import model.item.common.Sword;
+import model.item.rare.Gant;
 import model.item.superrare.Massue;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
+import model.map.Exit;
 import model.map.LockedDoor;
 import model.monster.Chicken;
 import model.monster.Soldat;
@@ -64,9 +69,26 @@ public class GameController {
 						var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
 						switch (res.type()) {
 						case ITEM -> {
-							data.setDragItem((Item) res.value());
+							var currentItem = (Item) res.value();
+							data.setDragItem(currentItem);
 							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
 							GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+							IO.println("ETAPE 0");
+							IO.println("ID ACTUEL : " + currentItem.getID());
+							IO.println(data.bag().bagItemLst());
+							if (currentItem.getID() == 1 && data.bag().bagItemLst().contains(new KeyDoor())) { // It's a key
+								IO.println("ETAPE 1");
+								var currentPos = data.map().getHeroPos();
+								switch(data.map().getGrid()[currentPos.y()][currentPos.x()]) {
+									case LockedDoor lockedDoor ->  {
+										IO.println("ETAPE 2");
+										lockedDoor.unlock();
+										data.map().updateMap(currentPos);
+										GameDataBackpack.removeItemFromBackpack(currentItem);
+									}
+								default -> {IO.println("ETAPE 3");}
+								}
+							}
 						}
 						case MAP_OR_BAG -> {
 							if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
@@ -80,13 +102,14 @@ public class GameController {
 						}
 						case EVENT_CHOICE -> {
 							if ((int) res.value() == 1) {
-								data.event().choose1(data.hero(), data.bag().bagItemLst());
+								data.event().choose1(data);
 							}
 							if ((int) res.value() == 2) {
-								data.event().choose2(data.hero(), data.bag().bagItemLst());
+								data.event().choose2(data);
 							}
 							if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
 								// Ajouter les conséquences de fin d'event
+								data.event().restartEvent();
 								data.outEvent();
 							}
 							;
@@ -95,10 +118,7 @@ public class GameController {
 						case MAP -> {
 							var coord = (XY) res.value();
 							if (coord.x() != -1 && coord.y() != -1) {
-								if (data.map().getHeroVisited().contains(coord)) {
-									data.map().setHeroPos(coord);
-
-								} else if (data.map().getHeroAccessible().contains(coord)) {
+								if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
 									data.map().setHeroPos(coord);
 
 									var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
@@ -111,20 +131,17 @@ public class GameController {
 									case EventRoom eventRoom -> {
 										if (!eventRoom.getAlreadyVisited()) {
 											var linkedEvent = eventRoom.getEvent();
-											var root = linkedEvent.getRoot();
 											data.inEvent(linkedEvent);
 											data.map().updateMap(coord);
+											eventRoom.visitedEvent();
 										}
 									}
-									case LockedDoor room -> {
-										if (data.map().getHaveKey()) {
-											room.unlock();
-											data.map().setHeroPos(coord);
-											data.map().updateMap(coord);
-											data.map().updateMap(coord);
-										}
-									}
-									default -> IO.println(coord);
+									case LockedDoor room -> {}
+									case Exit room -> {var linkedEvent = room.getEvent();
+																		data.inEvent(linkedEvent);
+																		data.map().updateMap(coord);}
+									default -> {IO.println(coord);
+															data.map().updateMap(coord);}
 									}
 								}
 							}
@@ -165,7 +182,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Massue());
+						GameDataClick.addDragItem(new KeyDoor());
 					}
 				}
 				// Start a combat against a RAT

@@ -10,23 +10,43 @@ import model.Item;
 public class LinkedEvent {
 	
 	private NodeEvent root;
+	private NodeEvent initialRoot;
 	private final int totalEvent = 1;
 	
-	public LinkedEvent(int floor, Hero hero) {
+	
+	/**
+	 * Constructor for all EventRoom
+	 * @param floor
+	 * @param hero
+	 */
+	public LinkedEvent(int floor) {
 		Random rand = new Random();
 		var x = rand.nextInt(totalEvent) + 1;
-		this.root = switch(x) {
-			case 1 -> event1(floor, hero);
-			default -> null;
+		switch(x) {
+			case 1 -> event1(floor);
+			default -> {}
 		};
+		initialRoot = root;
 	}
 	
-	public NodeEvent getRoot() {
-		return root;
+	/**
+	 * Constructor for exit room
+	 * @param data of the game
+	 */
+	public LinkedEvent(int floor, boolean isExit) {
+		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
+		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour " + question);
+		
+		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, "fight", "Bon courage !");
+		root.setChoice1(choiceOne);
+		
+		var choiceTwo = createNodeWithConsequence("Non ! Je vais finir de me préparer...", floor, 1, "nothing", "Ca marche, prépare toi bien !");
+		root.setChoice2(choiceTwo);
+		initialRoot = root;
 	}
 	
-	public NodeEvent event1(int floor, Hero hero) {
-		var root = new NodeEvent(null, "Vous rencontrez M. Revuz. \"Tu penses quoi du C?\"");
+	public void event1(int floor) {
+	  root = new NodeEvent(null, "Vous rencontrez M. Revuz. \"Tu penses quoi du C?\"");
 		// GOOD CHOICE
 		var choiceOne = new NodeEvent("Le C c'est trop cool !", "Et tu en fais souvent ?");
 		root.setChoice1(choiceOne);
@@ -43,10 +63,9 @@ public class LinkedEvent {
 		choiceTwo.setChoice1(choiceTwoOne);
 		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, "sub_hp", "On peut dire que c'est réciproque...\n*Vous vous battez et perdez de la vie*");
 		choiceTwo.setChoice2(choiceTwoTwo);
-		return root;
 	}
 	
-	public NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, String conseq, String lastAnswer) {
+	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, String conseq, String lastAnswer) {
 		var endNode = new NodeEvent("Mettre fin à l'évenement", null);
 		var node = new NodeEvent(answer, lastAnswer);
 		node.setChoice1(endNode);
@@ -54,17 +73,26 @@ public class LinkedEvent {
 		return node;
 	}
 	
-	public void choose1(Hero hero, ArrayList<Item> itemLst) {
+	public NodeEvent getRoot() {
+		return root;
+	}
+
+	
+	public void restartEvent() {
+		root = initialRoot;
+	}
+	
+	public void choose1(GameData data) {
 		root = root.getChoice1();
 		if (root.isLastChoice()) {
-			root.getConsequence().applyConsequence(hero, itemLst); 
+			root.getConsequence().applyConsequence(data); 
 		}
 	}
 
-	public void choose2(Hero hero, ArrayList<Item> item_list) {
+	public void choose2(GameData data) {
 		root = root.getChoice2();
 		if (root.isLastChoice()) {
-			root.getConsequence().applyConsequence(hero, item_list);
+			root.getConsequence().applyConsequence(data);
 		}
 	}
 }

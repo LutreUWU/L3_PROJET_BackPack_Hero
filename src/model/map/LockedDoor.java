@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.XY;
+import model.map.eventManager.LinkedEvent;
 
 public final class LockedDoor implements Room {
 	int floor;

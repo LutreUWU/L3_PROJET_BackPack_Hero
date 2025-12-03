@@ -18,7 +18,7 @@ public class Gant implements Item{
 	private Block[] b = new Block[2]; 
 	private Direction direction = Direction.UP;
 	private Rarity rarity = Rarity.RARE; 
-	private int id = 5;
+	private int id = 7;
 	private int score = 10;
 	/**
 	 * Initialize a sword. 
@@ -40,6 +40,7 @@ public class Gant implements Item{
 	 *  @param x Coordinate X
 	 *  @param y Coordinate Y
 	 */
+	@Override
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
 			b[0] = new Block(coord.x(), coord.y());

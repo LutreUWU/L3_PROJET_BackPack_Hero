@@ -13,9 +13,9 @@ public final class EventRoom implements Room {
 	private LinkedEvent event;
 	private boolean alreadyVisited = false;
 
-  public EventRoom(int floor, Hero hero) {
+  public EventRoom(int floor) {
       this.floor = floor;
-      event = new LinkedEvent(floor, hero);
+      event = new LinkedEvent(floor);
   }
   
   public LinkedEvent getEvent() {
