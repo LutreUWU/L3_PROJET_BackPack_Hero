@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.accessory.Gant;
-import model.shield.DespairShield;
-import model.weapon.Axe;
-import model.weapon.Massue;
-import model.weapon.Mimicry;
-import model.weapon.Sword;
+import model.item.common.Sword;
+import model.item.epic.DespairShield;
+import model.item.legendary.Axe;
+import model.item.mythic.Mimicry;
+import model.item.rare.Gant;
+import model.item.superrare.Massue;
 
 public class ItemRepository {
 

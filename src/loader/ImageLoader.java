@@ -1,4 +1,4 @@
-package game.data;
+package loader;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -42,6 +42,7 @@ public class ImageLoader {
 		addFolder("data/BG");
 		addFolder("data/monster");
 		addFolder("data/weapon");
+		addFolder("data/icon");
 		bgImages.put("bag", loadImg(new File("data/bag.png")));
 		bgImages.put("Roland", loadImg(new File("data/Roland.png")));
 		return bgImages;

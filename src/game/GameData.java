@@ -9,17 +9,16 @@ import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataHero;
 import game.data.GameDataMap;
-import game.data.ImageLoader;
+import loader.MathLoader;
+import loader.ImageLoader;
 import model.Backpack;
 import model.BoundingBox;
 import model.Hero;
 import model.Item;
 import model.ItemRepository;
 import model.XY;
-import model.EventManager.LinkedEvent;
-import model.EventManager.NodeEvent;
 import model.map.Floor;
-import model.weapon.Sword;
+import model.map.eventManager.LinkedEvent;
 
  /**
  * The SimpleGameData class stores all relevant pieces of information for the
@@ -79,7 +78,7 @@ public class GameData {
 	  dragItemLst = new LinkedHashMap<>();
 	  imgMap = ImageLoader.loadAllImage();
 	  ItemRepository.createItemRepository();
-	  new GameMath(this);
+	  new MathLoader(this);
 	  new GameDataBackpack(backpack);
     new GameDataHero(hero);
     new GameDataMap(map);

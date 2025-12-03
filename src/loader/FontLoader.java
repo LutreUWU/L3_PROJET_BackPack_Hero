@@ -1,4 +1,4 @@
-package game.data;
+package loader;
 
 import java.awt.Font;
 import java.awt.FontFormatException;

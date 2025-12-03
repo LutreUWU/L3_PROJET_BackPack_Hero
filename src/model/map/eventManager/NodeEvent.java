@@ -1,4 +1,4 @@
-package model.EventManager;
+package model.map.eventManager;
 
 public class NodeEvent {
 	private String question;

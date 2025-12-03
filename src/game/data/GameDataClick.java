@@ -6,7 +6,7 @@ import java.util.Map;
 import com.github.forax.zen.ScreenInfo;
 
 import game.GameData;
-import game.GameMath;
+import loader.MathLoader;
 import model.Backpack;
 import model.BoundingBox;
 import model.Item;
@@ -244,7 +244,7 @@ public class GameDataClick {
   	if (data.event() == null) {
   		return -1;
   	}
-  	var boundingBox = GameMath.getMapEvent().get("BG_CHOICE_END").box();
+  	var boundingBox = MathLoader.getMapEvent().get("BG_CHOICE_END").box();
   	if (data.event().getRoot().getChoice2() == null) {
     	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
     		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
@@ -254,7 +254,7 @@ public class GameDataClick {
   	}
   	for (int i = 0; i < 2; i++) {
   		String key = "BG_CHOICE" + Integer.toString(i + 1);
-  		boundingBox = GameMath.getMapEvent().get(key).box();
+  		boundingBox = MathLoader.getMapEvent().get(key).box();
     	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
     		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
     			return i + 1;

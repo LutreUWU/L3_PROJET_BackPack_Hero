@@ -1,12 +1,11 @@
 package model.map;
-import model.EventManager.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import game.GameData;
 import model.Hero;
 import model.XY;
+import model.map.eventManager.*;
 
 public final class EventRoom implements Room {
 	int floor;

@@ -1,4 +1,4 @@
-package model.EventManager;
+package model.map.eventManager;
 
 import java.util.ArrayList;
 import java.util.Random;

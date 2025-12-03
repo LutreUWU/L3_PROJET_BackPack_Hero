@@ -1,10 +1,10 @@
-package model.EventManager;
+package model.map.eventManager;
 import java.util.ArrayList;
 
 import game.data.GameDataClick;
 import model.Hero;
 import model.Item;
-import model.weapon.Axe;
+import model.item.superrare.Massue;
 
 public class Consequence {
 	private int floor;
@@ -21,7 +21,7 @@ public class Consequence {
 		switch(idConsequence) {
 			case "sub_hp" -> conseqSubHP(hero);
 			case "add_gold" -> hero.add("gold", (int) (floor * 5 * bonus));
-			case "add_weapon" -> GameDataClick.addDragItem(new Axe());
+			case "add_weapon" -> GameDataClick.addDragItem(new Massue());
 			default -> {} // Nothing
 		}
 	}

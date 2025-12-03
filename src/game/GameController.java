@@ -11,18 +11,18 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 
-import game.data.FontLoader;
 import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
+import loader.FontLoader;
 import model.Item;
 import model.XY;
+import model.item.superrare.Massue;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.LockedDoor;
 import model.monster.Chicken;
 import model.monster.Soldat;
-import model.weapon.Axe;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
@@ -118,7 +118,6 @@ public class GameController {
 									}
 									case LockedDoor room -> {
 										if (data.map().getHaveKey()) {
-											IO.println("OK3");
 											room.unlock();
 											data.map().setHeroPos(coord);
 											data.map().updateMap(coord);
@@ -166,7 +165,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Axe());
+						GameDataClick.addDragItem(new Massue());
 					}
 				}
 				// Start a combat against a RAT

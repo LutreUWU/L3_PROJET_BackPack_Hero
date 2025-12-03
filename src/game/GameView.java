@@ -14,6 +14,7 @@ import java.util.Objects;
 import com.github.forax.zen.ApplicationContext;
 
 import game.data.GameDataCombat;
+import loader.MathLoader;
 import model.Block;
 import model.BoundingBox;
 import model.Direction;
@@ -28,7 +29,6 @@ import model.map.Shop;
 import model.map.Start;
 import model.map.Treasure;
 import model.monster.Enemy;
-import model.weapon.Sword;
 
  /**
   * The SimpleGameView class deals with the display of the game the screen, and
@@ -64,7 +64,7 @@ public record GameView(int width, int height, int grid_size) {
 		graphics.fill(new Rectangle2D.Double(0, 0, data.screenInfo().width(), data.screenInfo().height()));
 		/////////////
 		BufferedImage img = data.imgMap().get("BG1");
-		graphics.drawImage(img, GameMath.getMapEvent().get("BG1").transform(), null);
+		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
 	}
 	
 	/**
@@ -191,8 +191,8 @@ public record GameView(int width, int height, int grid_size) {
     int size = data.bag().getGridSize();
 		int [][] grid = data.bag().grid();
 		BufferedImage imgBackpack = data.imgMap().get("bag");
-		BoundingBox boundingBox = GameMath.getMapEvent().get("BG_BACKPACK").box(); 
-		graphics.drawImage(imgBackpack, GameMath.getMapEvent().get("BG_BACKPACK").transform(), null);
+		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box(); 
+		graphics.drawImage(imgBackpack, MathLoader.getMapEvent().get("BG_BACKPACK").transform(), null);
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 7; j++) {
 	    	final int fi = i;
@@ -244,7 +244,7 @@ public record GameView(int width, int height, int grid_size) {
    * @param img				{@code BufferedImage} of the item
    */
 	private static void drawInBag(Graphics2D graphics, XY pos, int size, int width, int height, Direction direction, BufferedImage img){
-		BoundingBox coord = GameMath.getMapEvent().get("BG_BACKPACK").box();
+		BoundingBox coord = MathLoader.getMapEvent().get("BG_BACKPACK").box();
 		double centerX = 0, centerY = 0;
 		GameView.drawElement(graphics, img, 
 																	 coord.northWest().x() + (size * pos.x()) + centerX,
@@ -266,7 +266,7 @@ public record GameView(int width, int height, int grid_size) {
    * @param marginY		Value between 0.0 and 1.0 indicating the gap vertically
    */
 	private static void drawInBagSpecial(Graphics2D graphics, XY pos, int size, int width, int height, Direction direction, BufferedImage img, double marginX, double marginY){
-		BoundingBox coord = GameMath.getMapEvent().get("BG_BACKPACK").box();
+		BoundingBox coord = MathLoader.getMapEvent().get("BG_BACKPACK").box();
 		double centerX = 0, centerY = 0;
 		GameView.drawSpecialElementInBag(graphics, img, 
 																	 coord.northWest().x() + (size * pos.x()) + centerX,
@@ -329,14 +329,20 @@ public record GameView(int width, int height, int grid_size) {
    * @param data			GameData containing the game data. 
    */
   private static void drawMap(Graphics2D graphics, GameData data) {
+  	BufferedImage imgMap = data.imgMap().get("BG_MAP");
+  	var leftGrid = MathLoader.getMapEvent().get("BG_MAP").box();
   	var size = data.bag().getGridSize();  	
   	var gap = size * 0.1;
+  	graphics.drawImage(imgMap, MathLoader.getMapEvent().get("BG_MAP").transform(), null);
 		for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 11; j++) {
 	    	final int fi = i;
 	    	final int fj = j;
 		  	var coordXY = new XY(fj, fi);
+		  	int newX = (int) (gap * fj) + leftGrid.northWest().x() + (size * fj);
+		  	int newY = (int) (gap * fi) + leftGrid.northWest().y() + (size * fi);
 		  	if (data.map().getHeroVisible().contains(coordXY)) {
+		  		graphics.drawImage(data.imgMap().get("BG_MAP_TILE"), newX, newY, size, size, null);
 			  	switch(data.map().getGrid()[fi][fj]) {
 			  		case Shop _ -> graphics.setColor(Color.YELLOW);
 			  		case EnemyRoom _ -> graphics.setColor(Color.RED);
@@ -349,22 +355,24 @@ public record GameView(int width, int height, int grid_size) {
 			  		default ->  graphics.setColor(Color.GRAY);
 			  	}
 		  	} else graphics.setColor(Color.DARK_GRAY);
-		    graphics.fill(new Rectangle2D.Double((gap * fj) + (data.screenInfo().width() / 2) - 5.5 * size + (size * fj), 
-		    																		 (gap * fi) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi), 
+		  	// Finir les images quand Arthur aura réglé le bug d'actualisation là
+		  	// graphics.drawImage(data.imgMap().get("ICON_EVENT"),newX, newY, size, size, null);
+		    graphics.fill(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj), 
+		    																		 (gap * fi) + leftGrid.northWest().y() + (size * fi), 
 		    																			size, size));
 		    graphics.setColor(Color.BLACK);
-		    graphics.draw(new Rectangle2D.Double((gap * fj) + (data.screenInfo().width() / 2) - 5.5 * size + (size * fj), 
-		    																		 (gap * fi) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi), 
+		    graphics.draw(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj), 
+		    																		 (gap * fi) + leftGrid.northWest().y() + (size * fi), 
 																							size, size));
 		    
 		    if (data.map().getHeroAccessible().contains(coordXY)) {
 		    	graphics.setColor(Color.MAGENTA);
-		      graphics.fill(new Rectangle2D.Double(((gap * fj) + data.screenInfo().width() / 2) - 5.5 * size + (size * fj) + size/4, 
-		  																		  	 ((gap * fi) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi) + size/4, 
+		      graphics.fill(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj) + size/4, 
+		  																		  	 (gap * fi) + leftGrid.northWest().y() + (size * fi) + size/4, 
 		  																					size/2, size/2));
-		      graphics.draw(new Rectangle2D.Double(((gap * fj) + data.screenInfo().width() / 2) - 5.5 * size + (size * fj) + size/4, 
-					  	 ((gap * fi) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * fi) + size/4, 
-								size/2, size/2));
+		      graphics.draw(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj) + size/4, 
+																					  	 (gap * fi) + leftGrid.northWest().y() + (size * fi) + size/4, 
+																								size/2, size/2));
 		    }
       }
 		}
@@ -374,17 +382,17 @@ public record GameView(int width, int height, int grid_size) {
   	graphics.setStroke(new BasicStroke(5));
   	for (var coord : data.map().getHeroVisibleLine()) {
   		for (var coord_acc : data.map().getGrid()[coord.y()][coord.x()].getAccessible()) {
-  			graphics.drawLine((int) ((gap * coord.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x() + size/2)), 
-													(int) ((gap * coord.y()) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y() + size/2)), 
-													(int) ((gap * coord_acc.x()) + (data.screenInfo().width() / 2) - 5.5 * size + (size * coord_acc.x()) + size/2), 
-													(int) ((gap * coord_acc.y()) + (data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord_acc.y()) + size/2));
+  			graphics.drawLine((int) ((gap * coord.x()) + (leftGrid.northWest().x() + (size * coord.x() + size/2))), 
+													(int) ((gap * coord.y()) + (leftGrid.northWest().y() + (size * coord.y() + size/2))), 
+													(int) ((gap * coord_acc.x()) + (leftGrid.northWest().x() + (size * coord_acc.x()) + size/2)), 
+													(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (size * coord_acc.y()) + size/2)));
   		}
   	}
 		
 		graphics.setColor(Color.WHITE);
 		var coord = data.map().getHeroPos();
-    graphics.fill(new Rectangle2D.Double(((gap * coord.x()) + data.screenInfo().width() / 2) - 5.5 * size + (size * coord.x()) + size/4, 
-																		  	 ((gap * coord.y()) + data.screenInfo().height()/ 5.5) - 2.5* size + (size * coord.y()) + size/4, 
+    graphics.fill(new Rectangle2D.Double(((gap * coord.x()) + leftGrid.northWest().x() + (size * coord.x()) + size/4), 
+																		  	 ((gap * coord.y()) + leftGrid.northWest().y() + (size * coord.y()) + size/4), 
 																					size/2, size/2));
 		///////////////////////////////////
   }
@@ -558,12 +566,18 @@ public record GameView(int width, int height, int grid_size) {
    */
   private static void drawBgEvent(Graphics2D graphics, GameData data) {
   	BufferedImage img = data.imgMap().get("BG_EVENT");
-    graphics.drawImage(img, GameMath.getMapEvent().get("BG_EVENT").transform(), null);
+    graphics.drawImage(img, MathLoader.getMapEvent().get("BG_EVENT").transform(), null);
   }
   
+  /**
+   * Draw the text of the event in the screen
+   * 
+   * @param graphics {@code Graphics2D} of the game.
+   * @param data		 {@code GameData} containing all informations about the game
+   */
   private static void drawTextEvent(Graphics2D graphics, GameData data){
   	int size = 30;
-	  double top = GameMath.getMapEvent().get("BG_EVENT").box().northWest().y();
+	  double top = MathLoader.getMapEvent().get("BG_EVENT").box().northWest().y();
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setColor(Color.WHITE);
     graphics.setFont(font);
@@ -574,6 +588,50 @@ public record GameView(int width, int height, int grid_size) {
 	  graphics.drawString(data.event().getRoot().getQuestion(), x,	y);
   }
   
+  /**
+   * Draw the background image of a choice<br>
+   * Also called the fonction to write the choice inside.
+   * 
+   * @param graphics {@code Graphics2D} of the game.
+   * @param data		 {@code GameData} containing all informations about the game
+   */
+  private static void drawChoiceEvent(Graphics2D graphics, GameData data) {
+  	var img1 = data.imgMap().get("BG_CHOICE1");
+  	var img2 = data.imgMap().get("BG_CHOICE2");
+  	var event1 = MathLoader.getMapEvent().get("BG_CHOICE1");
+  	var event2 = MathLoader.getMapEvent().get("BG_CHOICE2");
+  	int width = event1.box().southEast().x() - event1.box().northWest().x();
+  	int height = event1.box().southEast().y() - event1.box().northWest().y();
+  	if (data.event().getRoot().getChoice2() == null){
+  		var img3 = data.imgMap().get("BG_CHOICE_END");
+  		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
+  		graphics.drawImage(img3, event3.transform(), null);
+		  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+		  															(int) event3.box().northWest().x() + width / 2, 
+		  															(int) (event3.box().northWest().y() + height * 0.5));
+  	}
+  	else {
+  		graphics.drawImage(img1, event1.transform(), null);
+  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+  	  															(int) event1.box().northWest().x() + width / 2, 
+  	  															(int) (event1.box().northWest().y() + height * 0.5));
+  		graphics.drawImage(img2, event2.transform(), null);
+  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
+  	  															(int) event2.box().northWest().x() + width / 2, 
+  	  															(int) (event2.box().northWest().y() + height * 0.5));
+  	}
+  }
+  
+  /**
+   * Draw the text inside each choice. <br>
+   * The text is draw at the center of the box choice.
+   * 
+   * @param graphics {@code Graphics2D} of the game.
+   * @param data		 {@code GameData} containing all informations about the game
+   * @param content	 Text we wants to write.
+   * @param x				 The x coordinate of the text
+   * @param y				 The y coordinate of the text
+   */
   private static void drawTextChoiceEvent(Graphics2D graphics, GameData data, String content, int x, int y) {
     int size = 20;
     Font font = new Font("Mikodacs", Font.PLAIN, size);
@@ -599,33 +657,6 @@ public record GameView(int width, int height, int grid_size) {
         int lineWidth = fm.stringWidth(line.toString());
         graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());
     }
-  }
-
-  private static void drawChoiceEvent(Graphics2D graphics, GameData data) {
-  	var img1 = data.imgMap().get("BG_CHOICE1");
-  	var img2 = data.imgMap().get("BG_CHOICE2");
-  	var event1 = GameMath.getMapEvent().get("BG_CHOICE1");
-  	var event2 = GameMath.getMapEvent().get("BG_CHOICE2");
-  	int width = event1.box().southEast().x() - event1.box().northWest().x();
-  	int height = event1.box().southEast().y() - event1.box().northWest().y();
-  	if (data.event().getRoot().getChoice2() == null){
-  		var img3 = data.imgMap().get("BG_CHOICE_END");
-  		var event3 = GameMath.getMapEvent().get("BG_CHOICE_END");
-  		graphics.drawImage(img3, event3.transform(), null);
-		  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
-		  															(int) event3.box().northWest().x() + width / 2, 
-		  															(int) (event3.box().northWest().y() + height * 0.5));
-  	}
-  	else {
-  		graphics.drawImage(img1, event1.transform(), null);
-  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
-  	  															(int) event1.box().northWest().x() + width / 2, 
-  	  															(int) (event1.box().northWest().y() + height * 0.5));
-  		graphics.drawImage(img2, event2.transform(), null);
-  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
-  	  															(int) event2.box().northWest().x() + width / 2, 
-  	  															(int) (event2.box().northWest().y() + height * 0.5));
-  	}
   }
   
   /**

@@ -1,4 +1,4 @@
-package model.weapon;
+package model.item.mythic;
 
 import game.data.GameDataHero;
 import model.Block;
@@ -11,20 +11,20 @@ import model.monster.Enemy;
 /**
  * Class for the Sword item
  */
-public class Sword implements Item{
+public class Mimicry implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
 	private Block[] b = new Block[3]; 
 	private Direction direction = Direction.UP;
-	private final Rarity rarity = Rarity.COMMON; 
-	private final int id = 1;
-	private final int score = 10;
+	private final Rarity rarity = Rarity.MYTHIC; 
+	private final int id = 3;
+	private final int score = 100;
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
 	 */
-	public Sword() {
+	public Mimicry() {
 		setXY(new XY(0, 0));
 	}
 	
@@ -61,8 +61,9 @@ public class Sword implements Item{
 	 */
 	@Override
 	public void use(Enemy enemy) {
-		GameDataHero.sub("energy", 1);
-		enemy.subHP(3);
+		GameDataHero.sub("energy", 2);
+		GameDataHero.sub("hp", 5);
+		enemy.subHP(30);
 	}
 	
   @Override
@@ -98,6 +99,3 @@ public class Sword implements Item{
   
  
 }
-
-
-

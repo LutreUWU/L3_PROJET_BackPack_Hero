@@ -1,17 +1,17 @@
-package game;
+package loader;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 
-import game.data.RenderData;
+import game.GameData;
 import model.BoundingBox;
 import model.XY;
 
 /**
  * The GameDataMath class is where all coordinate, size ... depending of the screen are stored.
  */
-public class GameMath {
+public class MathLoader {
 	private static int screenWidth;
 	private static int screenHeight;
 	private static GameData data;
@@ -19,12 +19,13 @@ public class GameMath {
 	
 	private static LinkedHashMap<String, RenderData> renderDataGame = new LinkedHashMap<>();
 	
-	public GameMath(GameData dataGame) {
+	public MathLoader(GameData dataGame) {
 		data = dataGame;
 		screenWidth = data.screenInfo().width();
 		screenHeight = data.screenInfo().height();
 		getBGValue();
 		getBackpackValue();
+		getMapValue();
 		getEventValue();
 	}
 	
@@ -75,7 +76,22 @@ public class GameMath {
 // ============================================
 	
 // ================== Map =====================
-	
+	private static void getMapValue() {
+		var size = data.bag().getGridSize();
+		var dimX = size * 13.0;
+		var dimY = size * 7.0;
+		XY NW = new XY((int) ((screenWidth / 2) - 5.5 * size), (int) ((data.screenInfo().height()/ 5) - 2.5 * size));
+		XY SE = new XY((int) ((screenWidth / 2) + 5.5 * size), (int) ((data.screenInfo().height()/ 5) + 2.5 * size));
+		BufferedImage img = data.imgMap().get("BG_MAP");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scaleX = dimX / width;
+		var scaleY = dimY / height;
+	  AffineTransform transform = new AffineTransform();
+		transform.translate(NW.x() - size/2.0, NW.y() - size / 2);
+	  transform.scale(scaleX, scaleY);
+		renderDataGame.put("BG_MAP", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
 // ============================================
 	
 // ================= Hero =====================
