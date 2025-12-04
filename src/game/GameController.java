@@ -17,8 +17,8 @@ import game.data.GameDataCombat;
 import loader.FontLoader;
 import model.Gold;
 import model.Item;
-import model.KeyDoor;
 import model.XY;
+import model.item.common.KeyDoor;
 import model.item.common.Sword;
 import model.item.rare.Gant;
 import model.item.superrare.Massue;
@@ -73,15 +73,14 @@ public class GameController {
 							data.setDragItem(currentItem);
 							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
 							GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-							IO.println("ETAPE 0");
-							IO.println("ID ACTUEL : " + currentItem.getID());
-							IO.println(data.bag().bagItemLst());
+//							IO.println("ETAPE 0");
+//							IO.println("ID ACTUEL : " + currentItem.getID());
 							if (currentItem.getID() == 1 && data.bag().bagItemLst().contains(new KeyDoor())) { // It's a key
-								IO.println("ETAPE 1");
+//								IO.println("ETAPE 1");
 								var currentPos = data.map().getHeroPos();
 								switch(data.map().getGrid()[currentPos.y()][currentPos.x()]) {
 									case LockedDoor lockedDoor ->  {
-										IO.println("ETAPE 2");
+//										IO.println("ETAPE 2");
 										lockedDoor.unlock();
 										data.map().updateMap(currentPos);
 										GameDataBackpack.removeItemFromBackpack(currentItem);

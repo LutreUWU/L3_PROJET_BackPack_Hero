@@ -1,11 +1,8 @@
 package model.map.eventManager;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import game.GameData;
-import model.Hero;
-import model.Item;
 
 public class LinkedEvent {
 	

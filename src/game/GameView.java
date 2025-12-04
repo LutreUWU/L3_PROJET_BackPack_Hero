@@ -220,7 +220,7 @@ public record GameView(int width, int height, int grid_size) {
 		for (var item : itemLst) {
 			Block coordinate = item.shape()[0];
 		  switch (item.getID()) {
-			  case 1 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor"));
+			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75);
 			  case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold"));
 				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("sword")); 
 				case 4 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 2, 2, item.direction(), data.imgMap().get("despairShield")); 
@@ -343,25 +343,7 @@ public record GameView(int width, int height, int grid_size) {
 		  	var coordXY = new XY(fj, fi);
 		  	int newX = (int) (gap * fj) + leftGrid.northWest().x() + (size * fj);
 		  	int newY = (int) (gap * fi) + leftGrid.northWest().y() + (size * fi);
-		  	if (data.map().getHeroVisible().contains(coordXY)) {
-		  		graphics.drawImage(data.imgMap().get("BG_MAP_TILE"), newX, newY, size, size, null);
-			  	switch(data.map().getGrid()[fi][fj]) {
-			  		case Shop _ -> graphics.setColor(Color.YELLOW);
-			  		case EnemyRoom _ -> graphics.setColor(Color.RED);
-			  		case EventRoom _ -> graphics.setColor(Color.PINK);
-			  		case Healer _ -> graphics.setColor(Color.GREEN);
-			  		case Start _ -> graphics.setColor(Color.BLUE);
-			  		case Exit _ -> graphics.setColor(Color.CYAN);
-			  		case LockedDoor _ -> graphics.setColor(Color.BLACK);
-			  		case Treasure _ -> graphics.setColor(Color.LIGHT_GRAY);
-			  		default ->  graphics.setColor(Color.GRAY);
-			  	}
-		  	} else graphics.setColor(Color.DARK_GRAY);
-		  	// Finir les images quand Arthur aura réglé le bug d'actualisation là
-		  	// graphics.drawImage(data.imgMap().get("ICON_EVENT"),newX, newY, size, size, null);
-		    graphics.fill(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj), 
-		    																		 (gap * fi) + leftGrid.northWest().y() + (size * fi), 
-		    																			size, size));
+		  	graphics.drawImage(data.imgMap().get("BG_MAP_TILE"), newX, newY, size, size, null);
 		    graphics.setColor(Color.BLACK);
 		    graphics.draw(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj), 
 		    																		 (gap * fi) + leftGrid.northWest().y() + (size * fi), 
@@ -376,6 +358,21 @@ public record GameView(int width, int height, int grid_size) {
 																					  	 (gap * fi) + leftGrid.northWest().y() + (size * fi) + size/4, 
 																								size/2, size/2));
 		    }
+		    
+		  	if (data.map().getHeroVisible().contains(coordXY)) {
+			  	switch(data.map().getGrid()[fi][fj]) {
+			  		case Shop _ -> graphics.setColor(Color.YELLOW);
+			  		case EnemyRoom _ -> graphics.drawImage(data.imgMap().get("ICON_COMBAT"), newX, newY, size, size, null);
+			  		case EventRoom _ -> graphics.drawImage(data.imgMap().get("ICON_EVENT"), newX, newY, size, size, null);
+			  		case Healer _ -> graphics.setColor(Color.GREEN);
+			  		case Start _ -> graphics.setColor(Color.BLUE);
+			  		case Exit _ -> graphics.setColor(Color.CYAN);
+			  		case LockedDoor _ -> graphics.setColor(Color.BLACK);
+			  		case Treasure _ -> graphics.setColor(Color.LIGHT_GRAY);
+			  		default ->  graphics.setColor(Color.GRAY);
+			  	}
+		  	} else graphics.setColor(Color.DARK_GRAY);
+
       }
 		}
 		
@@ -393,9 +390,7 @@ public record GameView(int width, int height, int grid_size) {
 		
 		graphics.setColor(Color.WHITE);
 		var coord = data.map().getHeroPos();
-    graphics.fill(new Rectangle2D.Double(((gap * coord.x()) + leftGrid.northWest().x() + (size * coord.x()) + size/4), 
-																		  	 ((gap * coord.y()) + leftGrid.northWest().y() + (size * coord.y()) + size/4), 
-																					size/2, size/2));
+		graphics.drawImage(data.imgMap().get("ICON_HERO"), (int) (gap * coord.x()) + leftGrid.northWest().x() + (coord.x() * size), (int) (gap * coord.y()) + leftGrid.northWest().y() + (coord.y() * size), size, size, null);
 		///////////////////////////////////
   }
 
@@ -423,13 +418,13 @@ public record GameView(int width, int height, int grid_size) {
    */
   private static void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
 	  switch (item.getID()) {
-		  case 1 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor")); 
+		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75); 
 		  case 2 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold")); 
 			case 3 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("sword")); 
 			case 4 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 2, 2, item.direction(), data.imgMap().get("despairShield")); 
 			case 5 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
 			case 6 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("massue")); 
-			case 7 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.9); 
+			case 7 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
 			case 8 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
 			default ->{}
 	  }

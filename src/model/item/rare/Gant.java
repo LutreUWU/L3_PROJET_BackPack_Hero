@@ -43,12 +43,14 @@ public class Gant implements Item{
 	@Override
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
+			int y = direction() == Direction.UP ? 1 : -1; 
 			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x(), coord.y() - 1);
+			b[1] = new Block(coord.x(), coord.y() - 1 * y);
 		}
 		else {
+			int x = direction() == Direction.RIGHT ? 1 : -1; 
 			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x() + 1, coord.y());
+			b[1] = new Block(coord.x() + 1 * x, coord.y());
 		}
 	}
 	
