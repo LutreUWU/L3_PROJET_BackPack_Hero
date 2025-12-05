@@ -20,6 +20,8 @@ public class DespairShield implements Item{
 	private final Rarity rarity = Rarity.EPIC; 
 	private final int id = 4;
 	private final int score = 10;
+	private final String description = "Un bouclier qui représente l'espoir et le desespoir";
+	private final String effect = "1AP : Perd 3PV et gagne 10 Shield";
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -58,7 +60,7 @@ public class DespairShield implements Item{
 	public void use(Enemy enemy) {
 		GameDataHero.sub("energy", 1);
 		GameDataHero.add("shield", 10);
-		enemy.subHP(3);
+		GameDataHero.sub("hp", 3 );
 	}
 	
   @Override
@@ -91,7 +93,20 @@ public class DespairShield implements Item{
 		return id;
 	}
   
+  @Override
+  public String getDescription() {
+		return description;
+	}
   
+  @Override
+  public String toString() {
+  	return "Despair";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  }  
  
 }
 

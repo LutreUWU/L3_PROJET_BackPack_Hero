@@ -11,6 +11,8 @@ public interface Item {
     Rarity getRarity();
     int getScore();
     int getID();
+    String getDescription();
+    String getEffect();
     
     default int getWidth() {
         Block[] b = shape();

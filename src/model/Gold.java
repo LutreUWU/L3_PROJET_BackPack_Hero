@@ -11,7 +11,10 @@ public class Gold implements Item {
 	private final Rarity rarity = null; 
 	private final int id = 2;
 	private final int score = -1;
-	
+	private String description = "De l'or, l'indispensable pour SURVIVRE";
+	private final String effect = "C'est de l'argent frérot, ça sert pour tout.";
+
+
 	public Gold() {
 		setXY(new XY(0, 0));
 	}
@@ -76,9 +79,23 @@ public class Gold implements Item {
 	}
   
   @Override
+  public String getDescription() {
+  	return description;
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  }
+  
+  @Override
 	public void setXY(XY coord) {
 		b[0] = new Block(coord.x(), coord.y());
 	}
 
+  @Override
+  public String toString() {
+  	return "Key";
+  }
 	
 }

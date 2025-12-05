@@ -15,13 +15,9 @@ import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
-import model.Gold;
 import model.Item;
 import model.XY;
-import model.item.common.KeyDoor;
-import model.item.common.Sword;
-import model.item.rare.Gant;
-import model.item.superrare.Massue;
+import model.item.legendary.Axe;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -149,8 +145,7 @@ public class GameController {
 									case Exit roomExit -> {var linkedEvent = roomExit.getEvent();
 																		data.inEvent(linkedEvent);
 																		data.map().updateMap(coord);}
-									default -> {IO.println(coord);
-															data.map().updateMap(coord);}
+									default -> {data.map().updateMap(coord);}
 									}
 								}
 							}
@@ -181,7 +176,7 @@ public class GameController {
 					GameView.draw(context, data);
 					data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
 		}
-		default -> IO.println(event);
+		default -> {}
 		}
 		// If event button is pressed
 		
@@ -191,7 +186,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new KeyDoor());
+						GameDataClick.addDragItem(new Axe());
 					}
 				}
 				// Start a combat against a RAT

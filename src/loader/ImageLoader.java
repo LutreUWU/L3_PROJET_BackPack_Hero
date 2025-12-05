@@ -33,7 +33,6 @@ public class ImageLoader {
 		        String fileName = f.getName();
 		        // Retirer l'extension
 		        String key = fileName.substring(0, fileName.lastIndexOf('.'));
-		        IO.println(key);
 		        bgImages.put(key, loadImg(f));
 		    }
 		}
@@ -45,7 +44,6 @@ public class ImageLoader {
 		addFolder("data/item/weapon");
 		addFolder("data/item/other");
 		addFolder("data/icon");
-		bgImages.put("bag", loadImg(new File("data/bag.png")));
 		bgImages.put("Roland", loadImg(new File("data/Roland.png")));
 		return bgImages;
 	}

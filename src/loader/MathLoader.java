@@ -25,6 +25,7 @@ public class MathLoader {
 		screenHeight = data.screenInfo().height();
 		getBGValue();
 		getBackpackValue();
+		getInfoItemValue();
 		getMapValue();
 		getEventValue();
 	}
@@ -58,22 +59,44 @@ public class MathLoader {
 // =============== Backpack ===================
 	private static void getBackpackValue() {
 		var size = data.bag().getGridSize();
-		var dimX = size * 8.0;
-		var dimY = size * 6.0;
-		XY NW = new XY((int) (screenWidth / 2 - dimX/2 + size/2), (int) (size / 2  + screenHeight * 0.02));
-		XY SE = new XY((int) (screenWidth / 2 + dimX/2), (int) (size / 2  + screenHeight * 0.02 + dimY));
-		BufferedImage img = data.imgMap().get("bag");
+		var dimX = size * 9.0;
+		var dimY = size * 7.0;
+		XY NW = new XY((int) (screenWidth / 2 - 3.5 * size), (int) (screenHeight * 0.02 + size * 0.8));
+		XY SE = new XY((int) (screenWidth / 2 + 3.5 * size), (int) (screenHeight * 0.02 + size * 5.8));
+		BufferedImage img = data.imgMap().get("BG_BACKPACK");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		var scaleX = dimX / width;
 		var scaleY = dimY / height;
 	  AffineTransform transform = new AffineTransform();
-		transform.translate(NW.x() - size/2, NW.y() - size / 2);
+		transform.translate(screenWidth / 2 - dimX / 2, screenHeight * 0.02) ;
 	  transform.scale(scaleX, scaleY);
 		renderDataGame.put("BG_BACKPACK", new RenderData(transform, new BoundingBox(NW, SE)));
 	}
 	
 // ============================================
+	
+//================== INFO ITEM ================
+	private static  void getInfoItemValue() {
+		var size = data.bag().getGridSize();
+		var dimX = size * 3.0;
+		var dimY = size * 5.0;
+		var NW = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size, renderDataGame.get("BG_BACKPACK").box().northWest().y());
+		var SE = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size + (int) dimX, renderDataGame.get("BG_BACKPACK").box().southEast().y() );
+		BufferedImage img = data.imgMap().get("BG_INFO_ITEM");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scaleX = dimX / width;
+		var scaleY = dimY / height;
+	  AffineTransform transform = new AffineTransform();
+		transform.translate(NW.x(), NW.y());
+	  transform.scale(scaleX, scaleY);
+	  var realNW = new XY((int) (NW.x() + size * 0.9), NW.y() + size/2);
+	  var realSE = new XY((int) (SE.x() + size * 0.9), SE.y() + size/2);
+		renderDataGame.put("BG_INFO_ITEM", new RenderData(transform, new BoundingBox(realNW, realSE)));
+	}
+		
+//============================================
 	
 // ================== Map =====================
 	private static void getMapValue() {
@@ -93,6 +116,7 @@ public class MathLoader {
 		renderDataGame.put("BG_MAP", new RenderData(transform, new BoundingBox(NW, SE)));
 	}
 // ============================================
+	
 	
 // ================= Hero =====================
 	

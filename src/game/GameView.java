@@ -190,7 +190,7 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawGrid(Graphics2D graphics, GameData data) {
     int size = data.bag().getGridSize();
 		int [][] grid = data.bag().grid();
-		BufferedImage imgBackpack = data.imgMap().get("bag");
+		BufferedImage imgBackpack = data.imgMap().get("BG_BACKPACK");
 		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box(); 
 		graphics.drawImage(imgBackpack, MathLoader.getMapEvent().get("BG_BACKPACK").transform(), null);
 		for (int i = 0; i < 5; i++) {
@@ -232,6 +232,61 @@ public record GameView(int width, int height, int grid_size) {
 				default ->{}
 		  }
 		}
+  }
+  
+  private static void drawItemInfo(Graphics2D graphics, GameData data) {
+  	BufferedImage imgItemInfo = data.imgMap().get("BG_INFO_ITEM");
+  	BoundingBox itemInfoBoundingBox = MathLoader.getMapEvent().get("BG_INFO_ITEM").box();
+  	XY NW = itemInfoBoundingBox.northWest();
+  	XY SE = itemInfoBoundingBox.southEast();
+		graphics.drawImage(imgItemInfo, MathLoader.getMapEvent().get("BG_INFO_ITEM").transform(), null);
+		Item item = data.dragItem();
+		if (item != null) {
+	    drawTextInfoName(graphics, item, NW);
+		  drawTextInfo(graphics, item.getDescription(), NW.x(), NW.y() + (int) (NW.y() * 0.30), 20);
+		  drawTextInfo(graphics, item.getEffect(), NW.x(), NW.y() + (int) ((SE.y() - NW.y()) / 2), 20);
+
+		}
+  }
+  
+  private static void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
+  	Font font = new Font("Mikodacs", Font.PLAIN, 25);
+    graphics.setFont(font);
+    graphics.setColor(switch(item.getRarity()) {
+	    case COMMON -> Color.GRAY;
+	    case RARE -> Color.GREEN;
+	    case SUPERARE -> Color.BLUE;
+	    case EPIC -> Color.MAGENTA;
+	    case LEGENDARY -> Color.YELLOW;
+	    case MYTHIC -> Color.PINK;
+    });
+	  graphics.drawString(item.toString().toUpperCase(), NW.x(),	NW.y() + (int) (NW.y() * 0.10));
+
+  }
+  
+  private static void drawTextInfo(Graphics2D graphics, String content, int x, int y, int maxChar) {
+    int size = 13;
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    graphics.setColor(Color.WHITE);
+    int maxCharsPerLine = maxChar;
+    String[] words = content.split(" ");
+    StringBuilder line = new StringBuilder();
+    int lineCount = 0;
+    for (String word : words) {
+        if (line.length() + word.length() + 1 > maxCharsPerLine) {
+            graphics.drawString(line.toString(), x, y + lineCount * fm.getHeight());
+            line = new StringBuilder(word);
+            lineCount++;
+        } else {
+            if (line.length() > 0) line.append(" ");
+            line.append(word);
+        }
+    }
+    if (line.length() > 0) {
+        graphics.drawString(line.toString(), x, y + lineCount * fm.getHeight());
+    }
   }
   
   /**
@@ -596,19 +651,19 @@ public record GameView(int width, int height, int grid_size) {
   		var img3 = data.imgMap().get("BG_CHOICE_END");
   		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
   		graphics.drawImage(img3, event3.transform(), null);
-		  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+		  drawTextEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
 		  															(int) event3.box().northWest().x() + width / 2, 
-		  															(int) (event3.box().northWest().y() + height * 0.5));
+		  															(int) (event3.box().northWest().y() + height * 0.5), 30);
   	}
   	else {
   		graphics.drawImage(img1, event1.transform(), null);
-  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+  	  drawTextEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
   	  															(int) event1.box().northWest().x() + width / 2, 
-  	  															(int) (event1.box().northWest().y() + height * 0.5));
+  	  															(int) (event1.box().northWest().y() + height * 0.5), 30);
   		graphics.drawImage(img2, event2.transform(), null);
-  	  drawTextChoiceEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
+  	  drawTextEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
   	  															(int) event2.box().northWest().x() + width / 2, 
-  	  															(int) (event2.box().northWest().y() + height * 0.5));
+  	  															(int) (event2.box().northWest().y() + height * 0.5), 30);
   	}
   }
   
@@ -621,14 +676,15 @@ public record GameView(int width, int height, int grid_size) {
    * @param content	 Text we wants to write.
    * @param x				 The x coordinate of the text
    * @param y				 The y coordinate of the text
+   * @param maxChar  Number of char max per line
    */
-  private static void drawTextChoiceEvent(Graphics2D graphics, GameData data, String content, int x, int y) {
+  private static void drawTextEvent(Graphics2D graphics, GameData data, String content, int x, int y, int maxChar) {
     int size = 20;
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
     graphics.setColor(Color.WHITE);
-    int maxCharsPerLine = 30;
+    int maxCharsPerLine = maxChar;
     String[] words = content.split(" ");
     StringBuilder line = new StringBuilder();
     int lineCount = 0;
@@ -663,6 +719,7 @@ public record GameView(int width, int height, int grid_size) {
 			if (data.mapOrBag()) {
 				drawGrid(graphics, data);
 				drawItemBag(graphics, data);
+				drawItemInfo(graphics, data);
 				if(!data.dragItemLst().isEmpty()) {
 					GameView.updateDragItem(graphics, data);
 				}

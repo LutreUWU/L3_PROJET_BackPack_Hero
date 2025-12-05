@@ -20,6 +20,8 @@ public class Axe implements Item{
 	private final Rarity rarity = Rarity.LEGENDARY; 
 	private final int id = 8;
 	private final int score = 15;
+	private final String description = "Une hache bien chargé, bien robuste, bien bagarre";
+	private final String effect = "1AP : Inflige -10PV à l'ennemi";
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -98,6 +100,20 @@ public class Axe implements Item{
 		return id;
 	}
   
+  @Override
+  public String getDescription() {
+		return description;
+	}
+  
+  @Override
+  public String toString() {
+  	return "Axe";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  } 
   
  
 }

@@ -13,6 +13,9 @@ public class KeyDoor implements Item {
 	private final Rarity rarity = Rarity.COMMON; 
 	private final int id = 1;
 	private final int score = -1;
+	private final String description = "Une clé toute mignonne !";
+	private final String effect = "Ouvre une porte verrouillée (1 fois)";
+
 	
 	public KeyDoor() {
 		setXY(new XY(0, 0));
@@ -81,4 +84,18 @@ public class KeyDoor implements Item {
   	return id;
   }
 
+  @Override
+  public String getDescription() {
+		return description;
+	}
+  
+  @Override
+  public String toString() {
+  	return "Key";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  }
 }

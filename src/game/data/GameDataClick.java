@@ -203,7 +203,6 @@ public class GameDataClick {
 											new XY(screenInfo.width() / 2 - (item.getWidth() * backpack.getGridSize() / 2) , screenInfo.height() / 2 - (item.getHeight() * backpack.getGridSize() / 2) ),
 											new XY(screenInfo.width() / 2 + (item.getWidth() * backpack.getGridSize() / 2) , screenInfo.height() / 2 + (item.getHeight() * backpack.getGridSize() / 2) ))
 							 );
-  	IO.println(dragItemMap.keySet());
   }
   
   public static void updateBoundingBox(Item item, int x, int y) {

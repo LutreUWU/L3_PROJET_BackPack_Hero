@@ -20,6 +20,9 @@ public class Sword implements Item{
 	private final Rarity rarity = Rarity.COMMON; 
 	private final int id = 3;
 	private final int score = 10;
+	private final String description = "Une épée simple et basique.";
+	private final String effect = "1AP : Inflige -3 à l'ennemi";
+	
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -96,6 +99,20 @@ public class Sword implements Item{
 		return id;
 	}
   
+  @Override
+  public String getDescription() {
+		return description;
+	}
+  
+  @Override
+  public String toString() {
+  	return "Sword";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  }
   
  
 }

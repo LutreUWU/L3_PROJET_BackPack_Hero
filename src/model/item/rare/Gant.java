@@ -20,6 +20,8 @@ public class Gant implements Item{
 	private Rarity rarity = Rarity.RARE; 
 	private int id = 7;
 	private int score = 10;
+	private final String description = "Des gants pour se protéger du froid hihihi";
+	private final String effect = "2AP : Heal 10PV";
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -95,7 +97,20 @@ public class Gant implements Item{
   public int getID() {
 		return id;
 	}
+  @Override
+  public String getDescription() {
+		return description;
+	}
   
+  @Override
+  public String toString() {
+  	return "Gant";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  } 
   
  
 }

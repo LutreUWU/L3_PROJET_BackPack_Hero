@@ -20,6 +20,8 @@ public class Mimicry implements Item{
 	private final Rarity rarity = Rarity.MYTHIC; 
 	private final int id = 5;
 	private final int score = 100;
+	private final String description = "L'épée emblématique de Red Mist, gare à vous !";
+	private final String effect = "2AP : Perd 5PV et inflige -30PV à l'ennemi";
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -96,7 +98,20 @@ public class Mimicry implements Item{
   public int getID() {
 		return id;
 	}
+  @Override
+  public String getDescription() {
+		return description;
+	}
   
+  @Override
+  public String toString() {
+  	return "Mimicry";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  } 
   
  
 }

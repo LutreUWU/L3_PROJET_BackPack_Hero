@@ -20,6 +20,8 @@ public class Massue implements Item{
 	private final Rarity rarity = Rarity.SUPERARE; 
 	private final int id = 6;
 	private final int score = 10;
+	private final String description = "Une épée, mais c'est une masse";
+	private final String effect = "1AP : Inflige -5 à l'ennemi";
 	/**
 	 * Initialize a sword. 
 	 * Since every items has their own shape, we do it manually
@@ -63,7 +65,7 @@ public class Massue implements Item{
 	@Override
 	public void use(Enemy enemy) {
 		GameDataHero.sub("energy", 1);
-		enemy.subHP(8);
+		enemy.subHP(5);
 	}
 	
   @Override
@@ -96,6 +98,20 @@ public class Massue implements Item{
 		return id;
 	}
   
+  @Override
+  public String getDescription() {
+		return description;
+	}
+  
+  @Override
+  public String toString() {
+  	return "Massue";
+  }
+  
+  @Override
+  public String getEffect() {
+  	return effect;
+  } 
   
  
 }
