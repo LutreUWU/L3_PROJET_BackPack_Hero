@@ -12,8 +12,8 @@ public final class EnemyRoom implements Room {
 	
 	private List<XY> accessible = new ArrayList<>();
 
-  public EnemyRoom(int floor) {
-      this.floor = floor;
+  public EnemyRoom(int floor2) {
+      floor = floor2;
   }
   
   public List<XY> getAccessible(){

@@ -3,6 +3,8 @@ package model.map.eventManager;
 import java.util.Random;
 
 import game.GameData;
+import game.data.GameDataBackpack;
+import model.Backpack;
 
 public class LinkedEvent {
 	
@@ -10,27 +12,45 @@ public class LinkedEvent {
 	private NodeEvent initialRoot;
 	private final int totalEvent = 1;
 	
+	/**
+	 * Constructor to create all linkedEvent
+	 * @param floor
+	 * @param whatEvent
+	 * @param data
+	 */
+	public LinkedEvent(int floor, String whatEvent) {
+		switch(whatEvent) {
+			case "eventRoom" -> createEventForEventRoom(floor);
+			case "exitRoom" -> createEventForExitRoom(floor);
+			case "lockedDoor" -> createEventForLockedRoom(floor);
+			case "healerRoom" -> createEventForHealerRoom(floor);
+		}
+		initialRoot = root;
+	}
+	
+
 	
 	/**
-	 * Constructor for all EventRoom
+	 * create event the a room
 	 * @param floor
 	 * @param hero
 	 */
-	public LinkedEvent(int floor) {
+	private void createEventForEventRoom(int floor) {
 		Random rand = new Random();
 		var x = rand.nextInt(totalEvent) + 1;
 		switch(x) {
 			case 1 -> event1(floor);
 			default -> {}
 		};
-		initialRoot = root;
 	}
 	
+	
+	
 	/**
-	 * Constructor for exit room
-	 * @param data of the game
+	 * Create event for ExitRoom
+	 * @param current floor
 	 */
-	public LinkedEvent(int floor, boolean isExit) {
+	private void createEventForExitRoom(int floor) {
 		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
 		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour " + question);
 		
@@ -39,7 +59,34 @@ public class LinkedEvent {
 		
 		var choiceTwo = createNodeWithConsequence("Non ! Je vais finir de me préparer...", floor, 1, "nothing", "Ca marche, prépare toi bien !");
 		root.setChoice2(choiceTwo);
-		initialRoot = root;
+	}
+	
+	/**
+	 * Create event for LockedDoor
+	 * @param current floor
+	 */
+	public void createEventForLockedRoom(int floor) {
+		root = new NodeEvent(null, "Souhaitez vous utiliser la clef ?\n*Si vous en avez une*");
+		
+		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "key", "La porte s'est ouverte si vous aviez une clef !");
+		root.setChoice1(choiceOne);
+		
+		var choiceTwo = createNodeWithConsequence("Non !", floor, 1, "nothing", "Ca marche ! Revient quand tu veux !");
+		root.setChoice2(choiceTwo);
+	}
+	
+	/**
+	 * Create event for LockedDoor
+	 * @param current floor
+	 */
+	public void createEventForHealerRoom(int floor) {
+		root = new NodeEvent(null, "Souhaitez récupérer votre vie et gagner un peu d'or maintenant ?");
+		
+		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "lifeAndGold", "C'est fait ! (+" + floor * 8 + " or)");
+		root.setChoice1(choiceOne);
+		
+		var choiceTwo = createNodeWithConsequence("Non !", floor, 1, "nothing", "Ca marche ! Revient quand tu veux !");
+		root.setChoice2(choiceTwo);
 	}
 	
 	public void event1(int floor) {

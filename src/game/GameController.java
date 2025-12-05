@@ -25,6 +25,7 @@ import model.item.superrare.Massue;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
+import model.map.Healer;
 import model.map.LockedDoor;
 import model.monster.Chicken;
 import model.monster.Soldat;
@@ -75,6 +76,7 @@ public class GameController {
 							GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 //							IO.println("ETAPE 0");
 //							IO.println("ID ACTUEL : " + currentItem.getID());
+							/*
 							if (currentItem.getID() == 1 && data.bag().bagItemLst().contains(new KeyDoor())) { // It's a key
 //								IO.println("ETAPE 1");
 								var currentPos = data.map().getHeroPos();
@@ -87,7 +89,7 @@ public class GameController {
 									}
 								default -> {IO.println("ETAPE 3");}
 								}
-							}
+							}*/
 						}
 						case MAP_OR_BAG -> {
 							if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
@@ -135,8 +137,16 @@ public class GameController {
 											eventRoom.visitedEvent();
 										}
 									}
-									case LockedDoor room -> {}
-									case Exit room -> {var linkedEvent = room.getEvent();
+									case LockedDoor roomDoor -> { if (roomDoor.getLock()) {
+																								var linkedEvent = roomDoor.getEvent();
+																								data.inEvent(linkedEvent);}
+																							}
+									case Healer healerRoom -> { if (!healerRoom.getAlreadyVisited()) {
+										var linkedEvent = healerRoom.getEvent();
+										data.inEvent(linkedEvent);
+										data.map().updateMap(coord);}
+									}
+									case Exit roomExit -> {var linkedEvent = roomExit.getEvent();
 																		data.inEvent(linkedEvent);
 																		data.map().updateMap(coord);}
 									default -> {IO.println(coord);

@@ -11,9 +11,9 @@ public final class Exit implements Room {
 	private List<XY> accessible = new ArrayList<>();
 	private LinkedEvent event; 
 	
-	public Exit(int floor) {
-		this.floor = floor;
-		event = new LinkedEvent(floor, true);
+	public Exit(int floor2) {
+		floor = floor2;
+		event = new LinkedEvent(floor, "exitRoom");
 	}
 	
 	public List<XY> getAccessible(){

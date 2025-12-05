@@ -73,7 +73,7 @@ public class GameData {
 	  backpack = new Backpack(screenInfo_.height());
 	  hero = new Hero(); 
 	  floor = 1;
-	  map = new Floor(floor, hero);
+	  map = new Floor(floor);
 	  screenInfo = screenInfo_;
 	  dragItemLst = new LinkedHashMap<>();
 	  imgMap = ImageLoader.loadAllImage();
@@ -158,7 +158,7 @@ public class GameData {
    */
   public void newFloor() {
   	floor++;
-    map = new Floor(floor, hero);
+    map = new Floor(floor);
   }
   
   /**

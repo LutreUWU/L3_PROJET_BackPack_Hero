@@ -9,8 +9,8 @@ public final class Start implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
 	
-	public Start(int floor) {
-		this.floor = floor;
+	public Start(int floor2) {
+		floor = floor2;
 	}
 	
 	public List<XY> getAccessible(){

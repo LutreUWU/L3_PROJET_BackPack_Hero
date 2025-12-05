@@ -5,13 +5,17 @@ import java.util.List;
 
 import model.Hero;
 import model.XY;
+import model.map.eventManager.LinkedEvent;
 
 public final class Healer implements Room {
 	int floor;
 	private List<XY> accessible = new ArrayList<>();
+	private boolean alreadyVisited = false;
+	private LinkedEvent event;
 
-	public Healer(int floor) {
-		this.floor = floor;
+	public Healer(int floor2) {
+		floor = floor2;
+		event = new LinkedEvent(floor2, "healerRoom");
 	}
 	
 	public List<XY> getAccessible(){
@@ -22,8 +26,16 @@ public final class Healer implements Room {
 		accessible.add(coord);
 	}
 	
-	public void healerUse(Hero hero) {
-		hero.add("gold", floor * 3);
-		hero.add("hp", floor * 6);
+	public void nowVisited() {
+		alreadyVisited = true;
 	}
+	
+	public boolean getAlreadyVisited() {
+		return alreadyVisited;
+	}
+	
+	public LinkedEvent getEvent() {
+		return event;
+	}
+	
 }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import game.GameData;
+import model.Backpack;
 import model.Hero;
 import model.XY;
 import model.monster.Enemy;
@@ -29,8 +30,8 @@ public class Floor {
    * @param floor
    * @param hero
    */
-  public Floor(int floor, Hero hero) {
-  	XY start = createAllRoom(1, hero);
+  public Floor(int floor) {
+  	XY start = createAllRoom(floor);
   	HashSet<XY> visited = new HashSet<>();
   	createWay(visited, start);
   	heroPos = start;
@@ -41,8 +42,8 @@ public class Floor {
    * Setters for hero position
    * @param hero_pos
    */
-	public void setHeroPos(XY hero_pos) {
-		this.heroPos = hero_pos;
+	public void setHeroPos(XY heroPos2) {
+		heroPos = heroPos2;
 	}
 
 
@@ -82,10 +83,10 @@ public class Floor {
    * @param floor
    * @return Starter Room
    */
-  private XY createAllRoom(int floor, Hero hero) {
+  private XY createAllRoom(int floor) {
   	List<XY> list1 = createXYList();
   	List<XY> list2 = shuffleList(list1);
-  	createSpecialRoom(list2, 1, hero);
+  	createSpecialRoom(list2, floor);
   	for (int i = 0; i < LINE; i++) {
   		for (int j = 0; j < ROW; j++) {
   			if (grid[i][j] == null) {
@@ -101,7 +102,7 @@ public class Floor {
    * @param list
    * @param floor
    */
-  private void createSpecialRoom(List<XY> list, int floor, Hero hero) {
+  private void createSpecialRoom(List<XY> list, int floor) {
   	grid[list.get(0).y()][list.get(0).x()] = new Shop(floor); // Create shop
   	grid[list.get(1).y()][list.get(1).x()] = new Treasure(floor); // Create treasure
   	grid[list.get(2).y()][list.get(2).x()] = new Treasure(floor); // Create treasure
@@ -111,7 +112,7 @@ public class Floor {
   	grid[list.get(6).y()][list.get(6).x()] = new EnemyRoom(floor); // Create Enemy
   	grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
   	grid[list.get(8).y()][list.get(8).x()] = new Start(floor); // Create start
-  	grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor
+  	grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the hero has a key)
   	grid[list.get(10).y()][list.get(10).x()] = new EventRoom(floor); // Create Event
   	
   }

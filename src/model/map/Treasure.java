@@ -12,8 +12,8 @@ public final class Treasure implements Room {
   private List<XY> accessible = new ArrayList<>();
   List<Item> reward;
 
-  public Treasure(int floor) {
-      this.floor = floor;
+  public Treasure(int floor2) {
+      floor = floor2;
       reward = createReward();
   }
   
