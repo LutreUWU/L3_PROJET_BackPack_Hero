@@ -343,35 +343,26 @@ public record GameView(int width, int height, int grid_size) {
 		  	var coordXY = new XY(fj, fi);
 		  	int newX = (int) (gap * fj) + leftGrid.northWest().x() + (size * fj);
 		  	int newY = (int) (gap * fi) + leftGrid.northWest().y() + (size * fi);
-		  	graphics.drawImage(data.imgMap().get("BG_MAP_TILE"), newX, newY, size, size, null);
-		    graphics.setColor(Color.BLACK);
-		    graphics.draw(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj), 
-		    																		 (gap * fi) + leftGrid.northWest().y() + (size * fi), 
-																							size, size));
-		    
-		    if (data.map().getHeroAccessible().contains(coordXY)) {
-		    	graphics.setColor(Color.MAGENTA);
-		      graphics.fill(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj) + size/4, 
-		  																		  	 (gap * fi) + leftGrid.northWest().y() + (size * fi) + size/4, 
-		  																					size/2, size/2));
-		      graphics.draw(new Rectangle2D.Double((gap * fj) + leftGrid.northWest().x() + (size * fj) + size/4, 
-																					  	 (gap * fi) + leftGrid.northWest().y() + (size * fi) + size/4, 
-																								size/2, size/2));
-		    }
+		  	
+
 		    
 		  	if (data.map().getHeroVisible().contains(coordXY)) {
+		  		graphics.drawImage(data.imgMap().get("BG_MAP_TILE"), newX, newY, size, size, null);
+			    if (data.map().getHeroAccessible().contains(coordXY)) {
+			    	graphics.drawImage(data.imgMap().get("BG_MAP_TILE_ACCES"), newX, newY, size, size, null);
+			    }
 			  	switch(data.map().getGrid()[fi][fj]) {
-			  		case Shop _ -> graphics.setColor(Color.YELLOW);
+			  		case Shop _ -> graphics.setColor(Color.YELLOW); // Ajouter icone shop
 			  		case EnemyRoom _ -> graphics.drawImage(data.imgMap().get("ICON_COMBAT"), newX, newY, size, size, null);
 			  		case EventRoom _ -> graphics.drawImage(data.imgMap().get("ICON_EVENT"), newX, newY, size, size, null);
-			  		case Healer _ -> graphics.setColor(Color.GREEN);
-			  		case Start _ -> graphics.setColor(Color.BLUE);
-			  		case Exit _ -> graphics.setColor(Color.CYAN);
-			  		case LockedDoor _ -> graphics.setColor(Color.BLACK);
-			  		case Treasure _ -> graphics.setColor(Color.LIGHT_GRAY);
-			  		default ->  graphics.setColor(Color.GRAY);
+			  		case Healer _ -> graphics.drawImage(data.imgMap().get("ICON_HEAL"), newX, newY, size, size, null);
+			  		case Start _ -> graphics.setColor(Color.BLUE); // Ajouter icone start
+			  		case Exit _ -> graphics.drawImage(data.imgMap().get("ICON_EXIT"), newX, newY, size, size, null);
+			  		case LockedDoor _ -> graphics.setColor(Color.BLACK); // Ajouter icone lock
+			  		case Treasure _ -> graphics.drawImage(data.imgMap().get("ICON_TREASURE"), newX, newY, size, size, null);
+			  		default ->  {}
 			  	}
-		  	} else graphics.setColor(Color.DARK_GRAY);
+		  	} else graphics.drawImage(data.imgMap().get("BG_MAP_SHADOW"), newX - (int) gap, newY - (int) gap, size + (int) gap*2, size + (int) gap*2, null);
 
       }
 		}
