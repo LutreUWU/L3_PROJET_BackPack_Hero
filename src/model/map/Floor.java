@@ -16,7 +16,7 @@ public class Floor {
 	private final int ROW = 11;
   private final int LINE = 5;
 	
-	private Room[][] grid = new Room[LINE][ROW];
+	final private Room[][] grid = new Room[LINE][ROW];
   
   final private HashSet<XY> heroVisited = new HashSet<>();
   final private HashSet<XY> heroAccessible = new HashSet<>();

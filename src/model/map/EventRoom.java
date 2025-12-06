@@ -8,8 +8,8 @@ import model.XY;
 import model.map.eventManager.*;
 
 public final class EventRoom implements Room {
-	int floor;
-	private List<XY> accessible = new ArrayList<>();
+	private int floor;
+	final private List<XY> accessible = new ArrayList<>();
 	private LinkedEvent event;
 	private boolean alreadyVisited = false;
 

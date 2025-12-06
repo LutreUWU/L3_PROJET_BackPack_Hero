@@ -14,6 +14,7 @@ public interface Item {
     String getDescription();
     String getEffect();
     
+    
     default int getWidth() {
         Block[] b = shape();
         int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
@@ -36,8 +37,8 @@ public interface Item {
         return maxY - minY + 1;
     }
 
-    default int final_score() {
-    	return getRarity().ordinal() * getScore();
+    default int finalScore() {
+    	return (getRarity().ordinal() + 1) * getScore();
     }
     
     default void rotateXY() {

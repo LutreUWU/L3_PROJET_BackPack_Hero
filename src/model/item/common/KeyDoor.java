@@ -10,7 +10,7 @@ import model.monster.Enemy;
 public class KeyDoor implements Item {
 	private Block[] b = new Block[2]; 
 	private Direction direction = Direction.UP;
-	private final Rarity rarity = Rarity.COMMON; 
+	private final Rarity rarity = Rarity.COMMON;
 	private final int id = 1;
 	private final int score = -1;
 	private final String description = "Une clé toute mignonne !";

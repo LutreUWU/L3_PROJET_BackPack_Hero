@@ -9,8 +9,8 @@ import model.XY;
 import model.map.eventManager.LinkedEvent;
 
 public final class LockedDoor implements Room {
-	int floor;
-	private List<XY> accessible = new ArrayList<>();
+	private int floor;
+	final private List<XY> accessible = new ArrayList<>();
 	private boolean lock = true;
 	private LinkedEvent event;
 

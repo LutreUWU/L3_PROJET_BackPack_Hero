@@ -6,7 +6,7 @@ import java.util.List;
 import model.XY;
 
 public final class Hallway implements Room {
-	private List<XY> accessible = new ArrayList<>();
+	final private List<XY> accessible = new ArrayList<>();
 	
 	public List<XY> getAccessible(){
 		return accessible;

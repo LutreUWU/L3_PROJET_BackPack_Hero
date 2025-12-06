@@ -73,11 +73,11 @@ public class GameData {
 	  backpack = new Backpack(screenInfo_.height());
 	  hero = new Hero(); 
 	  floor = 1;
+	  ItemRepository.createItemRepository();
 	  map = new Floor(floor);
 	  screenInfo = screenInfo_;
 	  dragItemLst = new LinkedHashMap<>();
 	  imgMap = ImageLoader.loadAllImage();
-	  ItemRepository.createItemRepository();
 	  new MathLoader(this);
 	  new GameDataBackpack(backpack);
     new GameDataHero(hero);

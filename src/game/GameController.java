@@ -23,6 +23,7 @@ import model.map.EventRoom;
 import model.map.Exit;
 import model.map.Healer;
 import model.map.LockedDoor;
+import model.map.Treasure;
 import model.monster.Chicken;
 import model.monster.Soldat;
 
@@ -120,10 +121,12 @@ public class GameController {
 
 									var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
 									switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
-									case EnemyRoom room -> {
+									case EnemyRoom room -> { if (!room.getAlreadyVisited()) {
 										data.swapMapOrBag();
 										GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())), data);
 										data.map().updateMap(coord);
+										room.nowVisited();
+									}
 									}
 									case EventRoom eventRoom -> {
 										if (!eventRoom.getAlreadyVisited()) {
@@ -139,6 +142,11 @@ public class GameController {
 																							}
 									case Healer healerRoom -> { if (!healerRoom.getAlreadyVisited()) {
 										var linkedEvent = healerRoom.getEvent();
+										data.inEvent(linkedEvent);
+										data.map().updateMap(coord);}
+									}
+									case Treasure treasure -> { if (!treasure.getAlreadyVisited()) {
+										var linkedEvent = treasure.getEvent();
 										data.inEvent(linkedEvent);
 										data.map().updateMap(coord);}
 									}

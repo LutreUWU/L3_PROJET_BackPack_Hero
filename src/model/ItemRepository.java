@@ -39,7 +39,7 @@ public class ItemRepository {
     private static void createRankingWeapon() {
     	Collection<Item> items = itemRepositoryMap.values();
     	itemRankLst = new ArrayList<>(items);
-    	itemRankLst.sort((a, b) -> Integer.compare(a.final_score(), b.final_score()));
+    	itemRankLst.sort((a, b) -> Integer.compare(a.finalScore(), b.finalScore()));
     }
 
     // Récupérer une arme par ID

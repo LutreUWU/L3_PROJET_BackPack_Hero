@@ -7,8 +7,8 @@ import model.XY;
 import model.map.eventManager.LinkedEvent;
 
 public final class Exit implements Room {
-	int floor;
-	private List<XY> accessible = new ArrayList<>();
+	private int floor;
+	final private List<XY> accessible = new ArrayList<>();
 	private LinkedEvent event; 
 	
 	public Exit(int floor2) {

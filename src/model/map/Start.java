@@ -6,8 +6,8 @@ import java.util.List;
 import model.XY;
 
 public final class Start implements Room {
-	int floor;
-	private List<XY> accessible = new ArrayList<>();
+	private int floor;
+	final private List<XY> accessible = new ArrayList<>();
 	
 	public Start(int floor2) {
 		floor = floor2;

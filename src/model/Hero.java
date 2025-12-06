@@ -2,6 +2,8 @@ package model;
 
 import java.util.Objects;
 
+import model.item.common.Gold;
+
 public class Hero {
   // Statistics of the hero
 	private int max_HP = 40;
@@ -10,7 +12,7 @@ public class Hero {
 	private int current_armor = 0; // as a percentage (between 0 and 100%)
 	private int energy_point = 3;
 	private int mana_point = 0;
-	private Gold money = new Gold();
+	private Gold money = new Gold(10);
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;

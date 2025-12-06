@@ -9,6 +9,7 @@ import model.item.common.KeyDoor;
 import model.item.superrare.Massue;
 import model.map.Healer;
 import model.map.LockedDoor;
+import model.map.Treasure;
 
 public class Consequence {
 	private int floor;
@@ -30,20 +31,31 @@ public class Consequence {
 			case "fight" -> {IO.println("FAUT QU'ON SE BATTE ICI !!!"); data.newFloor();}
 			case "key" -> consequenceKeyEvent(data);
 			case "lifeAndGold" -> consequenceHealer(data);
-			case "nothing" -> {}
+			case "openTreasure" -> consequenceTreasure(data);
 			default -> {} // Nothing
+		}
+	}
+	
+	private void consequenceTreasure(GameData data) {
+		var heroPos = data.map().getHeroPos();
+		switch(data.map().getGrid()[heroPos.y()][heroPos.x()]) {
+			case Treasure room -> room.openReward();
+		default -> throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
 		}
 	}
 	
 	private void consequenceHealer(GameData data) {
 		var hero = data.hero();
-		hero.setHP(hero.getMax_HP()); 
-		hero.add("gold", floor * 8);
-		var heroPos = data.map().getHeroPos();
-		switch(data.map().getGrid()[heroPos.y()][heroPos.x()]) {
-			case Healer room -> room.nowVisited();
-		default -> throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
-		}
+		if (hero.getGold() >= floor * 5) {
+			hero.sub("gold", floor * 5);
+			hero.add("hp", floor * 15);
+			if (hero.getHP() > hero.getMax_HP()) hero.setHP(hero.getMax_HP());
+			var heroPos = data.map().getHeroPos();
+			switch(data.map().getGrid()[heroPos.y()][heroPos.x()]) {
+				case Healer room -> room.nowVisited();
+			default -> throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
+			}
+		}	
 	}
 	
 	private void consequenceKeyEvent(GameData data) {

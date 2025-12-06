@@ -24,6 +24,7 @@ public class LinkedEvent {
 			case "exitRoom" -> createEventForExitRoom(floor);
 			case "lockedDoor" -> createEventForLockedRoom(floor);
 			case "healerRoom" -> createEventForHealerRoom(floor);
+			case "treasure" -> createEventForTreasure(floor);
 		}
 		initialRoot = root;
 	}
@@ -76,13 +77,27 @@ public class LinkedEvent {
 	}
 	
 	/**
+	 * Create event to open the Treasure
+	 * @param current floor
+	 */
+	public void createEventForTreasure(int floor) {
+		root = new NodeEvent(null, "Souhaitez vous utiliser ouvrir le coffre ?");
+		
+		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "openTreasure", "Vous venez d'ouvrir le coffre !");
+		root.setChoice1(choiceOne);
+		
+		var choiceTwo = createNodeWithConsequence("Non !", floor, 1, "nothing", "Ca marche ! Revient quand tu veux !");
+		root.setChoice2(choiceTwo);
+	}
+	
+	/**
 	 * Create event for LockedDoor
 	 * @param current floor
 	 */
 	public void createEventForHealerRoom(int floor) {
-		root = new NodeEvent(null, "Souhaitez récupérer votre vie et gagner un peu d'or maintenant ?");
+		root = new NodeEvent(null, "Souhaitez échanger " + floor * 5 + " pièces d'or contre " + floor * 15 + "HP ?");
 		
-		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "lifeAndGold", "C'est fait ! (+" + floor * 8 + " or)");
+		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "lifeAndGold", "Si vous aviez les pièces nécessaires,\nla transaction est effectué !");
 		root.setChoice1(choiceOne);
 		
 		var choiceTwo = createNodeWithConsequence("Non !", floor, 1, "nothing", "Ca marche ! Revient quand tu veux !");

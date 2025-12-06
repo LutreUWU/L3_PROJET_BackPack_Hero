@@ -1,21 +1,27 @@
-package model;
+package model.item.common;
 
 import game.data.GameDataHero;
+import model.Block;
+import model.Direction;
+import model.Item;
+import model.Rarity;
+import model.XY;
 import model.monster.Enemy;
 
 public class Gold implements Item {
-	private int gold = 100;
+	private int gold;
 	private int size_count = 1; // 1, 2, 3 or 4
 	private Block[] b = new Block[1]; 
 	private Direction direction = Direction.UP;
-	private final Rarity rarity = null; 
+	private final Rarity rarity = Rarity.COMMON;
 	private final int id = 2;
 	private final int score = -1;
 	private String description = "De l'or, l'indispensable pour SURVIVRE";
 	private final String effect = "C'est de l'argent frérot, ça sert pour tout.";
 
 
-	public Gold() {
+	public Gold(int gold2) {
+		gold = gold2;
 		setXY(new XY(0, 0));
 	}
 	
