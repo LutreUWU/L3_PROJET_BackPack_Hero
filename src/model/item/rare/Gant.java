@@ -1,5 +1,7 @@
 package model.item.rare;
 
+import java.util.ArrayList;
+
 import game.data.GameDataHero;
 import model.Block;
 import model.Direction;
@@ -63,7 +65,7 @@ public class Gant implements Item{
 	 * 
 	 */
 	@Override
-	public void use(Enemy enemy) {
+	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 2);
 		GameDataHero.add("PV", 10);
 	}

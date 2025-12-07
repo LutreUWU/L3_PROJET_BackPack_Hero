@@ -1,5 +1,7 @@
 package model.item.epic;
 
+import java.util.ArrayList;
+
 import game.data.GameDataHero;
 import model.Block;
 import model.Direction;
@@ -68,7 +70,7 @@ public class DespairShield implements Item{
 	 * 
 	 */
 	@Override
-	public void use(Enemy enemy) {
+	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 1);
 		GameDataHero.add("shield", 10);
 		GameDataHero.sub("hp", 3 );

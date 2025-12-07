@@ -11,6 +11,7 @@ import com.github.forax.zen.ScreenInfo;
 import game.GameData;
 import model.BoundingBox;
 import model.Item;
+import model.RandomItem;
 import model.XY;
 import model.monster.Enemy;
 
@@ -93,6 +94,8 @@ public class GameDataCombat {
 			}
 			if (lstEnemy.isEmpty()) {
 				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
+				var itemGain = RandomItem.generate(data.floor());
+				GameDataClick.addDragItem(itemGain);
 				combat = false;
 			}
 			else {

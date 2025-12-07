@@ -16,9 +16,8 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
 import model.Item;
-import model.RandomItem;
 import model.XY;
-import model.item.legendary.Axe;
+import model.item.epic.DespairShield;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -197,7 +196,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Axe());
+						GameDataClick.addDragItem(new DespairShield());
 					}
 				}
 				case Key.I -> {

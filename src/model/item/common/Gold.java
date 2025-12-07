@@ -1,5 +1,7 @@
 package model.item.common;
 
+import java.util.ArrayList;
+
 import game.data.GameDataHero;
 import model.Block;
 import model.Direction;
@@ -50,7 +52,7 @@ public class Gold implements Item {
 	}
 	
 	@Override
-	public void use(Enemy enemy) {
+	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		// Can't be use with a click
 	}
 	

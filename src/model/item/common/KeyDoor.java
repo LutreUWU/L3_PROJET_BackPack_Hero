@@ -1,5 +1,7 @@
 package model.item.common;
 
+import java.util.ArrayList;
+
 import model.Block;
 import model.Direction;
 import model.Item;
@@ -22,7 +24,7 @@ public class KeyDoor implements Item {
 	}
 	
 	@Override
-	public void use(Enemy enemy) {
+	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		// Can't be use with a click
 	}
 	
