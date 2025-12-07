@@ -1,10 +1,15 @@
 package game.data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.github.forax.zen.ScreenInfo;
+
 import game.GameData;
+import model.BoundingBox;
 import model.Item;
 import model.XY;
 import model.monster.Enemy;
@@ -22,9 +27,9 @@ public class GameDataCombat {
 	 * - lst_enemy : List of all enemy we're fighting
 	 */
 	private static boolean combat = false;
-	private static int target;
+	private static Enemy target;
   private static ArrayList<Enemy> lstEnemy;
-
+  private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
 	/**
 	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
 	 * 
@@ -38,9 +43,23 @@ public class GameDataCombat {
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
 		lstEnemy = monsters;
+		getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
 		lstEnemy.forEach(monster -> monster.preAction());
-		target = 0;
+		setTarget(lstEnemy.get(0));
 		combat = true;
+	}
+	
+	private static void getEnemyBox(ArrayList<Enemy> lstEnemy, ScreenInfo screenInfo,  int heroSizeX, int heroSizeY) {
+		for (int i = 0; i < lstEnemy.size(); i++) {
+			var enemy = lstEnemy.get(i);
+			double sizeX = heroSizeX * enemy.getSizeX();
+	  	double sizeY = heroSizeY * enemy.getSizeY();
+	  	double northWestX =  screenInfo.width() * 0.80 - heroSizeX + (i - (lstEnemy.size() - 1) / 2.0) * heroSizeX ;
+	  	double northWestY =  screenInfo.height() * (0.5 - (0.1 * (i%2))) + (heroSizeY - sizeY);
+	  	var NW = new XY((int) northWestX, (int) northWestY);
+	  	var SE = new XY(NW.x() + (int) sizeX,NW.y() + (int) sizeY);
+	  	enemyBox.put(enemy, new BoundingBox(NW, SE));
+		}
 	}
 	
 	/**
@@ -53,16 +72,24 @@ public class GameDataCombat {
 	public static void heroAction(GameData data, XY coord) {
 		Objects.requireNonNull(data);
 		int id = data.bag().grid()[coord.y()][coord.x()];
-		Enemy targetEnemy = lstEnemy.get(target); 
 		// A changer, pas ouf je pense
 		Optional<Item> weapon = data.bag().bagItemLst().stream()
 																											 .filter(item -> item.getID() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
-			item.use(targetEnemy);
-			if (targetEnemy.getHP() <= 0) {
-				lstEnemy.remove(target);
-				GameDataHero.add("xp", targetEnemy.getXP());
+			item.use(target, lstEnemy);
+			Iterator<Enemy> it = lstEnemy.iterator();
+			while (it.hasNext()) {
+		    Enemy enemy = it.next();
+				if(enemy.getHP() <= 0) {
+					it.remove();
+					enemyBox.remove(enemy);
+					if (target == enemy && !lstEnemy.isEmpty()) {
+						setTarget(lstEnemy.getFirst());
+					}
+					getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
+					GameDataHero.add("xp", enemy.getXP());
+				}
 			}
 			if (lstEnemy.isEmpty()) {
 				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
@@ -89,7 +116,19 @@ public class GameDataCombat {
 		return combat;
 	}
 	
+	public static void setTarget(Enemy enemy) {
+		target = enemy;
+	}
+	
+	public static Enemy getTarget(){
+		return target;
+	}
+	
 	public static ArrayList<Enemy> getLstEnemy(){
 		return lstEnemy;
+	}
+	
+	public static LinkedHashMap<Enemy, BoundingBox> getEnemyBox() {
+		return enemyBox;
 	}
 }

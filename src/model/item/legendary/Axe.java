@@ -1,5 +1,7 @@
 package model.item.legendary;
 
+import java.util.ArrayList;
+
 import game.data.GameDataHero;
 import model.Block;
 import model.Direction;
@@ -65,7 +67,7 @@ public class Axe implements Item{
 	 * 
 	 */
 	@Override
-	public void use(Enemy enemy) {
+	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 1);
 		enemy.subHP(10);
 	}

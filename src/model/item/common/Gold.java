@@ -101,7 +101,7 @@ public class Gold implements Item {
 
   @Override
   public String toString() {
-  	return "Key";
+  	return "Gold";
   }
 	
 }

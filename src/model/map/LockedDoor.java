@@ -14,27 +14,47 @@ public final class LockedDoor implements Room {
 	private boolean lock = true;
 	private LinkedEvent event;
 
-  public LockedDoor(int floor2) {
-      floor = floor2;
-      event = new LinkedEvent(floor, "lockedDoor");
-  }
-  
-  public List<XY> getAccessible(){
+	/**
+	 * Constructor for the LockedDoor
+	 * 
+	 * @param floor2
+	 */
+	public LockedDoor(int floor2) {
+		floor = floor2;
+		event = new LinkedEvent(floor, "lockedDoor");
+	}
+
+	/**
+	 * Getter for accessibles
+	 * 
+	 * @return List<XY>
+	 */
+	@Override
+	public List<XY> getAccessible() {
 		return accessible;
 	}
-	
-	public void addAccessible(XY coord){
-		accessible.add(coord);
-	}
-	
+
+	/**
+	 * Unlock the LockedDoor
+	 */
 	public void unlock() {
 		lock = false;
 	}
-	
+
+	/**
+	 * Getter to know if the LockedDoor is lock
+	 * 
+	 * @return
+	 */
 	public boolean getLock() {
 		return lock;
 	}
-	
+
+	/**
+	 * Getter for event
+	 * 
+	 * @return LinkedEvent
+	 */
 	public LinkedEvent getEvent() {
 		return event;
 	}

@@ -6,18 +6,15 @@ import java.util.List;
 import model.XY;
 
 public final class Start implements Room {
-	private int floor;
 	final private List<XY> accessible = new ArrayList<>();
 	
-	public Start(int floor2) {
-		floor = floor2;
-	}
-	
+	/**
+	 * Getter for accessibles
+	 * 
+	 * @return List<XY>
+	 */
+	@Override
 	public List<XY> getAccessible(){
 		return accessible;
-	}
-	
-	public void addAccessible(XY coord){
-		accessible.add(coord);
 	}
 }

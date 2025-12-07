@@ -16,6 +16,7 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
 import model.Item;
+import model.RandomItem;
 import model.XY;
 import model.item.legendary.Axe;
 import model.map.EnemyRoom;
@@ -158,6 +159,8 @@ public class GameController {
 								}
 							}
 						}
+						case NOTHING -> {}
+						default -> throw new IllegalArgumentException("Unexpected value: " + res.type());
 						}
 					}
 
@@ -197,7 +200,6 @@ public class GameController {
 						GameDataClick.addDragItem(new Axe());
 					}
 				}
-				// Start a combat against a RAT
 				case Key.I -> {
 					if (GameDataCombat.combat() == false) {
 						GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())),

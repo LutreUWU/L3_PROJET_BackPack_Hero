@@ -8,29 +8,34 @@ import model.monster.Chicken;
 import model.monster.Enemy;
 
 public final class EnemyRoom implements Room {
-	private int floor;
 	private boolean alreadyVisited = false;
-	
+
 	final private List<XY> accessible = new ArrayList<>();
 
-  public EnemyRoom(int floor2) {
-      floor = floor2;
-  }
-  
-  public List<XY> getAccessible(){
+	/**
+	 * Getter for accessibles
+	 * 
+	 * @return List<XY>
+	 */
+	@Override
+	public List<XY> getAccessible() {
 		return accessible;
 	}
-  
-  public boolean getAlreadyVisited() {
-  	return alreadyVisited;
-  }
-  
-  public void nowVisited() {
-  	alreadyVisited = true;
-  }
-	
-	public void addAccessible(XY coord){
-		accessible.add(coord);
+
+	/**
+	 * Getter for alreadyVisited
+	 * 
+	 * @return boolean
+	 */
+	public boolean getAlreadyVisited() {
+		return alreadyVisited;
 	}
-	
+
+	/**
+	 * Set nowVisited = true
+	 */
+	public void nowVisited() {
+		alreadyVisited = true;
+	}
+
 }

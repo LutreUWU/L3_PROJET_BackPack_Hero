@@ -11,6 +11,7 @@ import model.Backpack;
 import model.BoundingBox;
 import model.Item;
 import model.XY;
+import model.monster.Enemy;
 
 public class GameDataClick {
 	private static GameData data;
@@ -264,6 +265,18 @@ public class GameDataClick {
   	return -1;
   }
   
+  private static void mobClick(int x, int y) {
+  	GameDataCombat.getEnemyBox().forEach((enemy, boundingBox) -> {
+  		var NW = boundingBox.northWest();
+  		var SE = boundingBox.southEast();
+  		if (x >= NW.x() && x <= SE.x()) {
+  			if (y >= NW.y() && y <= SE.y()) {
+  				GameDataCombat.setTarget(enemy);
+  			}
+  		}
+  	}); ;
+  }
+  
   /**
    * Main function treating the click and returning information about what we clicks.
    * 
@@ -289,16 +302,18 @@ public class GameDataClick {
         return new ClickResult(ClickType.MAP, mapPos);
     }
     
-
-    int mob = mapOrBagClick(x, y);
-    if (mob != 0) {
-        return new ClickResult(ClickType.MAP_OR_BAG, mob);
+    int mapOrBag = mapOrBagClick(x, y);
+    if (mapOrBag != 0) {
+        return new ClickResult(ClickType.MAP_OR_BAG, mapOrBag);
     }
+    
     int choiceNumber = eventChoiceClick(x, y);
     if (choiceNumber != -1) {
     	return new ClickResult(ClickType.EVENT_CHOICE, choiceNumber);
     }
-    
+    if (GameDataCombat.combat()) {
+      mobClick(x, y);
+    }
     return new ClickResult(ClickType.NOTHING, null);
   }
   

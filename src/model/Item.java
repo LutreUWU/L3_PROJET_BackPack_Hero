@@ -1,11 +1,13 @@
 package model;
 
+import java.util.ArrayList;
+
 import model.monster.Enemy;
 
 public interface Item {
     Block[] shape();
     void setXY(XY coord);
-    void use(Enemy enemy);
+    void use(Enemy enemy, ArrayList<Enemy> lstenemy);
     Direction direction();
     void setDirection(Direction d);
     Rarity getRarity();
@@ -41,19 +43,18 @@ public interface Item {
     	return (getRarity().ordinal() + 1) * getScore();
     }
     
+    
     default void rotateXY() {
         Block[] b = shape();
         if (b == null || b.length == 0) return;
         int cx = b[0].x();
         int cy = b[0].y();
         for (int i = 0; i < b.length; i++) {
-            int x = b[i].x() - cx;
-            int y = b[i].y() - cy;
-
-            int newX = -y;
-            int newY = x;
+            int newX = -b[i].y();
+            int newY = b[i].x();
             b[i] = new Block(cx + newX, cy + newY);
         }
         setDirection(direction().next());
     }
+    
 }
