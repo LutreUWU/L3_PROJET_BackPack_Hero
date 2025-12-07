@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: game.GameController
+Class-Path: lib/zen-6.0.jar
+
