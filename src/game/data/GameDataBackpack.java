@@ -3,8 +3,8 @@ package game.data;
 import java.util.Objects;
 
 import model.Backpack;
-import model.Block;
 import model.Item;
+import model.XY;
 
  /**
   * The game data with all methods for backpack manipulation. 
@@ -14,6 +14,8 @@ import model.Item;
   */
 public class GameDataBackpack {
   private static Backpack backpack;
+	private static int caseUnlock = 0; // Number of case we can currently unlock.
+
   
   /**
    * Link the backpack with the one in GameData
@@ -85,4 +87,19 @@ public class GameDataBackpack {
     }
     backpack.bagItemLst().remove(item);
   }
+  
+  public static void unlockCaseBackpack(XY coord) {
+  	if (caseUnlock > 0 && backpack.grid()[coord.y()][coord.x()] == -2) {
+  		backpack.grid()[coord.y()][coord.x()] = -1;
+  		caseUnlock -=1;
+  	}
+  }
+  
+	public int getCaseUnlock() {
+		return caseUnlock;
+	}
+	
+	public static void addCaseUnlock(int value) {
+		caseUnlock += value;
+	}
 }

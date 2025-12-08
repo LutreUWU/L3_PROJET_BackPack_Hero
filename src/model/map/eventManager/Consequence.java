@@ -3,9 +3,11 @@ package model.map.eventManager;
 import java.util.ArrayList;
 
 import game.GameData;
+import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import model.Hero;
 import model.Item;
+import model.ItemRepository;
 import model.item.common.KeyDoor;
 import model.item.superrare.Massue;
 import model.map.Healer;
@@ -99,8 +101,8 @@ public class Consequence {
 			switch (data.map().getGrid()[heroPos.y()][heroPos.x()]) {
 			case LockedDoor room -> {
 				room.unlock();
-				var bag = data.bag().bagItemLst();
-				bag.remove(bag.stream().filter(item -> item.getID() == 1).findFirst().orElse(null));
+				var bag = data.bag();
+				GameDataBackpack.removeItemFromBackpack(bag.bagItemLst().stream().filter(item -> item.getID() == 1).findFirst().get()); // Bien
 				data.map().updateMap(heroPos);
 			}
 			default ->

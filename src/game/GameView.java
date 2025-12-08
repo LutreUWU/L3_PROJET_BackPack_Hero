@@ -362,8 +362,9 @@ public record GameView(int width, int height, int grid_size) {
 	  graphics.drawString("SHIELD : " + String.valueOf(data.hero().getCurrent_protection()), x,	y + size*2);
 	  graphics.drawString("AP : " + String.valueOf(data.hero().getEnergy_point()), x,	y + size*3);
 	  graphics.drawString("MANA : " + String.valueOf(data.hero().getMana_point()), x,	y + size*4);
-	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()) + "/" + String.valueOf(10 + ((data.hero().getLevel() - 1) * 2)), x,	y + size*5);
-	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size*6);
+	  graphics.drawString("Level : " + String.valueOf(data.hero().getLevel()), x,	y + size*5);
+	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()) + "/" + String.valueOf(10 + ((data.hero().getLevel() - 1) * 2)), x,	y + size*6);
+	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size*7);
   }
   
   /**

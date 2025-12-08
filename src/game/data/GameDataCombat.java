@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 import com.github.forax.zen.ScreenInfo;
 
@@ -31,6 +32,8 @@ public class GameDataCombat {
 	private static Enemy target;
   private static ArrayList<Enemy> lstEnemy;
   private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
+  private static int totalExp;
+  private static int levelBeforeCombat;
 	/**
 	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
 	 * 
@@ -44,6 +47,8 @@ public class GameDataCombat {
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
 		lstEnemy = monsters;
+		totalExp = 0;
+		levelBeforeCombat = data.hero().getLevel();
 		getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
 		lstEnemy.forEach(monster -> monster.preAction());
 		setTarget(lstEnemy.get(0));
@@ -83,17 +88,23 @@ public class GameDataCombat {
 			while (it.hasNext()) {
 		    Enemy enemy = it.next();
 				if(enemy.getHP() <= 0) {
+					totalExp += enemy.getXP();
 					it.remove();
 					enemyBox.remove(enemy);
 					if (target == enemy && !lstEnemy.isEmpty()) {
 						setTarget(lstEnemy.getFirst());
 					}
 					getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
-					GameDataHero.add("xp", enemy.getXP());
+					
 				}
 			}
 			if (lstEnemy.isEmpty()) {
 				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
+				GameDataHero.add("xp", totalExp);
+				for (int i = 0; i < data.hero().getLevel() - levelBeforeCombat; i++) {
+					Random r = new Random();
+					GameDataBackpack.addCaseUnlock(3 + r.nextInt(1));
+				}
 				var itemGain = RandomItem.generate(data.floor());
 				GameDataClick.addDragItem(itemGain);
 				combat = false;

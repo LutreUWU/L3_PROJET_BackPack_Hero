@@ -49,7 +49,7 @@ public class Hero {
 			case "energy" -> energy_point += value;
 			case "mana" -> mana_point += value;
 			case "gold" -> {money.addGold(value); money.updateGoldSize();}
-			case "xp" -> {xp += value; if (xp >= MAX_XP()) {xp -= MAX_XP(); level++;}}
+			case "xp" -> {xp += value; while (xp >= MAX_XP()) {xp -= MAX_XP(); level++;}}
 		}
 	}
 	
@@ -131,5 +131,4 @@ public class Hero {
 	public void setHP(int value) {
 		HP = value;
 	}
-
 }

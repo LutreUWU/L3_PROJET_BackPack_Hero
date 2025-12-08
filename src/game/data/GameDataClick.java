@@ -49,12 +49,12 @@ public class GameDataClick {
   	double coordLeftGrid = (screenInfo.width() / 2) - 3.5 * size;
   	double coordTopGrid = (screenInfo.height() / 4.5) - 2.5 * size;
   	if (data.mapOrBag() == false) {
-  	  return new XY(-1, -1);
+  	  return null;
   	}
   	if(x < coordLeftGrid || x > (coordLeftGrid + 7 * size) ||
   		 y < coordTopGrid   || y > (coordTopGrid + 5 * size)
   		) {
-  		return new XY(-1, -1);
+  		return null;
   	}
   	int newX = (int) (x - coordLeftGrid) / size;
   	int newY = (int) (y - coordTopGrid) / size;
@@ -173,7 +173,7 @@ public class GameDataClick {
       }
   	}
   	var res = bagClick(x,y);
-  	if (res.x() != -1 && res.y() != -1) {
+  	if (res != null) {
   		if ((item = backpack.getItem(res.x(), res.y())) == null) {
   	    return null;
   		}
@@ -253,15 +253,17 @@ public class GameDataClick {
     		}
     	}
   	}
-  	for (int i = 0; i < 2; i++) {
-  		String key = "BG_CHOICE" + Integer.toString(i + 1);
-  		boundingBox = MathLoader.getMapEvent().get(key).box();
-    	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
-    		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
-    			return i + 1;
-    		}
-    	}
-  	}  	
+  	else {
+    	for (int i = 0; i < 2; i++) {
+    		String key = "BG_CHOICE" + Integer.toString(i + 1);
+    		boundingBox = MathLoader.getMapEvent().get(key).box();
+      	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
+      		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
+      			return i + 1;
+      		}
+      	}
+    	}  
+  	}
   	return -1;
   }
   
@@ -293,7 +295,7 @@ public class GameDataClick {
     }
 
     XY bag = bagClick(x, y);
-    if (bag.x() != -1) {
+    if (bag != null) {
         return new ClickResult(ClickType.BAG, bag);
     }
 

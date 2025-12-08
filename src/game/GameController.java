@@ -17,7 +17,7 @@ import game.data.GameDataCombat;
 import loader.FontLoader;
 import model.Item;
 import model.XY;
-import model.item.epic.DespairShield;
+import model.item.common.KeyDoor;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -97,6 +97,7 @@ public class GameController {
 							if (data.mapOrBag() && GameDataCombat.combat()) {
 								GameDataCombat.heroAction(data, (XY) res.value());
 							}
+							GameDataBackpack.unlockCaseBackpack((XY) res.value());							
 						}
 						case EVENT_CHOICE -> {
 							if ((int) res.value() == 1) {
@@ -196,7 +197,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new DespairShield());
+						GameDataClick.addDragItem(new KeyDoor());
 					}
 				}
 				case Key.I -> {
