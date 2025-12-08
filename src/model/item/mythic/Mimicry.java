@@ -3,7 +3,6 @@ package model.item.mythic;
 import java.util.ArrayList;
 
 import game.data.GameDataHero;
-import model.Block;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -17,7 +16,7 @@ public class Mimicry implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
-	private Block[] b = new Block[3]; 
+	private XY[] b = new XY[3]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.MYTHIC; 
 	private final int id = 5;
@@ -47,14 +46,14 @@ public class Mimicry implements Item{
 	@Override
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x(), coord.y() - 1);
-			b[2] = new Block(coord.x(), coord.y() + 1);
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x(), coord.y() - 1);
+			b[2] = new XY(coord.x(), coord.y() + 1);
 		}
 		else {
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x() - 1, coord.y());
-			b[2] = new Block(coord.x() + 1, coord.y());
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x() - 1, coord.y());
+			b[2] = new XY(coord.x() + 1, coord.y());
 		}
 	}
 	
@@ -77,7 +76,7 @@ public class Mimicry implements Item{
   }
 	
   @Override
-  public Block[] shape() {
+  public XY[] shape() {
       return b;
   }
 

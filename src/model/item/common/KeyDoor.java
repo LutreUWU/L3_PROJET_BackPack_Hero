@@ -2,7 +2,6 @@ package model.item.common;
 
 import java.util.ArrayList;
 
-import model.Block;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -10,7 +9,7 @@ import model.XY;
 import model.monster.Enemy;
 
 public class KeyDoor implements Item {
-	private Block[] b = new Block[2]; 
+	private XY[] b = new XY[2]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.COMMON;
 	private final int id = 1;
@@ -34,7 +33,7 @@ public class KeyDoor implements Item {
   }
 	
   @Override
-  public Block[] shape() {
+  public XY[] shape() {
       return b;
   }
 
@@ -62,13 +61,13 @@ public class KeyDoor implements Item {
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
 			int y = direction() == Direction.UP ? 1 : -1; 
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x(), coord.y() - 1 * y);
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x(), coord.y() - 1 * y);
 		}
 		else {
 			int x = direction() == Direction.RIGHT ? 1 : -1; 
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x() + 1 * x, coord.y());
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x() + 1 * x, coord.y());
 		}
 	}
   

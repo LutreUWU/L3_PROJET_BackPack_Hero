@@ -3,7 +3,6 @@ package model.item.legendary;
 import java.util.ArrayList;
 
 import game.data.GameDataHero;
-import model.Block;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -17,7 +16,7 @@ public class Axe implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
-	private Block[] b = new Block[4]; 
+	private XY[] b = new XY[4]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.LEGENDARY; 
 	private final int id = 8;
@@ -47,16 +46,16 @@ public class Axe implements Item{
 	@Override
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x(), coord.y() + 1);
-			b[2] = new Block(coord.x(), coord.y() - 1);
-			b[3] = new Block(coord.x() + 1, coord.y() - 1);
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x(), coord.y() + 1);
+			b[2] = new XY(coord.x(), coord.y() - 1);
+			b[3] = new XY(coord.x() + 1, coord.y() - 1);
 		}
 		else {
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x() - 1, coord.y());
-			b[2] = new Block(coord.x() + 1, coord.y());
-			b[3] = new Block(coord.x() + 1, coord.y() + 1);
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x() - 1, coord.y());
+			b[2] = new XY(coord.x() + 1, coord.y());
+			b[3] = new XY(coord.x() + 1, coord.y() + 1);
 		}
 	}
 	
@@ -78,7 +77,7 @@ public class Axe implements Item{
   }
 	
   @Override
-  public Block[] shape() {
+  public XY[] shape() {
       return b;
   }
 

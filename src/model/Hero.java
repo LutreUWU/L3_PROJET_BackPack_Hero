@@ -22,7 +22,7 @@ public class Hero {
 	private int size_y = (int) (size_x * 1.2);
 	
 	
-	private int MAX_XP() {
+	public int MAX_XP() {
 		return 10 + (level - 1) * 2;
 	}
 	

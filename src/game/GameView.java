@@ -15,7 +15,6 @@ import com.github.forax.zen.ApplicationContext;
 
 import game.data.GameDataCombat;
 import loader.MathLoader;
-import model.Block;
 import model.BoundingBox;
 import model.Direction;
 import model.Item;
@@ -218,7 +217,7 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawItemBag(Graphics2D graphics, GameData data) {
 		var itemLst = data.bag().bagItemLst();
 		for (var item : itemLst) {
-			Block coordinate = item.shape()[0];
+			XY coordinate = item.shape()[0];
 		  switch (item.getID()) {
 			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75);
 			  case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold"));
@@ -354,17 +353,82 @@ public record GameView(int width, int height, int grid_size) {
    * @param y				 coordinate y where we wants to draw.
    */
   private static void drawHeroStats(Graphics2D graphics, GameData data, int x, int y) {
-  	int size = 14;
-    Font font = new Font("Arial", Font.PLAIN, size);
+  	int leftBorder = 0;
+  	int size = (int) (data.screenInfo().height() * 0.04);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    drawHeroHP(graphics, data);
+    drawHeroShield(graphics, data);
+    drawHeroLevel(graphics, data);
+    drawFloorLevel(graphics, data);
     graphics.setColor(Color.BLUE);
-		graphics.setFont(font);
-	  graphics.drawString("PV : " + data.hero().getHP() + "/" + data.hero().getMax_HP(), x,	y + size);
-	  graphics.drawString("SHIELD : " + String.valueOf(data.hero().getCurrent_protection()), x,	y + size*2);
+    graphics.setFont(font);
 	  graphics.drawString("AP : " + String.valueOf(data.hero().getEnergy_point()), x,	y + size*3);
 	  graphics.drawString("MANA : " + String.valueOf(data.hero().getMana_point()), x,	y + size*4);
-	  graphics.drawString("Level : " + String.valueOf(data.hero().getLevel()), x,	y + size*5);
-	  graphics.drawString("EXP : " + String.valueOf(data.hero().getXp()) + "/" + String.valueOf(10 + ((data.hero().getLevel() - 1) * 2)), x,	y + size*6);
 	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size*7);
+  }
+  
+  private static void drawHeroHP(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("ICON_HEALTH");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int height = (int) (data.screenInfo().height() * 0.04);
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = data.imgMap().get("ICON_HEALTH");
+    graphics.drawImage(img, render.transform() , null);
+	  graphics.setColor(Color.GRAY);
+    graphics.fill(new Rectangle2D.Double(logoWidth, height / 2 - size / 2 , data.screenInfo().width() * 0.20, size));
+    graphics.setColor(Color.GREEN);
+    graphics.fill(new Rectangle2D.Double(logoWidth, height / 2 - size / 2, data.screenInfo().width() * 0.20 * data.hero().getHP() / data.hero().getMax_HP(), size));
+    graphics.setColor(Color.WHITE);
+    graphics.draw(new Rectangle2D.Double(logoWidth, height / 2 - size / 2, data.screenInfo().width() * 0.20, size));
+	  graphics.drawString(data.hero().getHP() + "/" + data.hero().getMax_HP(), (int) (logoWidth + data.screenInfo().width() * 0.205), height / 2 + size / 2);
+  }
+  
+  private static void drawHeroShield(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("ICON_SHIELD");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int height = (int) (data.screenInfo().height() * 0.04);
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = data.imgMap().get("ICON_SHIELD");
+    graphics.drawImage(img, render.transform() , null);
+	  graphics.setColor(Color.GRAY);
+    graphics.fill(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + height / 2 - size / 2, data.screenInfo().width() * 0.20, size));
+    graphics.setColor(Color.BLUE);
+    graphics.fill(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + height / 2 - size / 2, data.screenInfo().width() * 0.20 * data.hero().getCurrent_protection() / data.hero().getMax_HP(), size));
+    graphics.setColor(Color.WHITE);
+    graphics.draw(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + height / 2 - size / 2, data.screenInfo().width() * 0.20, size));
+	  graphics.drawString(data.hero().getCurrent_protection() + "/" + data.hero().getMax_HP(), (int) (logoWidth + data.screenInfo().width() * 0.205), (int) (render.box().northWest().y() + height / 2 + size / 2));
+  }
+  
+  private static void drawHeroLevel(Graphics2D graphics, GameData data) {
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    int textWidth = fm.stringWidth("LEVEL " + data.hero().getLevel());
+    int textHeight = fm.getAscent();
+    graphics.setColor(Color.WHITE);
+	  graphics.drawString("LEVEL " + data.hero().getLevel(), data.screenInfo().width() / 2 - textWidth / 2,	size);
+	  graphics.setColor(Color.GRAY);
+    graphics.fill(new Rectangle2D.Double(data.screenInfo().width() / 2 - textWidth / 2, (int) (data.screenInfo().height() * 0.03)  , textWidth, size * 0.25));
+    graphics.setColor(Color.CYAN);
+    graphics.fill(new Rectangle2D.Double(data.screenInfo().width() / 2 - textWidth / 2, (int) (data.screenInfo().height() * 0.03)  , textWidth * data.hero().getXp() / data.hero().MAX_XP(), size * 0.25));
+  }
+  
+  private static void drawFloorLevel(Graphics2D graphics, GameData data) {
+  	int size = (int) (data.screenInfo().height() * 0.03);
+  	Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    int textWidth = fm.stringWidth("ETAGE : " + data.floor());
+    int textHeight = fm.getAscent();
+    graphics.setColor(Color.WHITE);
+	  graphics.drawString("ETAGE : " + data.floor(), data.screenInfo().width() - (int) (textWidth * 1.2),	size);
+
+
   }
   
   /**

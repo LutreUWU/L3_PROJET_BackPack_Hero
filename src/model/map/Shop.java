@@ -38,7 +38,6 @@ public final class Shop implements Room {
 			var item = RandomItem.generate(floor);
 			currentShop.put(item, item.finalScore());
 		}
-  	IO.println(currentShop);
   }
   
   /**

@@ -3,7 +3,6 @@ package model.item.rare;
 import java.util.ArrayList;
 
 import game.data.GameDataHero;
-import model.Block;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -17,7 +16,7 @@ public class Gant implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
-	private Block[] b = new Block[2]; 
+	private XY[] b = new XY[2]; 
 	private Direction direction = Direction.UP;
 	private Rarity rarity = Rarity.RARE; 
 	private int id = 7;
@@ -48,13 +47,13 @@ public class Gant implements Item{
 	public void setXY(XY coord) {
 		if (direction() == Direction.UP || direction() == Direction.DOWN) {
 			int y = direction() == Direction.UP ? 1 : -1; 
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x(), coord.y() - 1 * y);
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x(), coord.y() - 1 * y);
 		}
 		else {
 			int x = direction() == Direction.RIGHT ? 1 : -1; 
-			b[0] = new Block(coord.x(), coord.y());
-			b[1] = new Block(coord.x() + 1 * x, coord.y());
+			b[0] = new XY(coord.x(), coord.y());
+			b[1] = new XY(coord.x() + 1 * x, coord.y());
 		}
 	}
 	
@@ -76,7 +75,7 @@ public class Gant implements Item{
   }
 	
   @Override
-  public Block[] shape() {
+  public XY[] shape() {
       return b;
   }
 

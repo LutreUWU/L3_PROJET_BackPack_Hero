@@ -123,8 +123,8 @@ public class GameDataClick {
   private static XY floorClick(int x, int y) {
   	int size = backpack.getGridSize();
   	var gap = size * 0.1;
-  	double leftGrid = (screenInfo.width() / 2) - 5.5 * size;
-  	double topGrid = (screenInfo.height() / 5.5) - 2.5 * size;
+  	double leftGrid = MathLoader.getMapEvent().get("BG_MAP").box().northWest().x();
+  	double topGrid = MathLoader.getMapEvent().get("BG_MAP").box().northWest().y();
   	if(x < leftGrid || x > (leftGrid + 11 * size + 10 * gap) ||
    		 y < topGrid   || y > (topGrid + 5 * size + 4 * gap)
    		) {

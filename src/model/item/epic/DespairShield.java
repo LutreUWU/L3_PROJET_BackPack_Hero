@@ -3,7 +3,6 @@ package model.item.epic;
 import java.util.ArrayList;
 
 import game.data.GameDataHero;
-import model.Block;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -17,7 +16,7 @@ public class DespairShield implements Item{
 	/**
 	 * ID of the weapon (Every weapon has a unique ID)
 	 */
-	private Block[] b = new Block[4]; 
+	private XY[] b = new XY[4]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.EPIC; 
 	private final int id = 4;
@@ -46,21 +45,10 @@ public class DespairShield implements Item{
 	 */
 	@Override
 	public void setXY(XY coord) {
-//		var currentDir = direction;
-//		direction = Direction.UP;
-		b[0] = new Block(coord.x(), coord.y());
-		b[1] = new Block(coord.x() + 1, coord.y());
-		b[2] = new Block(coord.x(), coord.y() + 1);
-		b[3] = new Block(coord.x() + 1, coord.y() + 1);
-//		for (int i = 0; i < currentDir.ordinal(); i++) {
-//			rotateXY();
-//		}
-//		IO.println("OUIUI");
-//		IO.println(b[0]);
-//		IO.println(b[1]);
-//		IO.println(b[2]);
-//		IO.println(b[3]);
-//		IO.println("OUIUI");
+		b[0] = new XY(coord.x(), coord.y());
+		b[1] = new XY(coord.x() + 1, coord.y());
+		b[2] = new XY(coord.x(), coord.y() + 1);
+		b[3] = new XY(coord.x() + 1, coord.y() + 1);
 	}
 	
 	/**
@@ -72,7 +60,7 @@ public class DespairShield implements Item{
 	@Override
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 1);
-		GameDataHero.add("shield", 10);
+		GameDataHero.add("protection", 10);
 		GameDataHero.sub("hp", 3 );
 	}
 	
@@ -82,7 +70,7 @@ public class DespairShield implements Item{
   }
 	
   @Override
-  public Block[] shape() {
+  public XY[] shape() {
       return b;
   }
 

@@ -2,8 +2,6 @@ package model.item.common;
 
 import java.util.ArrayList;
 
-import game.data.GameDataHero;
-import model.Block;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -13,7 +11,7 @@ import model.monster.Enemy;
 public class Gold implements Item {
 	private int gold;
 	private int size_count = 1; // 1, 2, 3 or 4
-	private Block[] b = new Block[1]; 
+	private XY[] b = new XY[1]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.COMMON;
 	private final int id = 2;
@@ -62,7 +60,7 @@ public class Gold implements Item {
   }
 	
   @Override
-  public Block[] shape() {
+  public XY[] shape() {
       return b;
   }
 
@@ -98,7 +96,7 @@ public class Gold implements Item {
   
   @Override
 	public void setXY(XY coord) {
-		b[0] = new Block(coord.x(), coord.y());
+		b[0] = new XY(coord.x(), coord.y());
 	}
 
   @Override

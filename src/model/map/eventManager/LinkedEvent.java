@@ -136,7 +136,7 @@ public class LinkedEvent {
 		var choiceTwoOne = createNodeWithConsequence("J'arrive jamais a faire un malloc...", floor, 1, "nothing",
 				"C'est peut être le temps de relire ton cours...\nM. Revuz te force à installer linux *aucun effet c'est gratuit*");
 		choiceTwo.setChoice1(choiceTwoOne);
-		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, "sub_hp",
+		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, "fight",
 				"On peut dire que c'est réciproque...\n*Vous vous battez et perdez de la vie*");
 		choiceTwo.setChoice2(choiceTwoTwo);
 	}

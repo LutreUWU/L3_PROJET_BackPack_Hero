@@ -18,6 +18,8 @@ import loader.FontLoader;
 import model.Item;
 import model.XY;
 import model.item.common.KeyDoor;
+import model.item.epic.DespairShield;
+import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -174,7 +176,7 @@ public class GameController {
 						int x = pointerEvent.location().x();
 						int y = pointerEvent.location().y();
 						var res = GameDataClick.bagClick(x, y);
-						if (res.x() != -1) {
+						if (res != null) {
 							data.dragItem().setXY(GameDataClick.bagClick(x, y));
 							if (GameDataBackpack.addItemToBackpack(data.dragItem())) {
 								data.removeItemFromDrag(data.dragItem());
@@ -198,6 +200,9 @@ public class GameController {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 						GameDataClick.addDragItem(new KeyDoor());
+						GameDataClick.addDragItem(new Mimicry());
+						GameDataClick.addDragItem(new DespairShield());
+
 					}
 				}
 				case Key.I -> {

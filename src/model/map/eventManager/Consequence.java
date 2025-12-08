@@ -1,10 +1,12 @@
 package model.map.eventManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataBackpack;
 import game.data.GameDataClick;
+import game.data.GameDataCombat;
 import model.Hero;
 import model.Item;
 import model.ItemRepository;
@@ -13,6 +15,8 @@ import model.item.superrare.Massue;
 import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Treasure;
+import model.monster.Chicken;
+import model.monster.Soldat;
 
 public class Consequence {
 	private int floor;
@@ -44,12 +48,12 @@ public class Consequence {
 		case "add_gold" -> hero.add("gold", (int) (floor * 5 * bonus));
 		case "add_weapon" -> GameDataClick.addDragItem(new Massue());
 		case "fight" -> {
-			IO.println("FAUT QU'ON SE BATTE ICI !!!");
-			data.newFloor();
+			GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken())), data);
 		}
 		case "key" -> consequenceKeyEvent(data);
 		case "lifeAndGold" -> consequenceHealer(data);
 		case "openTreasure" -> consequenceTreasure(data);
+		case "floor" -> data.newFloor();
 		default -> {
 		} // Nothing
 		}

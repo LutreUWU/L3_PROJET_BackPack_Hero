@@ -115,10 +115,10 @@ public class GameDataCombat {
 					if(data.hero().getHP() == 0) {
 						// TO DO 
 					}
+					GameDataHero.reset();
 					GameDataHero.add("energy", 3);
 				}
 			}
-			GameDataHero.reset();
 		});
 	}
 	

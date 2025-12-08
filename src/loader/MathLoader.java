@@ -24,11 +24,37 @@ public class MathLoader {
 		screenWidth = data.screenInfo().width();
 		screenHeight = data.screenInfo().height();
 		getBGValue();
+		getIconHeroValue();
 		getBackpackValue();
 		getInfoItemValue();
 		getMapValue();
 		getEventValue();
 	}
+	
+// ================= ICON =====================
+	private static void getIconHeroValue() {
+  	double sizeY =  screenHeight * 0.04;
+		BufferedImage img = data.imgMap().get("ICON_HEALTH");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		double scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.scale(scale, scale);
+		XY NW = new XY(0, 0);
+		XY SE = new XY((int) (width * scale), (int) (height * scale));
+		renderDataGame.put("ICON_HEALTH", new RenderData(transform, new BoundingBox(NW, SE)));
+		img = data.imgMap().get("ICON_SHIELD");
+		transform = new AffineTransform();
+    transform.translate(0, height * scale);
+    transform.scale(scale, scale);
+		NW = new XY(0, (int) (height * scale));
+		SE = new XY((int) (width * scale), (int) (height * scale * 2));
+		renderDataGame.put("ICON_SHIELD", new RenderData(transform, new BoundingBox(NW, SE)));
+
+
+	}
+	
+//============================================	
 	
 // ================== BG ======================
 	private static void getBGValue() {
@@ -101,17 +127,18 @@ public class MathLoader {
 // ================== Map =====================
 	private static void getMapValue() {
 		var size = data.bag().getGridSize();
-		var dimX = size * 13.0;
-		var dimY = size * 7.0;
-		XY NW = new XY((int) ((screenWidth / 2) - 5.5 * size), (int) ((data.screenInfo().height()/ 5) - 2.5 * size));
-		XY SE = new XY((int) ((screenWidth / 2) + 5.5 * size), (int) ((data.screenInfo().height()/ 5) + 2.5 * size));
+  	var gap = size * 0.1;
+		var dimX = size * 12.0 + 10 * gap;
+		var dimY = size * 6.0 + 4 * gap;
+		XY NW = new XY((int) ((screenWidth / 2) - 5.5 * size - 5*gap), (int) ((screenHeight * 0.04 + size / 2.0)));
+		XY SE = new XY((int) ((screenWidth / 2) + 5.5 * size + 5*gap), (int) ((screenHeight * 0.04 + size / 2.0) + 5.0 * size + 4*gap));
 		BufferedImage img = data.imgMap().get("BG_MAP");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		var scaleX = dimX / width;
 		var scaleY = dimY / height;
 	  AffineTransform transform = new AffineTransform();
-		transform.translate(NW.x() - size/2.0, NW.y() - size / 2);
+		transform.translate(NW.x() - size / 2.0, NW.y() - size / 2.0);
 	  transform.scale(scaleX, scaleY);
 		renderDataGame.put("BG_MAP", new RenderData(transform, new BoundingBox(NW, SE)));
 	}

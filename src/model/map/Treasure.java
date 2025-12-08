@@ -98,10 +98,8 @@ public final class Treasure implements Room {
 		rewardList.add(new KeyDoor()); // add a key
 		// add 1, 2 or 3 random item (probability with Gauss)
 		for (int i = 1; i <= 3; i++) {
-			IO.println(rewardList);
 			var item = RandomItem.generate(floor);
 			rewardList.add(item);
 		}
-		IO.println(rewardList);
 	}
 }

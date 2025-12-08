@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import model.monster.Enemy;
 
 public interface Item {
-    Block[] shape();
+    XY[] shape();
     void setXY(XY coord);
     void use(Enemy enemy, ArrayList<Enemy> lstenemy);
     Direction direction();
@@ -18,9 +18,9 @@ public interface Item {
     
     
     default int getWidth() {
-        Block[] b = shape();
+        XY[] b = shape();
         int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
-        for (Block block : b) {
+        for (XY block : b) {
             int x = block.x();
             if (x < minX) minX = x;
             if (x > maxX) maxX = x;
@@ -29,9 +29,9 @@ public interface Item {
     }
 
     default int getHeight() {
-        Block[] b = shape();
+        XY[] b = shape();
         int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
-        for (Block block : b) {
+        for (XY block : b) {
             int y = block.y();
             if (y < minY) minY = y;
             if (y > maxY) maxY = y;
@@ -45,14 +45,14 @@ public interface Item {
     
     
     default void rotateXY() {
-        Block[] b = shape();
+        XY[] b = shape();
         if (b == null || b.length == 0) return;
         int cx = b[0].x();
         int cy = b[0].y();
         for (int i = 0; i < b.length; i++) {
             int newX = -b[i].y();
             int newY = b[i].x();
-            b[i] = new Block(cx + newX, cy + newY);
+            b[i] = new XY(cx + newX, cy + newY);
         }
         setDirection(direction().next());
     }
