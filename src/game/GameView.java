@@ -14,6 +14,7 @@ import java.util.Objects;
 import com.github.forax.zen.ApplicationContext;
 
 import game.data.GameDataCombat;
+import loader.FontLoader;
 import loader.MathLoader;
 import model.BoundingBox;
 import model.Direction;
@@ -249,7 +250,7 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   private static void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
-  	Font font = new Font("Mikodacs", Font.PLAIN, 25);
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH2());
     graphics.setFont(font);
     graphics.setColor(switch(item.getRarity()) {
 	    case COMMON -> Color.GRAY;
@@ -264,8 +265,7 @@ public record GameView(int width, int height, int grid_size) {
   }
   
   private static void drawTextInfo(Graphics2D graphics, String content, int x, int y, int maxChar) {
-    int size = 13;
-    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getSpan());
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
     graphics.setColor(Color.WHITE);
@@ -640,7 +640,7 @@ public record GameView(int width, int height, int grid_size) {
    * @param y				 Coordinate y where we wants to draw.
    */
   private static void drawEnemyInfo(Graphics2D graphics, Enemy enemy, int x, int y) {
-  	int size = 14;
+  	int size = FontLoader.getSpan();
     Font font = new Font("Arial", Font.PLAIN, size);
     graphics.setColor(GameDataCombat.getTarget() == enemy ? Color.RED : Color.WHITE);
 		graphics.setFont(font);
@@ -679,9 +679,8 @@ public record GameView(int width, int height, int grid_size) {
    * @param data		 {@code GameData} containing all informations about the game
    */
   private static void drawTextEvent(Graphics2D graphics, GameData data){
-  	int size = 30;
 	  double top = MathLoader.getMapEvent().get("BG_EVENT").box().northWest().y();
-    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setColor(Color.WHITE);
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
@@ -737,8 +736,7 @@ public record GameView(int width, int height, int grid_size) {
    * @param maxChar  Number of char max per line
    */
   private static void drawTextEvent(Graphics2D graphics, GameData data, String content, int x, int y, int maxChar) {
-    int size = 20;
-    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
     graphics.setColor(Color.WHITE);

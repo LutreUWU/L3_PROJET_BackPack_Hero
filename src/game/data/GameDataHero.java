@@ -54,7 +54,7 @@ public class GameDataHero {
    * Return the current hero's statue from data
    * @return
    */
-  public Hero hero() {
+  public static Hero hero() {
     return hero;
   }
 }

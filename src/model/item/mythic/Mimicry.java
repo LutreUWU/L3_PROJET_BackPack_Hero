@@ -65,9 +65,11 @@ public class Mimicry implements Item{
 	 */
 	@Override
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-		GameDataHero.sub("energy", 2);
-		GameDataHero.sub("hp", 5);
-		enemy.subHP(30);
+		if (GameDataHero.hero().getEnergy_point() >= 2) {
+			GameDataHero.sub("energy", 2);
+			GameDataHero.sub("hp", 5);
+			enemy.subHP(30);
+		}
 	}
 	
   @Override

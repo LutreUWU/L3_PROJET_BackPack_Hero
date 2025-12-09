@@ -166,13 +166,15 @@ public class MathLoader {
 		BufferedImage img = data.imgMap().get("BG_EVENT");
     int imgW = img.getWidth();
     int imgH = img.getHeight();
+    double scaleX = (double) (0.80 * screenWidth) / imgW;
     double scaleY = (double) (0.40 * screenHeight) / imgH;
     double imgHeightScale = imgH * scaleY;
+    double imgWidthScale = imgW * scaleX;
     double drawY = screenHeight - imgHeightScale;
     AffineTransform transform = new AffineTransform();
-    transform.translate(screenWidth/2 - (imgW/2.0), drawY);
+    transform.translate(screenWidth/2 - (imgWidthScale/2.0), drawY);
     transform.scale(1, scaleY);
-    var boundingBox = new BoundingBox(new XY(screenWidth / 2 - imgW/2, (int) drawY), new XY(screenWidth / 2 + imgW/2, screenHeight));
+    var boundingBox = new BoundingBox(new XY(screenWidth / 2 - (int) imgWidthScale/2, (int) drawY), new XY(screenWidth / 2 + (int) imgWidthScale/2, screenHeight));
     renderDataGame.put("BG_EVENT", new RenderData(transform, boundingBox));
 	}
 	

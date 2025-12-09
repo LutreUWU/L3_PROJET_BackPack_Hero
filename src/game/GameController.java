@@ -241,7 +241,7 @@ public class GameController {
 	private static void memoryGame(ApplicationContext context) {
 		var screenInfo = context.getScreenInfo();
 		var data = new GameData(screenInfo);
-		FontLoader.load_font();
+		FontLoader.load_font(screenInfo);
 		GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
 		GameView.draw(context, data);
 		while (true) {

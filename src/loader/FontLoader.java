@@ -7,7 +7,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import com.github.forax.zen.ScreenInfo;
+
 public class FontLoader {		
+	private static int h1;
+	private static int h2;
+	private static int h3;
+	private static int span;
+
 	private static BufferedImage load_font(String name) {
 		try {
 	    File fontFile = new File(name);
@@ -38,8 +45,28 @@ public class FontLoader {
 	}
 	
 	
-	public static void load_font() {
+	public static void load_font(ScreenInfo screenInfo) {
 		add_folder("data/font");
+		h1 = (int) (screenInfo.width() * 0.025);
+		h2 = (int) (screenInfo.width() * 0.02);
+		h3 = (int) (screenInfo.width() * 0.015);
+		span = (int) (screenInfo.width() * 0.009);
+	}
+	
+	public static int getH1() {
+		return h1;
+	}
+	
+	public static int getH2() {
+		return h2;
+	}
+	
+	public static int getH3() {
+		return h3;
+	}
+	
+	public static int getSpan() {
+		return span;
 	}
 }
 
