@@ -28,12 +28,13 @@ public class MathLoader {
 		getBackpackValue();
 		getInfoItemValue();
 		getMapValue();
-		getEventValue();
+		getEventValue();	
 	}
 	
 // ================= ICON =====================
 	private static void getIconHeroValue() {
   	double sizeY =  screenHeight * 0.04;
+  	// ICON HEALTH
 		BufferedImage img = data.imgMap().get("ICON_HEALTH");
 		var width = img.getWidth();
 		var height = img.getHeight();
@@ -43,6 +44,7 @@ public class MathLoader {
 		XY NW = new XY(0, 0);
 		XY SE = new XY((int) (width * scale), (int) (height * scale));
 		renderDataGame.put("ICON_HEALTH", new RenderData(transform, new BoundingBox(NW, SE)));
+		// ICON SHIELD
 		img = data.imgMap().get("ICON_SHIELD");
 		transform = new AffineTransform();
     transform.translate(0, height * scale);
@@ -50,7 +52,30 @@ public class MathLoader {
 		NW = new XY(0, (int) (height * scale));
 		SE = new XY((int) (width * scale), (int) (height * scale * 2));
 		renderDataGame.put("ICON_SHIELD", new RenderData(transform, new BoundingBox(NW, SE)));
-
+		// ICON MANA
+		img = data.imgMap().get("ICON_MANA");
+		transform = new AffineTransform();
+    transform.translate(0, height * scale * 2);
+    transform.scale(scale, scale);
+		NW = new XY(0, (int) (height * scale * 2));
+		SE = new XY((int) (width * scale), (int) (height * scale * 3));
+		renderDataGame.put("ICON_MANA", new RenderData(transform, new BoundingBox(NW, SE)));
+		// ICON ACTION
+		img = data.imgMap().get("ICON_ACTION");
+		transform = new AffineTransform();
+    transform.translate(0, height * scale * 3);
+    transform.scale(scale, scale);
+		NW = new XY(0, (int) (height * scale * 3));
+		SE = new XY((int) (width * scale), (int) (height * scale * 4));
+		renderDataGame.put("ICON_ACTION", new RenderData(transform, new BoundingBox(NW, SE)));
+		// ICON UNLOCK
+		img = data.imgMap().get("ICON_UNLOCK");
+		transform = new AffineTransform();
+    transform.translate(0, height * scale * 4);
+    transform.scale(scale, scale);
+		NW = new XY(0, (int) (height * scale * 4));
+		SE = new XY((int) (width * scale), (int) (height * scale * 5));
+		renderDataGame.put("ICON_UNLOCK", new RenderData(transform, new BoundingBox(NW, SE)));
 
 	}
 	
@@ -88,7 +113,7 @@ public class MathLoader {
 		var dimX = size * 9.0;
 		var dimY = size * 7.0;
 		XY NW = new XY((int) (screenWidth / 2 - 3.5 * size), (int) (screenHeight * 0.02 + size * 0.8));
-		XY SE = new XY((int) (screenWidth / 2 + 3.5 * size), (int) (screenHeight * 0.02 + size * 5.8));
+		XY SE = new XY((int) (screenWidth / 2 + 3.5 * size), (int) (screenHeight * 0.02 + size * 7.0));
 		BufferedImage img = data.imgMap().get("BG_BACKPACK");
 		var width = img.getWidth();
 		var height = img.getHeight();

@@ -17,6 +17,7 @@ public class Backpack {
 											    {-2, -1, -1, -1, -1, -1, -2},
 											    {-2, -2, -1, -1, -1, -2, -2}
 											};
+	
 	private int gridSize;
 	private static ArrayList<Item> bagItemLst = new ArrayList<>(); // List of items I have (Index = ID)
 	
@@ -61,13 +62,4 @@ public class Backpack {
 		return gridSize;
 	}
 	
-	@Override
-	public String toString(){
-		var builder = new StringBuilder();
-		builder.append("Liste items : \n");
-		for (var item : bagItemLst) {
-			builder.append(item);
-		}
-		return builder.toString();
-	}
 }

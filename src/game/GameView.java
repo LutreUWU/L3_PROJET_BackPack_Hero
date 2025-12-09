@@ -13,6 +13,7 @@ import java.util.Objects;
 
 import com.github.forax.zen.ApplicationContext;
 
+import game.data.GameDataBackpack;
 import game.data.GameDataCombat;
 import loader.FontLoader;
 import loader.MathLoader;
@@ -228,7 +229,6 @@ public record GameView(int width, int height, int grid_size) {
 				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("massue")); 
 				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
 				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
-
 				default ->{}
 		  }
 		}
@@ -358,13 +358,14 @@ public record GameView(int width, int height, int grid_size) {
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     drawHeroHP(graphics, data);
     drawHeroShield(graphics, data);
+    drawHeroAction(graphics, data);
+    drawHeroMana(graphics, data);
+    drawHeroUnlock(graphics, data);
     drawHeroLevel(graphics, data);
     drawFloorLevel(graphics, data);
     graphics.setColor(Color.BLUE);
     graphics.setFont(font);
-	  graphics.drawString("AP : " + String.valueOf(data.hero().getEnergy_point()), x,	y + size*3);
-	  graphics.drawString("MANA : " + String.valueOf(data.hero().getMana_point()), x,	y + size*4);
-	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size*7);
+	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size);
   }
   
   private static void drawHeroHP(Graphics2D graphics, GameData data) {
@@ -401,6 +402,45 @@ public record GameView(int width, int height, int grid_size) {
     graphics.setColor(Color.WHITE);
     graphics.draw(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + height / 2 - size / 2, data.screenInfo().width() * 0.20, size));
 	  graphics.drawString(data.hero().getCurrent_protection() + "/" + data.hero().getMax_HP(), (int) (logoWidth + data.screenInfo().width() * 0.205), (int) (render.box().northWest().y() + height / 2 + size / 2));
+  }
+  
+  private static void drawHeroMana(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("ICON_MANA");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int height = (int) (data.screenInfo().height() * 0.04);
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = data.imgMap().get("ICON_MANA");
+    graphics.drawImage(img, render.transform() , null);
+	  graphics.setColor(Color.CYAN);
+	  graphics.drawString(data.hero().getMana_point() + " MANA" , (int) (logoWidth + data.screenInfo().width() * 0.005), (int) (render.box().northWest().y() + height / 2 + size / 2));
+  }
+  
+  private static void drawHeroAction(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("ICON_ACTION");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int height = (int) (data.screenInfo().height() * 0.04);
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = data.imgMap().get("ICON_ACTION");
+    graphics.drawImage(img, render.transform() , null);
+    graphics.setColor(data.hero().getEnergy_point() > 1 ? Color.YELLOW : Color.RED);
+	  graphics.drawString(data.hero().getEnergy_point() + " AP", (int) (logoWidth + data.screenInfo().width() * 0.005), (int) (render.box().northWest().y() + height / 2 + size / 2));
+  }
+  
+  private static void drawHeroUnlock(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("ICON_UNLOCK");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int height = (int) (data.screenInfo().height() * 0.04);
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = data.imgMap().get("ICON_UNLOCK");
+    graphics.drawImage(img, render.transform() , null);
+    graphics.setColor(GameDataBackpack.getCaseUnlock() > 0 ? Color.GREEN : Color.RED);
+	  graphics.drawString(GameDataBackpack.getCaseUnlock() + " CASE DEBLOQUABLE", (int) (logoWidth + data.screenInfo().width() * 0.005), (int) (render.box().northWest().y() + height / 2 + size / 2));
   }
   
   private static void drawHeroLevel(Graphics2D graphics, GameData data) {
@@ -609,11 +649,12 @@ public record GameView(int width, int height, int grid_size) {
    * @param data			GameData containing the game data. 
    * @param lstEnemy List of all enemy we fight
    */
-  public static void updateEnemy(Graphics2D graphics, GameData data,  ArrayList<Enemy> lstEnemy) {
+  public static void updateCombat(Graphics2D graphics, GameData data,  ArrayList<Enemy> lstEnemy) {
   	Objects.requireNonNull(graphics);
   	Objects.requireNonNull(data);
   	Objects.requireNonNull(lstEnemy);
   	lstEnemy.forEach(enemy -> drawEnemy(graphics, data, enemy));
+  	drawLog(graphics, data, GameDataCombat.getLog());
   }
   
   /**
@@ -629,6 +670,16 @@ public record GameView(int width, int height, int grid_size) {
   	int sizeY = boundingBox.southEast().y() - boundingBox.northWest().y();
 		drawElement(graphics, data.imgMap().get(enemy.getImg()), boundingBox.northWest().x(), boundingBox.northWest().y(), sizeX, sizeY, Direction.UP);
 		drawEnemyInfo(graphics, enemy, (int) boundingBox.northWest().x(), (int) (boundingBox.southEast().y()));
+  }
+  
+  private static void drawLog(Graphics2D graphics, GameData data, String log) {
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+    graphics.setColor(Color.WHITE);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    int textWidth = fm.stringWidth(log);
+    int textHeight = fm.getAscent();
+	  graphics.drawString(log, data.screenInfo().width() / 2 - textWidth / 2,	MathLoader.getMapEvent().get("BG_BACKPACK").box().southEast().y() + (int) (textHeight * 1.1));
   }
   
   /**
@@ -786,7 +837,7 @@ public record GameView(int width, int height, int grid_size) {
 			drawButton(graphics, data);
 			// Draw enemy if we're in combat
 			if (GameDataCombat.combat()) {
-				updateEnemy(graphics, data, GameDataCombat.getLstEnemy());
+				updateCombat(graphics, data, GameDataCombat.getLstEnemy());
 			}
 			if (data.event() != null) {
 				drawEvent(graphics, data);	

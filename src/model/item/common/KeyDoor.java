@@ -99,4 +99,10 @@ public class KeyDoor implements Item {
   public String getEffect() {
   	return effect;
   }
+  
+  @Override
+  public Item copy() {
+  	return new KeyDoor();
+  }
+	
 }

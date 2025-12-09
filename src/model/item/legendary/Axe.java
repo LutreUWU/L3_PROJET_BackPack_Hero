@@ -116,7 +116,10 @@ public class Axe implements Item{
   	return effect;
   } 
   
- 
+  @Override
+  public Item copy() {
+  	return new Axe();
+  }  
 }
 
 

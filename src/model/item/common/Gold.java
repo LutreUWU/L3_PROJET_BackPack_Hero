@@ -103,5 +103,10 @@ public class Gold implements Item {
   public String toString() {
   	return "Gold";
   }
+  
+  @Override
+  public Item copy() {
+  	return null;
+  }
 	
 }

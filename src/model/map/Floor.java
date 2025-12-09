@@ -5,11 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import game.GameData;
-import model.Backpack;
-import model.Hero;
 import model.XY;
-import model.monster.Enemy;
 
 public class Floor {
 

@@ -109,6 +109,11 @@ public class DespairShield implements Item{
   	return effect;
   }  
  
+  @Override
+  public Item copy() {
+  	return new DespairShield();
+  }
+	
 }
 
 

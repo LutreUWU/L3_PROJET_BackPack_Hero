@@ -115,6 +115,11 @@ public class Sword implements Item{
   	return effect;
   }
   
+  @Override
+  public Item copy() {
+  	return new Sword();
+  }
+	
  
 }
 

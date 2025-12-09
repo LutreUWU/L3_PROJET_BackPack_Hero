@@ -15,7 +15,7 @@ public interface Item {
     int getID();
     String getDescription();
     String getEffect();
-    
+    Item copy();
     
     default int getWidth() {
         XY[] b = shape();
@@ -56,5 +56,4 @@ public interface Item {
         }
         setDirection(direction().next());
     }
-    
 }

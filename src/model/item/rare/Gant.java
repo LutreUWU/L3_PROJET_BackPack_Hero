@@ -7,6 +7,7 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
 /**
@@ -112,6 +113,11 @@ public class Gant implements Item{
   public String getEffect() {
   	return effect;
   } 
+  
+  @Override
+  public Item copy() {
+  	return new Gant();
+  }  
   
  
 }

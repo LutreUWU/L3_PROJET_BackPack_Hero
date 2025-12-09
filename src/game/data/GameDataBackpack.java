@@ -95,7 +95,7 @@ public class GameDataBackpack {
   	}
   }
   
-	public int getCaseUnlock() {
+	public static int getCaseUnlock() {
 		return caseUnlock;
 	}
 	
