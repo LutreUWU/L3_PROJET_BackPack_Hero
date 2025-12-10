@@ -2,6 +2,7 @@ package model.item.epic;
 
 import java.util.ArrayList;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
@@ -59,6 +60,7 @@ public class DespairShield implements Item{
 	 */
 	@Override
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+		GameDataCombat.setLog("Le héro gagne 10 Shield, mais au prix de -3 PV ...");
 		GameDataHero.sub("energy", 1);
 		GameDataHero.add("protection", 10);
 		GameDataHero.sub("hp", 3 );

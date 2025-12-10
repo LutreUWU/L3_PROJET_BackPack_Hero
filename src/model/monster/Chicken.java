@@ -3,6 +3,7 @@ package model.monster;
 import java.util.List;
 import java.util.Random;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 
 /**
@@ -45,8 +46,14 @@ public class Chicken implements Enemy{
 	@Override
 	public void action() {
 		switch(action) {
-			case "Morsure" -> GameDataHero.sub("HP", 3);
-			case "Protection" -> shield += 2;
+			case "Morsure" -> {
+				GameDataHero.sub("HP", 3);
+				GameDataCombat.setLog("Le poulet malicieux mord l'ennemi (-3PV)");
+				}
+			case "Protection" -> {
+				shield += 2;
+				GameDataCombat.setLog("Le poulet malicieux se protège (+2 Shield)");
+				}
 		}
 		preAction();
 	}

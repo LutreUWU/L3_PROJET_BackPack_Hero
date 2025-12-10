@@ -76,6 +76,14 @@ public class MathLoader {
 		NW = new XY(0, (int) (height * scale * 4));
 		SE = new XY((int) (width * scale), (int) (height * scale * 5));
 		renderDataGame.put("ICON_UNLOCK", new RenderData(transform, new BoundingBox(NW, SE)));
+		// ICON GOLD
+		img = data.imgMap().get("gold");
+		transform = new AffineTransform();
+    transform.translate(0, height * scale * 5);
+    transform.scale(scale, scale);
+		NW = new XY(0, (int) (height * scale * 5));
+		SE = new XY((int) (width * scale), (int) (height * scale * 6));
+		renderDataGame.put("gold", new RenderData(transform, new BoundingBox(NW, SE)));
 
 	}
 	

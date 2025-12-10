@@ -2,6 +2,7 @@ package model.item.mythic;
 
 import java.util.ArrayList;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
@@ -70,6 +71,10 @@ public class Mimicry implements Item{
 			GameDataHero.sub("energy", 2);
 			GameDataHero.sub("hp", 5);
 			enemy.subHP(30);
+			GameDataCombat.setLog("En échange de 5PV, " + enemy + " se fait FOUDROYER par Red Mist (-30PV) ");
+		}
+		else {
+			GameDataCombat.setLog("Vous n'avez pas assez d'AP pour utiliser Mimicry ...");
 		}
 	}
 	

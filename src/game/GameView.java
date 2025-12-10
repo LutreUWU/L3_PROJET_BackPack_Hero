@@ -353,19 +353,14 @@ public record GameView(int width, int height, int grid_size) {
    * @param y				 coordinate y where we wants to draw.
    */
   private static void drawHeroStats(Graphics2D graphics, GameData data, int x, int y) {
-  	int leftBorder = 0;
-  	int size = (int) (data.screenInfo().height() * 0.04);
-    Font font = new Font("Mikodacs", Font.PLAIN, size);
     drawHeroHP(graphics, data);
     drawHeroShield(graphics, data);
     drawHeroAction(graphics, data);
     drawHeroMana(graphics, data);
     drawHeroUnlock(graphics, data);
     drawHeroLevel(graphics, data);
+    drawHeroGold(graphics, data);
     drawFloorLevel(graphics, data);
-    graphics.setColor(Color.BLUE);
-    graphics.setFont(font);
-	  graphics.drawString("Gold : " + String.valueOf(data.hero().getGold()), x,	y + size);
   }
   
   private static void drawHeroHP(Graphics2D graphics, GameData data) {
@@ -441,6 +436,19 @@ public record GameView(int width, int height, int grid_size) {
     graphics.drawImage(img, render.transform() , null);
     graphics.setColor(GameDataBackpack.getCaseUnlock() > 0 ? Color.GREEN : Color.RED);
 	  graphics.drawString(GameDataBackpack.getCaseUnlock() + " CASE DEBLOQUABLE", (int) (logoWidth + data.screenInfo().width() * 0.005), (int) (render.box().northWest().y() + height / 2 + size / 2));
+  }
+  
+  private static void drawHeroGold(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("gold");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int height = (int) (data.screenInfo().height() * 0.04);
+  	int size = (int) (data.screenInfo().height() * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = data.imgMap().get("gold");
+    graphics.drawImage(img, render.transform() , null);
+    graphics.setColor(data.hero().getGold() > 0 ? Color.GREEN : Color.RED);
+	  graphics.drawString(data.hero().getGold() + " gold", (int) (logoWidth + data.screenInfo().width() * 0.005), (int) (render.box().northWest().y() + height / 2 + size / 2));
   }
   
   private static void drawHeroLevel(Graphics2D graphics, GameData data) {
@@ -679,7 +687,7 @@ public record GameView(int width, int height, int grid_size) {
     FontMetrics fm = graphics.getFontMetrics();
     int textWidth = fm.stringWidth(log);
     int textHeight = fm.getAscent();
-	  graphics.drawString(log, data.screenInfo().width() / 2 - textWidth / 2,	MathLoader.getMapEvent().get("BG_BACKPACK").box().southEast().y() + (int) (textHeight * 1.1));
+	  graphics.drawString(log, data.screenInfo().width() / 2 - textWidth / 2,	(int) (data.screenInfo().height() * 0.9));
   }
   
   /**

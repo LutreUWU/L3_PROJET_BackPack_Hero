@@ -2,6 +2,7 @@ package model.item.common;
 
 import java.util.ArrayList;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
@@ -66,6 +67,7 @@ public class Sword implements Item{
 	 */
 	@Override
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+		GameDataCombat.setLog("Le héro tranche " + enemy + " avec l'épée");
 		GameDataHero.sub("energy", 1);
 		enemy.subHP(3);
 	}

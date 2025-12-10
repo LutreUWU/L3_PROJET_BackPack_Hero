@@ -79,7 +79,6 @@ public class GameDataCombat {
 	 */
 	public static void heroAction(GameData data, XY coord) {
 		Objects.requireNonNull(data);
-		StringBuilder builder = new StringBuilder();
 		int id = data.bag().grid()[coord.y()][coord.x()];
 		// A changer, pas ouf je pense
 		Optional<Item> weapon = data.bag().bagItemLst().stream()
@@ -87,7 +86,6 @@ public class GameDataCombat {
 																											 .findFirst();
 		weapon.ifPresent(item -> {
 			item.use(target, lstEnemy);
-	    builder.append("Le héro a attaqué ").append(target.toString()).append(" avec ").append(item.toString());
 			Iterator<Enemy> it = lstEnemy.iterator();
 			while (it.hasNext()) {
 		    Enemy enemy = it.next();
@@ -115,7 +113,6 @@ public class GameDataCombat {
 			else {
 				if(data.hero().getEnergy_point() <= 0) {
 					lstEnemy.forEach(enemy -> enemy.action());
-					log = "Les ennemis attaquent !";
 					if(data.hero().getHP() == 0) {
 						// TO DO 
 					}
@@ -124,7 +121,6 @@ public class GameDataCombat {
 				}
 			}
 		});
-		log = builder.toString();
 	}
 	
 	/**
@@ -149,6 +145,10 @@ public class GameDataCombat {
 	
 	public static LinkedHashMap<Enemy, BoundingBox> getEnemyBox() {
 		return enemyBox;
+	}
+	
+	public static void setLog(String log) {
+		GameDataCombat.log = log;
 	}
 	
 	public static String getLog() {

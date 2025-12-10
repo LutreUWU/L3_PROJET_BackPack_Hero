@@ -2,6 +2,7 @@ package model.item.superrare;
 
 import java.util.ArrayList;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
@@ -68,6 +69,7 @@ public class Massue implements Item{
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 1);
 		enemy.subHP(5);
+		GameDataCombat.setLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
 	}
 	
   @Override

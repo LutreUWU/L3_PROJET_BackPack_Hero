@@ -2,6 +2,7 @@ package model.item.rare;
 
 import java.util.ArrayList;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
@@ -68,6 +69,7 @@ public class Gant implements Item{
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 2);
 		GameDataHero.add("PV", 10);
+		GameDataCombat.setLog("Le héro porte de super gant ! Il gagne 10 PV");
 	}
 	
   @Override

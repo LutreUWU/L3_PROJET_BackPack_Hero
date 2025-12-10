@@ -2,6 +2,7 @@ package model.item.legendary;
 
 import java.util.ArrayList;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
@@ -69,6 +70,7 @@ public class Axe implements Item{
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 1);
 		enemy.subHP(10);
+		GameDataCombat.setLog("Le héro ARRACHE " + enemy + " avec SA GROSSE HACHE (-10PV)");
 	}
 	
   @Override
