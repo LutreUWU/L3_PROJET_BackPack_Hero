@@ -12,7 +12,6 @@ public class Hero {
 	private int current_armor = 0; // as a percentage (between 0 and 100%)
 	private int energy_point = 3;
 	private int mana_point = 0;
-	private Gold money = new Gold(10);
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;
@@ -48,7 +47,6 @@ public class Hero {
 			case "armor" -> current_armor += value;
 			case "energy" -> energy_point += value;
 			case "mana" -> mana_point += value;
-			case "gold" -> {money.addGold(value); money.updateGoldSize();}
 			case "xp" -> {xp += value; while (xp >= MAX_XP()) {xp -= MAX_XP(); level++;}}
 		}
 	}
@@ -67,7 +65,6 @@ public class Hero {
 			case "armor" -> current_armor -= value;
 			case "energy" -> energy_point -= value;
 			case "mana" -> mana_point -= value;
-			case "gold" -> {money.subGold(value); money.updateGoldSize();}
 		}
 	}
 	
@@ -106,10 +103,6 @@ public class Hero {
 
 	public int getMana_point() {
 		return mana_point;
-	}
-
-	public int getGold() {
-		return money.getGold();
 	}
 
 	public int getXp() {

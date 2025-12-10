@@ -177,7 +177,7 @@ public class GameDataClick {
   		if ((item = backpack.getItem(res.x(), res.y())) == null) {
   	    return null;
   		}
-  		GameDataBackpack.removeItemFromBackpack(item);
+  		data.bag().removeItemFromBackpack(item);
   		addDragItemFromBag(item, res.x(), res.y());
   		return item;
   	}

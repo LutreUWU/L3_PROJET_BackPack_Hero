@@ -3,19 +3,14 @@ package model.map;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import game.GameData;
-import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import model.Item;
-import model.ItemRepository;
 import model.RandomItem;
 import model.XY;
 import model.item.common.Gold;
 import model.item.common.KeyDoor;
-import model.item.legendary.Axe;
 import model.map.eventManager.LinkedEvent;
 
 public final class Treasure implements Room {

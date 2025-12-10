@@ -1,23 +1,18 @@
 package model.map.eventManager;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import game.GameData;
-import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.Hero;
-import model.Item;
-import model.ItemRepository;
+import model.item.common.Gold;
 import model.item.common.KeyDoor;
 import model.item.superrare.Massue;
 import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Treasure;
-import model.monster.Chicken;
 import model.monster.Enemy;
-import model.monster.Soldat;
 
 public class Consequence {
 	final private int floor;
@@ -60,7 +55,7 @@ public class Consequence {
 		var hero = data.hero();
 		switch (idConsequence) {
 		case "sub_hp" -> conseqSubHP(hero);
-		case "add_gold" -> hero.add("gold", (int) (floor * 5 * bonus));
+		case "add_gold" -> GameDataClick.addDragItem(new Gold(floor * 5 * (int) bonus));
 		case "add_weapon" -> GameDataClick.addDragItem(new Massue());
 		case "key" -> consequenceKeyEvent(data);
 		case "lifeExchangeGold" -> consequenceHealer(data);
@@ -96,8 +91,8 @@ public class Consequence {
 	 */
 	private void consequenceHealer(GameData data) {
 		var hero = data.hero();
-		if (hero.getGold() >= floor * 5) {
-			hero.sub("gold", floor * 5);
+		if (data.bag().getGoldInBag() >= floor * 5) {
+			data.bag().subGoldInBag(floor * 5);
 			hero.add("hp", floor * 15);
 			if (hero.getHP() > hero.getMax_HP())
 				hero.setHP(hero.getMax_HP());
@@ -118,12 +113,12 @@ public class Consequence {
 	private void consequenceKeyEvent(GameData data) {
 		for (var item : data.bag().bagItemLst()) {
 			switch(item) {
-			case KeyDoor key -> {
+			case KeyDoor _ -> {
 				var heroPos = data.map().getHeroPos();
 				switch (data.map().getGrid()[heroPos.y()][heroPos.x()]) {
 				case LockedDoor room -> {
 					room.unlock();
-					GameDataBackpack.removeItemFromBackpack(item);
+					data.bag().removeItemFromBackpack(item);
 					data.map().updateMap(heroPos);
 					return ;
 				}
@@ -131,7 +126,7 @@ public class Consequence {
 					throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
 				}
 			}
-			default -> throw new IllegalArgumentException("Unexpected value: " + item);
+			default -> {}
 			}
 		}
 	}

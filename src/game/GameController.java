@@ -11,15 +11,12 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 
-import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
-import model.item.common.KeyDoor;
-import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -60,7 +57,7 @@ public class GameController {
 	 * @param data    GameData of the game.
 	 * @return True if the game continue, False if we press the button to stop
 	 */
-	private static boolean gameLoop(ApplicationContext context, GameData data) {
+	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
 		Event event = context.pollOrWaitEvent(10);
 		if (event != null) switch(event) {
 			case PointerEvent pointerEvent -> {
@@ -73,22 +70,6 @@ public class GameController {
 							data.setDragItem(currentItem);
 							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
 							GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-//							IO.println("ETAPE 0");
-//							IO.println("ID ACTUEL : " + currentItem.getID());
-							/*
-							if (currentItem.getID() == 1 && data.bag().bagItemLst().contains(new KeyDoor())) { // It's a key
-//								IO.println("ETAPE 1");
-								var currentPos = data.map().getHeroPos();
-								switch(data.map().getGrid()[currentPos.y()][currentPos.x()]) {
-									case LockedDoor lockedDoor ->  {
-//										IO.println("ETAPE 2");
-										lockedDoor.unlock();
-										data.map().updateMap(currentPos);
-										GameDataBackpack.removeItemFromBackpack(currentItem);
-									}
-								default -> {IO.println("ETAPE 3");}
-								}
-							}*/
 						}
 						case MAP_OR_BAG -> {
 							if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
@@ -99,7 +80,7 @@ public class GameController {
 							if (data.mapOrBag() && GameDataCombat.combat()) {
 								GameDataCombat.heroAction(data, (XY) res.value());
 							}
-							GameDataBackpack.unlockCaseBackpack((XY) res.value());							
+							data.bag().unlockCaseBackpack((XY) res.value());							
 						}
 						case EVENT_CHOICE -> {
 							if ((int) res.value() == 1) {
@@ -176,12 +157,9 @@ public class GameController {
 						int x = pointerEvent.location().x();
 						int y = pointerEvent.location().y();
 						var res = GameDataClick.bagClick(x, y);
-						IO.println(data.dragItemLst());
 						if (res != null) {
-							
 							data.dragItem().setXY(GameDataClick.bagClick(x, y));
-							if (GameDataBackpack.addItemToBackpack(data.dragItem())) {
-								IO.println(data.dragItem() + " : " + res);
+							if (data.bag().addItemToBackpack(data.dragItem())) {
 								data.removeItemFromDrag(data.dragItem());
 							} else {
 								// Merge gold
@@ -205,7 +183,7 @@ public class GameController {
 						}
 						data.setDragItem(null);
 					}
-					GameView.draw(context, data);
+					GameView.draw(context, data, view);
 					data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
 		}
 		default -> {}
@@ -218,7 +196,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Gold(10));
+						GameDataClick.addDragItem(new Gold(1));
 					}
 				}
 				case Key.I -> {
@@ -241,27 +219,26 @@ public class GameController {
 				default -> {
 				}
 				}
-				GameView.draw(context, data);
+				GameView.draw(context, data, view);
 			}
 		}
 		default -> {}
 		}
 		return true;
 	}
-
 	/**
 	 * Sets up the game, then launches the game loop.
 	 * 
 	 * @param context {@code ApplicationContext} of the game.
 	 */
-	private static void memoryGame(ApplicationContext context) {
+	public static void memoryGame(ApplicationContext context) {
 		var screenInfo = context.getScreenInfo();
 		var data = new GameData(screenInfo);
 		FontLoader.load_font(screenInfo);
-		GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
-		GameView.draw(context, data);
+		var view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
+		GameView.draw(context, data, view);
 		while (true) {
-			if (!gameLoop(context, data)) {
+			if (!gameLoop(context, data, view)) {
 				System.out.println("Thank you for quitting!");
 				context.dispose();
 				return;

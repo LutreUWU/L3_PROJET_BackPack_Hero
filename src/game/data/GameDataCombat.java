@@ -104,7 +104,7 @@ public class GameDataCombat {
 				GameDataHero.add("xp", totalExp);
 				for (int i = 0; i < data.hero().getLevel() - levelBeforeCombat; i++) {
 					Random r = new Random();
-					GameDataBackpack.addCaseUnlock(3 + r.nextInt(1));
+					data.bag().addCaseUnlock(3 + r.nextInt(1));
 				}
 				var itemGain = RandomItem.generate(data.floor());
 				GameDataClick.addDragItem(itemGain);

@@ -50,7 +50,7 @@ public class FontLoader {
 		h1 = (int) (screenInfo.width() * 0.025);
 		h2 = (int) (screenInfo.width() * 0.02);
 		h3 = (int) (screenInfo.width() * 0.015);
-		span = (int) (screenInfo.width() * 0.009);
+		span = (int) (screenInfo.width() * 0.008);
 	}
 	
 	public static int getH1() {

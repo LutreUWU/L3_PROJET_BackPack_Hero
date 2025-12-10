@@ -5,12 +5,11 @@ import java.util.Map;
 
 import com.github.forax.zen.ScreenInfo;
 
-import game.data.GameDataBackpack;
 import game.data.GameDataClick;
 import game.data.GameDataHero;
 import game.data.GameDataMap;
-import loader.MathLoader;
 import loader.ImageLoader;
+import loader.MathLoader;
 import model.Backpack;
 import model.BoundingBox;
 import model.Hero;
@@ -79,7 +78,6 @@ public class GameData {
 	  dragItemLst = new LinkedHashMap<>();
 	  imgMap = ImageLoader.loadAllImage();
 	  new MathLoader(this);
-	  new GameDataBackpack(backpack);
     new GameDataHero(hero);
     new GameDataMap(map);
     new GameDataClick(this);

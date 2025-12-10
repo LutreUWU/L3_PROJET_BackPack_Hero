@@ -1,15 +1,13 @@
 package model.map.eventManager;
 
-import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import game.GameData;
-import game.data.GameDataBackpack;
-import model.Backpack;
 import model.monster.Enemy;
 import model.monster.Gnome;
+import model.monster.Robot;
 import model.monster.Soldat;
 
 public class LinkedEvent {
@@ -62,7 +60,7 @@ public class LinkedEvent {
 		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
 		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour " + question);
 		
-		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(new Gnome())), "Bon courage !");
+		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(new Soldat())), "Bon courage !");
 		root.setChoice1(choiceOne);
 
 		var choiceTwo = createNodeWithConsequence("Non ! Je vais finir de me préparer...", floor, 1, "nothing",
@@ -142,7 +140,7 @@ public class LinkedEvent {
 		var choiceTwoOne = createNodeWithConsequence("J'arrive jamais a faire un malloc...", floor, 1, "nothing",
 				"C'est peut être le temps de relire ton cours...\nM. Revuz te force à installer linux *aucun effet c'est gratuit*");
 		choiceTwo.setChoice1(choiceTwoOne);
-		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, new ArrayList<>(List.of(new Soldat())),
+		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, new ArrayList<>(List.of(new Robot())),
 				"On peut dire que c'est réciproque...\n*M. Revuz veut se battre !*");
 		choiceTwo.setChoice2(choiceTwoTwo);
 	}

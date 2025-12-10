@@ -16,9 +16,7 @@ public class Gold implements Item {
 	private final Rarity rarity = Rarity.COMMON;
 	private final int id = 2;
 	private final int score = -1;
-	private String description = "De l'or, l'indispensable pour SURVIVRE";
-	private final String effect = "C'est de l'argent frérot, ça sert pour tout.";
-
+	private String description = "Comme dans la vraie vie, sans argent t'es dans la merde";
 
 	public Gold(int gold2) {
 		gold = gold2;
@@ -94,7 +92,7 @@ public class Gold implements Item {
   
   @Override
   public String getEffect() {
-  	return effect;
+  	return "Il y a " + gold + " pièces" ;
   }
   
   @Override
