@@ -16,12 +16,14 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Treasure;
 import model.monster.Chicken;
+import model.monster.Enemy;
 import model.monster.Soldat;
 
 public class Consequence {
-	private int floor;
-	private double bonus; // OR *MALUS* !
-	private String idConsequence;
+	final private int floor;
+	final private double bonus; // OR *MALUS* !
+	private String idConsequence = null;
+	private ArrayList<Enemy> enemyList = null;
 
 	/**
 	 * Constructor for consequence
@@ -35,7 +37,20 @@ public class Consequence {
 		idConsequence = idConsequence2;
 		bonus = bonus2;
 	}
-
+	
+	/**
+	 * Constructor for consequence (for fight)
+	 * 
+	 * @param enemyList2
+	 * @param floor2
+	 * @param bonus2
+	 */
+	public Consequence(ArrayList<Enemy> enemyList2, int floor2, double bonus2) {
+		floor = floor2;
+		bonus = bonus2;
+		enemyList = enemyList2;
+	}
+	
 	/**
 	 * Can apply all consequence
 	 * 
@@ -47,13 +62,11 @@ public class Consequence {
 		case "sub_hp" -> conseqSubHP(hero);
 		case "add_gold" -> hero.add("gold", (int) (floor * 5 * bonus));
 		case "add_weapon" -> GameDataClick.addDragItem(new Massue());
-		case "fight" -> {
-			GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken())), data);
-		}
 		case "key" -> consequenceKeyEvent(data);
-		case "lifeAndGold" -> consequenceHealer(data);
+		case "lifeExchangeGold" -> consequenceHealer(data);
 		case "openTreasure" -> consequenceTreasure(data);
 		case "floor" -> data.newFloor();
+		case null -> GameDataCombat.startCombat(enemyList, data);
 		default -> {
 		} // Nothing
 		}
@@ -67,7 +80,10 @@ public class Consequence {
 	private void consequenceTreasure(GameData data) {
 		var heroPos = data.map().getHeroPos();
 		switch (data.map().getGrid()[heroPos.y()][heroPos.x()]) {
-		case Treasure room -> room.openReward();
+		case Treasure room -> {
+			room.openReward();
+			room.nowVisited();
+		}
 		default ->
 			throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
 		}
@@ -95,22 +111,27 @@ public class Consequence {
 	}
 
 	/**
-	 * apply consequence for the lockedDoor
+	 * apply consequence for the lockedDoor (unlock door if the hero have a key)
 	 * 
 	 * @param data
 	 */
 	private void consequenceKeyEvent(GameData data) {
-		if (data.bag().bagItemLst().contains(new KeyDoor())) {
-			var heroPos = data.map().getHeroPos();
-			switch (data.map().getGrid()[heroPos.y()][heroPos.x()]) {
-			case LockedDoor room -> {
-				room.unlock();
-				var bag = data.bag();
-				GameDataBackpack.removeItemFromBackpack(bag.bagItemLst().stream().filter(item -> item.getID() == 1).findFirst().get()); // Bien
-				data.map().updateMap(heroPos);
+		for (var item : data.bag().bagItemLst()) {
+			switch(item) {
+			case KeyDoor key -> {
+				var heroPos = data.map().getHeroPos();
+				switch (data.map().getGrid()[heroPos.y()][heroPos.x()]) {
+				case LockedDoor room -> {
+					room.unlock();
+					GameDataBackpack.removeItemFromBackpack(item);
+					data.map().updateMap(heroPos);
+					return ;
+				}
+				default ->
+					throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
+				}
 			}
-			default ->
-				throw new IllegalArgumentException("Unexpected value: " + data.map().getGrid()[heroPos.y()][heroPos.x()]);
+			default -> throw new IllegalArgumentException("Unexpected value: " + item);
 			}
 		}
 	}

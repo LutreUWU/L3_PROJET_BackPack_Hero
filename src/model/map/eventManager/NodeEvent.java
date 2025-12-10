@@ -1,8 +1,8 @@
 package model.map.eventManager;
 
 public class NodeEvent {
-	private String question;
-	private String answer;
+	final private String question;
+	final private String answer;
 	private NodeEvent choice1 = null;
 	private NodeEvent choice2 = null;
 	private Consequence consequence = null;

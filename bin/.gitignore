@@ -1,6 +1,2 @@
-/game/
-<<<<<<< HEAD
 /model/
-=======
-/loader/
->>>>>>> de508cb (Swap target pendant le combat & finition map)
+/game/

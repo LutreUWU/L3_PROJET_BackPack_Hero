@@ -71,6 +71,7 @@ public class KeyDoor implements Item {
 		}
 	}
   
+  /*
   @Override
   public boolean equals(Object obj) {
   	return switch(obj) {
@@ -84,6 +85,7 @@ public class KeyDoor implements Item {
   public int hashCode() {
   	return id;
   }
+  */
 
   @Override
   public String getDescription() {

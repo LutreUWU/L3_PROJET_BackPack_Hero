@@ -1,10 +1,16 @@
 package model.map.eventManager;
 
+import java.awt.Robot;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import game.GameData;
 import game.data.GameDataBackpack;
 import model.Backpack;
+import model.monster.Enemy;
+import model.monster.Gnome;
+import model.monster.Soldat;
 
 public class LinkedEvent {
 
@@ -55,8 +61,8 @@ public class LinkedEvent {
 	private void createEventForExitRoom(int floor) {
 		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
 		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour " + question);
-
-		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, "fight", "Bon courage !");
+		
+		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(new Gnome())), "Bon courage !");
 		root.setChoice1(choiceOne);
 
 		var choiceTwo = createNodeWithConsequence("Non ! Je vais finir de me préparer...", floor, 1, "nothing",
@@ -86,7 +92,7 @@ public class LinkedEvent {
 	 * @param current floor
 	 */
 	public void createEventForTreasure(int floor) {
-		root = new NodeEvent(null, "Souhaitez vous utiliser ouvrir le coffre ?");
+		root = new NodeEvent(null, "Souhaitez vous ouvrir le coffre ?");
 
 		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "openTreasure", "Vous venez d'ouvrir le coffre !");
 		root.setChoice1(choiceOne);
@@ -103,7 +109,7 @@ public class LinkedEvent {
 	public void createEventForHealerRoom(int floor) {
 		root = new NodeEvent(null, "Souhaitez échanger " + floor * 5 + " pièces d'or contre " + floor * 15 + "HP ?");
 
-		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "lifeAndGold",
+		var choiceOne = createNodeWithConsequence("Oui !", floor, 1, "lifeExchangeGold",
 				"Si vous aviez les pièces nécessaires,\nla transaction est effectué !");
 		root.setChoice1(choiceOne);
 
@@ -136,8 +142,8 @@ public class LinkedEvent {
 		var choiceTwoOne = createNodeWithConsequence("J'arrive jamais a faire un malloc...", floor, 1, "nothing",
 				"C'est peut être le temps de relire ton cours...\nM. Revuz te force à installer linux *aucun effet c'est gratuit*");
 		choiceTwo.setChoice1(choiceTwoOne);
-		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, "fight",
-				"On peut dire que c'est réciproque...\n*Vous vous battez et perdez de la vie*");
+		var choiceTwoTwo = createNodeWithConsequence("Par ce que je vous aime pas", floor, 1.5, new ArrayList<>(List.of(new Soldat())),
+				"On peut dire que c'est réciproque...\n*M. Revuz veut se battre !*");
 		choiceTwo.setChoice2(choiceTwoTwo);
 	}
 
@@ -151,12 +157,29 @@ public class LinkedEvent {
 	 * @param lastAnswer
 	 * @return a node
 	 */
-	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, String conseq,
-			String lastAnswer) {
+	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, String conseq, String lastAnswer) {
 		var endNode = new NodeEvent("Mettre fin à l'évenement", null);
 		var node = new NodeEvent(answer, lastAnswer);
 		node.setChoice1(endNode);
 		node.setConsequence(new Consequence(conseq, floor, bonus));
+		return node;
+	}
+	
+	/**
+	 * Create the node with the consequences for fight
+	 * 
+	 * @param answer
+	 * @param floor
+	 * @param bonus
+	 * @param conseqEnemy (List of enemies)
+	 * @param lastAnswer
+	 * @return a node
+	 */
+	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, ArrayList<Enemy> conseqEnemy, String lastAnswer) {
+		var endNode = new NodeEvent("Mettre fin à l'évenement", null);
+		var node = new NodeEvent(answer, lastAnswer);
+		node.setChoice1(endNode);
+		node.setConsequence(new Consequence(conseqEnemy, floor, bonus));
 		return node;
 	}
 

@@ -17,6 +17,8 @@ import game.data.GameDataCombat;
 import loader.FontLoader;
 import model.Item;
 import model.XY;
+import model.item.common.Gold;
+import model.item.common.KeyDoor;
 import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
@@ -174,12 +176,31 @@ public class GameController {
 						int x = pointerEvent.location().x();
 						int y = pointerEvent.location().y();
 						var res = GameDataClick.bagClick(x, y);
+						IO.println(data.dragItemLst());
 						if (res != null) {
+							
 							data.dragItem().setXY(GameDataClick.bagClick(x, y));
 							if (GameDataBackpack.addItemToBackpack(data.dragItem())) {
+								IO.println(data.dragItem() + " : " + res);
 								data.removeItemFromDrag(data.dragItem());
 							} else {
-								GameDataClick.addDragItem(data.dragItem());
+								// Merge gold
+								switch(data.dragItem()) {
+								case Gold goldDrag -> {
+									var colideItem = data.bag().getItem(res.x(), res.y());
+									if (colideItem != null && goldDrag.getID() == colideItem.getID()) {
+										var goldCollide = (Gold) colideItem;
+										goldCollide.addGold(goldDrag.getGold());
+										data.dragItemLst().remove(goldDrag);
+										goldCollide.updateGoldSize();
+										IO.println("Merge	gold : " + goldCollide.getGold());
+									} else {
+										GameDataClick.addDragItem(data.dragItem());
+									}
+								}
+								default -> {GameDataClick.addDragItem(data.dragItem());}
+								}
+								
 							}
 						}
 						data.setDragItem(null);
@@ -197,8 +218,7 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Mimicry());
-
+						GameDataClick.addDragItem(new Gold(10));
 					}
 				}
 				case Key.I -> {

@@ -21,6 +21,7 @@ import model.BoundingBox;
 import model.Direction;
 import model.Item;
 import model.XY;
+import model.item.common.Gold;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -222,7 +223,7 @@ public record GameView(int width, int height, int grid_size) {
 			XY coordinate = item.shape()[0];
 		  switch (item.getID()) {
 			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75);
-			  case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold"));
+			  case 2 -> drawItemGold(graphics, data, coordinate, item);
 				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("sword")); 
 				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 2, 2, item.direction(), data.imgMap().get("despairShield"), 0.25, 0.25); 
 				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
@@ -232,6 +233,15 @@ public record GameView(int width, int height, int grid_size) {
 				default ->{}
 		  }
 		}
+  }
+  
+  private static void drawItemGold(Graphics2D graphics, GameData data, XY coordinate, Item item) {
+  	var itemGold = (Gold) item;
+  	switch (itemGold.getSizeCount()) {
+  	case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold3"));
+  	case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold2"));
+  	default -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold1"));
+  	}
   }
   
   private static void drawItemInfo(Graphics2D graphics, GameData data) {
@@ -445,7 +455,7 @@ public record GameView(int width, int height, int grid_size) {
   	int size = (int) (data.screenInfo().height() * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("gold");
+    BufferedImage img = data.imgMap().get("gold1");
     graphics.drawImage(img, render.transform() , null);
     graphics.setColor(data.hero().getGold() > 0 ? Color.GREEN : Color.RED);
 	  graphics.drawString(data.hero().getGold() + " gold", (int) (logoWidth + data.screenInfo().width() * 0.005), (int) (render.box().northWest().y() + height / 2 + size / 2));
@@ -575,7 +585,7 @@ public record GameView(int width, int height, int grid_size) {
   private static void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
 	  switch (item.getID()) {
 		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75); 
-		  case 2 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold")); 
+		  case 2 -> drawDragGold(graphics, data, item, box);
 			case 3 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("sword")); 
 			case 4 -> drawDragSpecialItem(graphics, box.northWest(), data.bag().getGridSize(), 2, 2, item.direction(), data.imgMap().get("despairShield"), 0.25, 0.25); 
 			case 5 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
@@ -585,6 +595,15 @@ public record GameView(int width, int height, int grid_size) {
 			default ->{}
 	  }
 	}
+  
+  private static void drawDragGold(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
+  	var itemGold = (Gold) item;
+  	switch (itemGold.getSizeCount()) {
+  	case 3 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold3"));
+  	case 2 -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold2")); 
+  	default -> drawDragItem(graphics, box.northWest(), data.bag().getGridSize(), 1, 1, item.direction(), data.imgMap().get("gold1"));
+  	}
+  }
   
   /**
    * Draw the current item we're dragging.

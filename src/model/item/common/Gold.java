@@ -10,7 +10,7 @@ import model.monster.Enemy;
 
 public class Gold implements Item {
 	private int gold;
-	private int size_count = 1; // 1, 2, 3 or 4
+	private int sizeCount = 1; // 1, 2, or 3
 	private XY[] b = new XY[1]; 
 	private Direction direction = Direction.UP;
 	private final Rarity rarity = Rarity.COMMON;
@@ -23,6 +23,10 @@ public class Gold implements Item {
 	public Gold(int gold2) {
 		gold = gold2;
 		setXY(new XY(0, 0));
+	}
+	
+	public int getSizeCount() {
+		return sizeCount;
 	}
 	
 	public int getGold() {
@@ -43,10 +47,9 @@ public class Gold implements Item {
 	}
 	
 	public void updateGoldSize() {
-		if (gold <= 10) size_count = 1;
-		else if (gold <= 25) size_count = 2;
-		else if (gold <= 50) size_count = 3;
-		else size_count = 4;
+		if (gold <= 15) sizeCount = 1;
+		else if (gold <= 50) sizeCount = 2;
+		else sizeCount = 3;
 	}
 	
 	@Override

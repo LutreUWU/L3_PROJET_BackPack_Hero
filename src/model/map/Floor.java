@@ -163,18 +163,27 @@ public class Floor {
 	public void addTwoVisible() {
 		for (var coord : heroAccessible) {
 			var room = grid[coord.y()][coord.x()];
-			if (!(room instanceof LockedDoor)) {
+			switch (room) {
+			case LockedDoor door -> {
+			}
+			default -> {
 				heroVisible.add(coord);
+				heroVisibleForLine.add(coord);
 				for (var coord_acc : room.getAccessible()) {
 					heroVisible.add(coord_acc);
 					var room2 = grid[coord_acc.y()][coord_acc.x()];
-					if (!(room2 instanceof LockedDoor)) {
+					switch (room) {
+					case LockedDoor door -> {
+					}
+					default -> {
 						heroVisibleForLine.add(coord_acc);
 						for (var coord_acc2 : room2.getAccessible()) {
 							heroVisible.add(coord_acc2);
 						}
 					}
+					}
 				}
+			}
 			}
 		}
 	}
@@ -193,14 +202,14 @@ public class Floor {
 			var room = grid[coord.y()][coord.x()];
 			for (var coord_ac : room.getAccessible()) {
 				var room_acc = grid[coord_ac.y()][coord_ac.x()];
-				if (room_acc instanceof Hallway) {
-					updateAll(coord_ac);
-				} else {
+				switch (room_acc) {
+				case Hallway coordHallWay -> updateAll(coord_ac);
+				default -> {
 					if (!heroVisited.contains(coord_ac)) {
 						heroVisible.add(coord_ac);
 						heroAccessible.add(coord_ac);
 					}
-
+				}
 				}
 			}
 		}
