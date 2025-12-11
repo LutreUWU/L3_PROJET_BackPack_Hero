@@ -33,10 +33,18 @@ public final class Shop implements Room {
    * Create the shop with 4 items
    */
   private void createShop() {
+  	int i = 0;
+  	boolean alreadyThere = false;
 		currentShop.put(new KeyDoor(), 10);
 		while (currentShop.size() != 4) {
 			var item = RandomItem.generate(floor);
-			currentShop.put(item, item.finalScore());
+			for (var itemBag : currentShop.keySet()) {
+				if (itemBag.getID() == item.getID()) {
+					alreadyThere = true;
+				}
+			}
+			if (!alreadyThere) currentShop.put(item, item.finalScore());
+			alreadyThere = false;
 		}
   }
   

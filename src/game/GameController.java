@@ -17,6 +17,9 @@ import loader.FontLoader;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
+import model.item.common.KeyDoor;
+import model.item.epic.DespairShield;
+import model.item.legendary.Axe;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -196,7 +199,11 @@ public class GameController {
 				switch (key.key()) {
 				case Key.A -> {
 					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Gold(1));
+						GameDataClick.addDragItem(new Axe());
+						GameDataClick.addDragItem(new Gold(12));
+						GameDataClick.addDragItem(new Gold(12));
+						GameDataClick.addDragItem(new DespairShield());
+						GameDataClick.addDragItem(new KeyDoor());
 					}
 				}
 				case Key.I -> {

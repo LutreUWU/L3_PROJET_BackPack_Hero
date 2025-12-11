@@ -14,6 +14,7 @@ public class RandomItem {
 		var sixth = (int) (sizeList / 6);
 		Random rand = new Random();
 		int randomIndexWithGauss = (int) rand.nextGaussian(sixth * floor * 2, 1);
+		IO.println(randomIndexWithGauss);
 		if (randomIndexWithGauss < 0)
 			randomIndexWithGauss = 0;
 		if (randomIndexWithGauss >= sizeList - 1)

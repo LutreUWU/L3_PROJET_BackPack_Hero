@@ -9,6 +9,7 @@ import model.Hero;
 import model.item.common.Gold;
 import model.item.common.KeyDoor;
 import model.item.superrare.Massue;
+import model.map.Exit;
 import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Treasure;
@@ -61,7 +62,16 @@ public class Consequence {
 		case "lifeExchangeGold" -> consequenceHealer(data);
 		case "openTreasure" -> consequenceTreasure(data);
 		case "floor" -> data.newFloor();
-		case null -> GameDataCombat.startCombat(enemyList, data);
+		case null -> {
+			GameDataCombat.startCombat(enemyList, data);
+			var heroPos = data.map().getHeroPos();
+			switch(data.map().getGrid()[heroPos.y()][heroPos.x()]) {
+			case Exit _ -> {
+				data.newFloor();
+			}
+			default -> {}
+			}
+		}
 		default -> {
 		} // Nothing
 		}

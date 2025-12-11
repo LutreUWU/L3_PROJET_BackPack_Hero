@@ -68,7 +68,7 @@ public class Gant implements Item{
 	@Override
 	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
 		GameDataHero.sub("energy", 2);
-		GameDataHero.add("PV", 10);
+		GameDataHero.add("hp", 10);
 		GameDataCombat.setLog("Le héro porte de super gant ! Il gagne 10 PV");
 	}
 	
