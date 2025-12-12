@@ -62,177 +62,198 @@ public class GameController {
 	 */
 	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
 		Event event = context.pollOrWaitEvent(10);
-		if (event != null) switch(event) {
+		if (event != null)
+			switch (event) {
 			case PointerEvent pointerEvent -> {
-		// If we click down on the screen
-					if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) {
-						var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
-						switch (res.type()) {
-						case ITEM -> {
-							var currentItem = (Item) res.value();
-							data.setDragItem(currentItem);
-							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-							GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+				// If we click down on the screen
+				if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) {
+					var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
+					switch (res.type()) {
+					case ITEM -> {
+						var currentItem = (Item) res.value();
+						data.setDragItem(currentItem);
+						GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+						GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+					}
+					case MAP_OR_BAG -> {
+						if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
+							data.swapMapOrBag();
 						}
-						case MAP_OR_BAG -> {
-							if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
-								data.swapMapOrBag();
-							}
+					}
+					case BAG -> {
+						if (data.mapOrBag() && GameDataCombat.combat()) {
+							GameDataCombat.heroAction(data, (XY) res.value());
 						}
-						case BAG -> {
-							if (data.mapOrBag() && GameDataCombat.combat()) {
-								GameDataCombat.heroAction(data, (XY) res.value());
-							}
-							data.bag().unlockCaseBackpack((XY) res.value());							
+						data.bag().unlockCaseBackpack((XY) res.value());
+					}
+					case EVENT_CHOICE -> {
+						if ((int) res.value() == 1) {
+							data.event().choose1(data);
 						}
-						case EVENT_CHOICE -> {
-							if ((int) res.value() == 1) {
-								data.event().choose1(data);
-							}
-							if ((int) res.value() == 2) {
-								data.event().choose2(data);
-							}
-							if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
-								// Ajouter les conséquences de fin d'event
-								data.event().restartEvent();
-								data.outEvent();
-							}
-							;
+						if ((int) res.value() == 2) {
+							data.event().choose2(data);
+						}
+						if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
+							// Ajouter les conséquences de fin d'event
+							data.event().restartEvent();
+							data.outEvent();
+						}
+						;
 
-						}
-						case MAP -> {
-							var coord = (XY) res.value();
-							if (coord.x() != -1 && coord.y() != -1) {
-								if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
-									data.map().setHeroPos(coord);
+					}
+					case MAP -> {
+						var coord = (XY) res.value();
+						if (coord.x() != -1 && coord.y() != -1) {
+							if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
+								GameDataView.heroMove(data, coord);
+								data.map().setHeroPos(coord);
+								
 
-									var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
-									switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
-									case EnemyRoom room -> { if (!room.getAlreadyVisited()) {
+								var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
+								switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
+								case EnemyRoom room -> {
+									if (!room.getAlreadyVisited()) {
 										data.swapMapOrBag();
 										GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())), data);
 										data.map().updateMap(coord);
 										room.nowVisited();
 									}
+								}
+								case EventRoom eventRoom -> {
+									if (!eventRoom.getAlreadyVisited()) {
+										var linkedEvent = eventRoom.getEvent();
+										data.inEvent(linkedEvent);
+										data.map().updateMap(coord);
+										eventRoom.visitedEvent();
 									}
-									case EventRoom eventRoom -> {
-										if (!eventRoom.getAlreadyVisited()) {
-											var linkedEvent = eventRoom.getEvent();
-											data.inEvent(linkedEvent);
-											data.map().updateMap(coord);
-											eventRoom.visitedEvent();
-										}
+								}
+								case LockedDoor roomDoor -> {
+									if (roomDoor.getLock()) {
+										var linkedEvent = roomDoor.getEvent();
+										data.inEvent(linkedEvent);
 									}
-									case LockedDoor roomDoor -> { if (roomDoor.getLock()) {
-																								var linkedEvent = roomDoor.getEvent();
-																								data.inEvent(linkedEvent);}
-																							}
-									case Healer healerRoom -> { if (!healerRoom.getAlreadyVisited()) {
+								}
+								case Healer healerRoom -> {
+									if (!healerRoom.getAlreadyVisited()) {
 										var linkedEvent = healerRoom.getEvent();
 										data.inEvent(linkedEvent);
-										data.map().updateMap(coord);}
+										data.map().updateMap(coord);
 									}
-									case Treasure treasure -> { if (!treasure.getAlreadyVisited()) {
+								}
+								case Treasure treasure -> {
+									if (!treasure.getAlreadyVisited()) {
 										var linkedEvent = treasure.getEvent();
 										data.inEvent(linkedEvent);
-										data.map().updateMap(coord);}
+										data.map().updateMap(coord);
 									}
-									case Exit roomExit -> {var linkedEvent = roomExit.getEvent();
-																		data.inEvent(linkedEvent);
-																		data.map().updateMap(coord);}
-									default -> {data.map().updateMap(coord);}
-									}
+								}
+								case Exit roomExit -> {
+									var linkedEvent = roomExit.getEvent();
+									data.inEvent(linkedEvent);
+									data.map().updateMap(coord);
+								}
+								default -> {
+									data.map().updateMap(coord);
+								}
 								}
 							}
 						}
-						case NOTHING -> {}
-						default -> throw new IllegalArgumentException("Unexpected value: " + res.type());
-						}
 					}
-
-					if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
-						if (data.dragItem() != null) {
-							GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-							GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-						}
+					case NOTHING -> {
 					}
-					if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-						int x = pointerEvent.location().x();
-						int y = pointerEvent.location().y();
-						var res = GameDataClick.bagClick(x, y);
-						if (res != null) {
-							data.dragItem().setXY(GameDataClick.bagClick(x, y));
-							if (data.bag().addItemToBackpack(data.dragItem())) {
-								data.removeItemFromDrag(data.dragItem());
-							} else {
-								// Merge gold
-								switch(data.dragItem()) {
-								case Gold goldDrag -> {
-									var colideItem = data.bag().getItem(res.x(), res.y());
-									if (colideItem != null && goldDrag.getID() == colideItem.getID()) {
-										var goldCollide = (Gold) colideItem;
-										goldCollide.addGold(goldDrag.getGold());
-										data.dragItemLst().remove(goldDrag);
-										goldCollide.updateGoldSize();
-										IO.println("Merge	gold : " + goldCollide.getGold());
-									} else {
-										GameDataClick.addDragItem(data.dragItem());
-									}
-								}
-								default -> {GameDataClick.addDragItem(data.dragItem());}
-								}
-								
-							}
-						}
-						data.setDragItem(null);
-					}
-					GameView.draw(context, data, view);
-					data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
-		}
-		default -> {}
-		}
-		// If event button is pressed
-		
-		if (event != null) switch (event) {
-		case KeyboardEvent key -> {
-			if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
-				switch (key.key()) {
-				case Key.A -> {
-					if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-						GameDataClick.addDragItem(new Axe());
-						GameDataClick.addDragItem(new Gold(12));
-						GameDataClick.addDragItem(new Gold(12));
-						GameDataClick.addDragItem(new DespairShield());
-						GameDataClick.addDragItem(new KeyDoor());
-					}
-				}
-				case Key.I -> {
-					if (GameDataCombat.combat() == false) {
-						GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())),
-								data);
+					default -> throw new IllegalArgumentException("Unexpected value: " + res.type());
 					}
 				}
 
-				case Key.R -> {
+				if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
 					if (data.dragItem() != null) {
-						GameData.rotateItem(data.dragItem());
-						GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
+						GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
+						GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
 					}
 				}
-				// Leave the game
-				case Key.E -> {
-					return false;
-				}
-				default -> {
-				}
+				if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+					int x = pointerEvent.location().x();
+					int y = pointerEvent.location().y();
+					var res = GameDataClick.bagClick(x, y);
+					if (res != null) {
+						data.dragItem().setXY(GameDataClick.bagClick(x, y));
+						if (data.bag().addItemToBackpack(data.dragItem())) {
+							data.removeItemFromDrag(data.dragItem());
+						} else {
+							// Merge gold
+							switch (data.dragItem()) {
+							case Gold goldDrag -> {
+								var colideItem = data.bag().getItem(res.x(), res.y());
+								if (colideItem != null && goldDrag.getID() == colideItem.getID()) {
+									var goldCollide = (Gold) colideItem;
+									goldCollide.addGold(goldDrag.getGold());
+									data.dragItemLst().remove(goldDrag);
+									goldCollide.updateGoldSize();
+									IO.println("Merge	gold : " + goldCollide.getGold());
+								} else {
+									GameDataClick.addDragItem(data.dragItem());
+								}
+							}
+							default -> {
+								GameDataClick.addDragItem(data.dragItem());
+							}
+							}
+
+						}
+					}
+					data.setDragItem(null);
 				}
 				GameView.draw(context, data, view);
+				data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
 			}
-		}
-		default -> {}
-		}
+			default -> {
+			}
+			}
+		// If event button is pressed
+
+		if (event != null)
+			switch (event) {
+			case KeyboardEvent key -> {
+				if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
+					switch (key.key()) {
+					case Key.A -> {
+						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
+							GameDataClick.addDragItem(new Axe());
+							GameDataClick.addDragItem(new Gold(12));
+							GameDataClick.addDragItem(new Gold(12));
+							GameDataClick.addDragItem(new DespairShield());
+							GameDataClick.addDragItem(new KeyDoor());
+						}
+					}
+					case Key.I -> {
+						if (GameDataCombat.combat() == false) {
+							GameDataCombat
+									.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())), data);
+						}
+					}
+
+					case Key.R -> {
+						if (data.dragItem() != null) {
+							GameData.rotateItem(data.dragItem());
+							GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
+						}
+					}
+					// Leave the game
+					case Key.E -> {
+						return false;
+					}
+					default -> {
+					}
+					}
+					GameView.draw(context, data, view);
+				}
+			}
+			default -> {
+			}
+			}
 		return true;
 	}
+
 	/**
 	 * Sets up the game, then launches the game loop.
 	 * 

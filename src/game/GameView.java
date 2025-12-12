@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.github.forax.zen.ApplicationContext;
 
@@ -25,6 +26,7 @@ import model.map.EventRoom;
 import model.map.Exit;
 import model.map.Healer;
 import model.map.LockedDoor;
+import model.map.Room;
 import model.map.Shop;
 import model.map.Start;
 import model.map.Treasure;
@@ -851,6 +853,16 @@ public record GameView(int width, int height, int tileSize) {
 			drawEvent(graphics, data);	
 		}
  }
+  
+  public static void heroMove(GameData data, XY coordFinal) {
+  	heroMove(data.map().getGrid(), data.map().getHeroPos(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), new ArrayList<XY>());
+  }
+  
+  private static void heroMove(Room[][] grid, XY coordStart, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay) {
+  	for (var room : grid[coordStart.y()][coordStart.x()].getAccessible()) {
+  		
+  	}
+  }
   
   public static void draw(ApplicationContext context, GameData data, GameView view) {
 		context.renderFrame(graphics -> view.draw(graphics, data));
