@@ -10,6 +10,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.github.forax.zen.ApplicationContext;
 
@@ -24,6 +26,7 @@ import model.item.common.Gold;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
+import model.map.Floor;
 import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Room;
@@ -854,13 +857,41 @@ public record GameView(int width, int height, int tileSize) {
 		}
  }
   
-  public static void heroMove(GameData data, XY coordFinal) {
-  	heroMove(data.map().getGrid(), data.map().getHeroPos(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), new ArrayList<XY>());
+  public static void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
+  	var bestWay = new ArrayList<XY>();
+  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
+  	heroMove(data.map().getGrid(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), bestWay, data.map());
+  	IO.println(bestWay.stream()
+  										.map(XY::toString)
+  										.collect(Collectors.joining(" -> ")));
+  	for (var coord : bestWay) {
+  		data.map().setHeroPos(coord);
+  		GameView.draw(context, data, view);
+  		try {
+				TimeUnit.MILLISECONDS.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+  	}
   }
   
-  private static void heroMove(Room[][] grid, XY coordStart, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay) {
-  	for (var room : grid[coordStart.y()][coordStart.x()].getAccessible()) {
-  		
+  private static void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
+  	IO.println("Meilleur : " + bestWay);
+  	if (coordCurrent.equals(coordFinal)) {
+  		if (currentWay.size() <= bestWay.size() || bestWay.isEmpty()) {
+  			bestWay.clear();
+  			bestWay.addAll(currentWay);
+  		}
+  	} else {
+  		for (var room : grid[coordCurrent.y()][coordCurrent.x()].getAccessible()) {
+  			if (floor.getHeroAccessible().contains(room) || floor.getHeroVisited().contains(room)) {
+  				if (!currentWay.contains(room)) {
+      			var newCurrentWay = new ArrayList<>(currentWay);
+      			newCurrentWay.add(room);
+      			heroMove(grid, room, coordFinal, bestWay, newCurrentWay, floor);
+      		}
+  			}
+    	}
   	}
   }
   

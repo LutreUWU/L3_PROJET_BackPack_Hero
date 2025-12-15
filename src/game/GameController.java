@@ -105,7 +105,7 @@ public class GameController {
 						var coord = (XY) res.value();
 						if (coord.x() != -1 && coord.y() != -1) {
 							if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
-								GameDataView.heroMove(data, coord);
+								GameView.heroMove(data, coord, context, view);
 								data.map().setHeroPos(coord);
 								
 

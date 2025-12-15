@@ -19,7 +19,6 @@ public class RandomItem {
 			randomIndexWithGauss = 0;
 		if (randomIndexWithGauss >= sizeList - 1)
 			randomIndexWithGauss = sizeList - 1;
-		var item = allItem.get(randomIndexWithGauss).copy();
 		return allItem.get(randomIndexWithGauss).copy();
 	}
 }
