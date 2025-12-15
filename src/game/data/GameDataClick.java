@@ -194,6 +194,28 @@ public class GameDataClick {
   	oldPosition = new XY(x, y);
   }
   
+  private static int getWidth(Item item) {
+    XY[] b = item.shape();
+    int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+    for (XY block : b) {
+        int x = block.x();
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+    }
+    return maxX - minX + 1;
+}
+
+  private static int getHeight(Item item) {
+    XY[] b = item.shape();
+    int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
+    for (XY block : b) {
+        int y = block.y();
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    }
+    return maxY - minY + 1;
+}
+  
   /**
    * Add an item in the list of items draggable.
    * 
@@ -201,16 +223,16 @@ public class GameDataClick {
    */
   public static void addDragItem(Item item) {
   	dragItemMap.put(item, new BoundingBox(
-											new XY(screenInfo.width() / 2 - (item.getWidth() * backpack.getGridSize() / 2) , screenInfo.height() / 2 - (item.getHeight() * backpack.getGridSize() / 2) ),
-											new XY(screenInfo.width() / 2 + (item.getWidth() * backpack.getGridSize() / 2) , screenInfo.height() / 2 + (item.getHeight() * backpack.getGridSize() / 2) ))
+											new XY(screenInfo.width() / 2 - (getWidth(item) * backpack.getGridSize() / 2) , screenInfo.height() / 2 - (getHeight(item) * backpack.getGridSize() / 2) ),
+											new XY(screenInfo.width() / 2 + (getWidth(item) * backpack.getGridSize() / 2) , screenInfo.height() / 2 + (getHeight(item) * backpack.getGridSize() / 2) ))
 							 );
   }
   
   public static void updateBoundingBox(Item item, int x, int y) {
-  	int minX = x - (item.getWidth() * backpack.getGridSize() / 2);
-    int minY = y - (item.getHeight() * backpack.getGridSize() / 2);
-  	int maxX = x + (item.getWidth() * backpack.getGridSize() / 2);
-    int maxY = y + (item.getHeight() * backpack.getGridSize() / 2);
+  	int minX = x - (getWidth(item) * backpack.getGridSize() / 2);
+    int minY = y - (getHeight(item) * backpack.getGridSize() / 2);
+  	int maxX = x + (getWidth(item) * backpack.getGridSize() / 2);
+    int maxY = y + (getHeight(item) * backpack.getGridSize() / 2);
     dragItemMap.put(item, new BoundingBox(new XY(minX, minY), new XY(maxX, maxY)));
   }
   
@@ -222,7 +244,7 @@ public class GameDataClick {
   public static void addDragItemFromBag(Item item, int x, int y) {
   	var size = backpack.getGridSize();
   	var northWest = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)), (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * (y - 1))));
-  	var southEast = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + item.getWidth() * size, (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * y) + item.getHeight() * size));
+  	var southEast = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + getWidth(item) * size, (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * y) + getHeight(item) * size));
   	dragItemMap.put(item, new BoundingBox(northWest, southEast));
   }
   

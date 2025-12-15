@@ -82,7 +82,7 @@ public class GameDataCombat {
 		int id = data.bag().grid()[coord.y()][coord.x()];
 		// A changer, pas ouf je pense
 		Optional<Item> weapon = data.bag().bagItemLst().stream()
-																											 .filter(item -> item.getID() == id)
+																											 .filter(item -> item.ID() == id)
 																											 .findFirst();
 		weapon.ifPresent(item -> {
 			item.use(target, lstEnemy);

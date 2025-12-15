@@ -117,8 +117,7 @@ public class Floor {
 		grid[list.get(6).y()][list.get(6).x()] = new EnemyRoom(); // Create Enemy
 		grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
 		grid[list.get(8).y()][list.get(8).x()] = new Start(); // Create start
-		grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the
-																																		// hero has a key)
+		grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the					// hero has a key)
 		grid[list.get(10).y()][list.get(10).x()] = new EventRoom(floor); // Create Event
 	}
 

@@ -104,6 +104,6 @@ public class Soldat implements Enemy{
 	
 	@Override
 	public String toString() {
-		return "Poulet malicieux";
+		return "Soldat";
 	}
 }

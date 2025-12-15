@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import model.item.common.Sword;
+import model.item.common.Gold;
 import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
@@ -22,7 +22,7 @@ public class ItemRepository {
     
     // Trier du moins rare au plus rare
     public static void createItemRepository() {
-  	  registerWeapon(new Sword()); // Common 
+  	  registerWeapon(new Gold(1)); // Common 
   	  registerWeapon(new Gant()); // Rare
   	  registerWeapon(new Massue()); // SuperRare
   	  registerWeapon(new DespairShield()); // Epic
@@ -33,13 +33,17 @@ public class ItemRepository {
     
     // Méthode pour enregistrer une arme
     private static void registerWeapon(Item item) {
-        itemRepositoryMap.put(item.getID(), item);
+        itemRepositoryMap.put(item.ID(), item);
+    }
+    
+    private static int finalScore(Item item) {
+      return (item.rarity().ordinal() + 1) * item.score();
     }
     
     private static void createRankingWeapon() {
     	Collection<Item> items = itemRepositoryMap.values();
     	itemRankLst = new ArrayList<>(items);
-    	itemRankLst.sort((a, b) -> Integer.compare(a.finalScore(), b.finalScore()));
+    	itemRankLst.sort((a, b) -> Integer.compare(finalScore(a), finalScore(b)));
     }
 
     // Récupérer une arme par ID

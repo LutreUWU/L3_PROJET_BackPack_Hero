@@ -71,20 +71,20 @@ public class Backpack {
 	}
 	
 	public int getGoldInBag() {
-		return bagItemLst.stream()
-										 .filter(item -> item.getID() == 2)
-										 .mapToInt(item -> ((Gold) item).getGold())
-										 .sum();
+    return bagItemLst.stream()
+            .filter(item -> item instanceof Gold)
+            .mapToInt(item -> ((Gold) item).value()) 
+            .sum();
 	}
 	
 	public boolean subGoldInBag(int value) {
-		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.getID() == 2).map(item -> (Gold) item).toList();
+		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.ID() == 2).map(item -> (Gold) item).toList();
 		for (Gold gold : goldItems) {
-			if (gold.getGold() > value) {
-				gold.subGold(value);
+			if (gold.value() > value) {
+				gold.changeGoldValue(value);
 			}
 			else {
-				value -= gold.getGold();
+				value -= gold.value();
 				removeItemFromBackpack(gold);
 			}
 			if (value == 0) {
@@ -132,7 +132,7 @@ public class Backpack {
     if (checkPlace(item)) {
       var b = item.shape();
       for (var block : b) {
-        backpack[block.y()][block.x()] = item.getID();
+        backpack[block.y()][block.x()] = item.ID();
       }
       bagItemLst.add(item);
       return true;

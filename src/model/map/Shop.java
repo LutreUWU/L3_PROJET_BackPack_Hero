@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import game.data.GameDataClick;
 import model.Item;
-import model.ItemRepository;
 import model.RandomItem;
 import model.XY;
 import model.item.common.Gold;
-import model.item.common.KeyDoor;
-import model.item.common.Sword;
 
 public final class Shop implements Room {
   private int floor;
@@ -35,15 +31,17 @@ public final class Shop implements Room {
   private void createShop() {
   	int i = 0;
   	boolean alreadyThere = false;
-		currentShop.put(new KeyDoor(), 10);
+		currentShop.put(new Gold(10), 10);
 		while (currentShop.size() != 4) {
 			var item = RandomItem.generate(floor);
 			for (var itemBag : currentShop.keySet()) {
-				if (itemBag.getID() == item.getID()) {
+				if (itemBag.ID() == item.ID()) {
 					alreadyThere = true;
 				}
 			}
-			if (!alreadyThere) currentShop.put(item, item.finalScore());
+			IO.println(currentShop);
+			// Créer une méthode pour calculer le prix en fonction du score et la rareté de l'item
+			if (!alreadyThere) currentShop.put(item, item.score()); 
 			alreadyThere = false;
 		}
   }

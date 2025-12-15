@@ -10,119 +10,65 @@ import model.Rarity;
 import model.XY;
 import model.monster.Enemy;
 
-/**
- * Class for the Sword item
- */
-public class Axe implements Item{
-	/**
-	 * ID of the weapon (Every weapon has a unique ID)
-	 */
-	private XY[] b = new XY[4]; 
-	private Direction direction = Direction.UP;
-	private final Rarity rarity = Rarity.LEGENDARY; 
-	private final int id = 8;
-	private final int score = 15;
-	private final String description = "Une hache bien chargé, bien robuste, bien bagarre";
-	private final String effect = "1AP : Inflige -10PV à l'ennemi";
-	/**
-	 * Initialize a sword. 
-	 * Since every items has their own shape, we do it manually
-	 */
-	public Axe() {
-		setXY(new XY(0, 0));
-	}
+public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+
+		public Axe() {
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.LEGENDARY, 8, 15);
+	  }
 	
-	/**
-	 * Initialize the position of the item at the coordinate in parameter.
-	 * The center of the item is where the initialization start.
-	 * For example if we call setXY(2, 2), the methods will initialize the item at this coordinate :
-	 * 
-	 *  o # (2, 3)
-	 *  o # (2, 2)
-	 *  o # (2, 4)
-	 *  
-	 *  @param x Coordinate X
-	 *  @param y Coordinate Y
-	 */
-	@Override
-	public void setXY(XY coord) {
-		if (direction() == Direction.UP || direction() == Direction.DOWN) {
-			b[0] = new XY(coord.x(), coord.y());
-			b[1] = new XY(coord.x(), coord.y() + 1);
-			b[2] = new XY(coord.x(), coord.y() - 1);
-			b[3] = new XY(coord.x() + 1, coord.y() - 1);
-		}
-		else {
-			b[0] = new XY(coord.x(), coord.y());
-			b[1] = new XY(coord.x() - 1, coord.y());
-			b[2] = new XY(coord.x() + 1, coord.y());
-			b[3] = new XY(coord.x() + 1, coord.y() + 1);
-		}
-	}
-	
-	/**
-	 * Use this item on a enemy
-	 * 
-	 * @param enemy The enemy
-	 * 
-	 */
-	@Override
-	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-		GameDataHero.sub("energy", 1);
-		enemy.subHP(10);
-		GameDataCombat.setLog("Le héro ARRACHE " + enemy + " avec SA GROSSE HACHE (-10PV)");
-	}
-	
-  @Override
-  public void setDirection(Direction d) {
-    this.direction = d;
-  }
-	
-  @Override
-  public XY[] shape() {
+		public Axe(XY coord, Direction direction) {
+      this(initShape(coord, direction), direction, Rarity.LEGENDARY, 8, 15);
+    }
+		
+		public Axe(XY[] shape, Direction direction) {
+      this(shape, direction, Rarity.LEGENDARY, 8, 15);
+    }
+
+    private static XY[] initShape(XY coord, Direction direction) {
+      XY[] b = new XY[4];
+      b[0] = new XY(coord.x(), coord.y());
+      b[1] = new XY(coord.x(), coord.y() + 1);
+      b[2] = new XY(coord.x(), coord.y() - 1);
+      b[3] = new XY(coord.x() + 1, coord.y() - 1);
+
+      for (int i = 0; i < direction.ordinal(); i++) {
+      	b = rotate90(b, b[0]);
+      }
       return b;
-  }
+    }
+    
+    private static XY[] rotate90(XY[] shape, XY pivot) {
+      XY[] rotated = new XY[shape.length];
+      for (int i = 0; i < shape.length; i++) {
+        int dx = shape[i].x() - pivot.x();
+        int dy = shape[i].y() - pivot.y();
+        int newX = -dy;
+        int newY = dx;
+        rotated[i] = new XY(pivot.x() + newX, pivot.y() + newY);
+      }
+      return rotated;
+    }
+    
+    @Override
+    public Axe setXY(XY coord) {
+      return new Axe(coord, direction);
+    }
 
-  @Override
-  public Direction direction() {
-      return direction;
-  }
-  
-  @Override
-  public Rarity getRarity() {
-		return rarity;
-	}
-  
-  @Override
-  public int getScore() {
-		return score;
-	}
-  
-  @Override
-  public int getID() {
-		return id;
-	}
-  
-  @Override
-  public String getDescription() {
-		return description;
-	}
-  
-  @Override
-  public String toString() {
-  	return "Axe";
-  }
-  
-  @Override
-  public String getEffect() {
-  	return effect;
-  } 
-  
-  @Override
-  public Item copy() {
-  	return new Axe();
-  }  
+    @Override
+    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+      GameDataCombat.setLog("Le héro EXPLOSE " + enemy + " avec SA GROSSE HACHE (-10PV)");
+      GameDataHero.sub("energy", 1);
+      enemy.subHP(10);
+    }
+    
+    @Override
+    public Axe rotateXY() {
+      return new Axe(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+    }
+
+
+    @Override
+    public String toString() {
+      return "Axe";
+    }
 }
-
-
-

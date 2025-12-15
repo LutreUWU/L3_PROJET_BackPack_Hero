@@ -17,7 +17,6 @@ import loader.FontLoader;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
-import model.item.common.KeyDoor;
 import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.map.EnemyRoom;
@@ -27,6 +26,7 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Treasure;
 import model.monster.Chicken;
+import model.monster.Robot;
 import model.monster.Soldat;
 
 /**
@@ -176,20 +176,21 @@ public class GameController {
 					int y = pointerEvent.location().y();
 					var res = GameDataClick.bagClick(x, y);
 					if (res != null) {
-						data.dragItem().setXY(GameDataClick.bagClick(x, y));
-						if (data.bag().addItemToBackpack(data.dragItem())) {
+						var item = 	data.dragItem().setXY(GameDataClick.bagClick(x, y));
+						if (data.bag().addItemToBackpack(item)) {
 							data.removeItemFromDrag(data.dragItem());
 						} else {
 							// Merge gold
 							switch (data.dragItem()) {
 							case Gold goldDrag -> {
 								var colideItem = data.bag().getItem(res.x(), res.y());
-								if (colideItem != null && goldDrag.getID() == colideItem.getID()) {
+								if (colideItem != null && goldDrag.ID() == colideItem.ID()) {
 									var goldCollide = (Gold) colideItem;
-									goldCollide.addGold(goldDrag.getGold());
+									data.bag().removeItemFromBackpack(goldCollide);
+									goldCollide = goldCollide.changeGoldValue(goldDrag.value());
+									data.bag().addItemToBackpack(goldCollide);
 									data.dragItemLst().remove(goldDrag);
-									goldCollide.updateGoldSize();
-									IO.println("Merge	gold : " + goldCollide.getGold());
+									IO.println("Merge	gold : " + goldCollide.value());
 								} else {
 									GameDataClick.addDragItem(data.dragItem());
 								}
@@ -220,21 +221,20 @@ public class GameController {
 						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 							GameDataClick.addDragItem(new Axe());
 							GameDataClick.addDragItem(new Gold(12));
-							GameDataClick.addDragItem(new Gold(12));
 							GameDataClick.addDragItem(new DespairShield());
-							GameDataClick.addDragItem(new KeyDoor());
 						}
 					}
 					case Key.I -> {
 						if (GameDataCombat.combat() == false) {
-							GameDataCombat
-									.startCombat(new ArrayList<>(List.of(new Chicken(), new Soldat(), new model.monster.Robot())), data);
+							GameDataCombat.startCombat(new ArrayList<>(List.of(new Soldat(), new Robot())), data);
 						}
 					}
 
 					case Key.R -> {
 						if (data.dragItem() != null) {
-							GameData.rotateItem(data.dragItem());
+							data.removeItemFromDrag(data.dragItem());
+							data.setDragItem(GameData.rotateItem(data.dragItem()));			
+							GameDataClick.addDragItem(data.dragItem());
 							GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
 						}
 					}

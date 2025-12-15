@@ -23,6 +23,13 @@ import model.Direction;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
+import model.item.common.KeyDoor;
+import model.item.common.Sword;
+import model.item.epic.DespairShield;
+import model.item.legendary.Axe;
+import model.item.mythic.Mimicry;
+import model.item.rare.Gant;
+import model.item.superrare.Massue;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -224,7 +231,7 @@ public record GameView(int width, int height, int tileSize) {
 		var itemLst = data.bag().bagItemLst();
 		for (var item : itemLst) {
 			XY coordinate = item.shape()[0];
-		  switch (item.getID()) {
+		  switch (item.ID()) {
 			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75);
 			  case 2 -> drawItemGold(graphics, data, coordinate, item);
 				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMap().get("sword")); 
@@ -240,11 +247,39 @@ public record GameView(int width, int height, int tileSize) {
   
   private void drawItemGold(Graphics2D graphics, GameData data, XY coordinate, Item item) {
   	var itemGold = (Gold) item;
-  	switch (itemGold.getSizeCount()) {
+  	switch (itemGold.sizeCount()) {
   	case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold3"));
   	case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold2"));
   	default -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold1"));
   	}
+  }
+  
+  private String getDescriptionItem(Item item) {
+  	return switch (item) {
+	  	case KeyDoor _ -> "Une épée simple et basique."; 
+	  	case Gold _ -> "Comme dans la vraie vie, sans argent c'est la merde";
+	  	case Sword _ -> "Une épée simple et basique.";
+	  	case DespairShield _ -> "Une épée simple et basique.";
+	  	case Mimicry _ -> "Une épée simple et basique.";
+	  	case Massue _ -> "Une épée simple et basique.";
+	  	case Gant _ -> "Une épée simple et basique.";
+	  	case Axe _ -> "Une épée simple et basique.";
+	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
+  	};
+  }
+  
+  private String getEffectItem(Item item) {
+  	return switch (item) {
+	  	case KeyDoor _ -> "Une épée simple et basique."; 
+	  	case Gold g -> "Il y a " + g.value();
+	  	case Sword _ -> "1AP : Inflige -3 à l'ennemi";
+	  	case DespairShield _ -> "Une épée simple et basique.";
+	  	case Mimicry _ -> "Une épée simple et basique.";
+	  	case Massue _ -> "Une épée simple et basique.";
+	  	case Gant _ -> "Une épée simple et basique.";
+	  	case Axe _ -> "Une épée simple et basique.";
+	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
+  	};
   }
   
   private void drawItemInfo(Graphics2D graphics, GameData data) {
@@ -256,8 +291,8 @@ public record GameView(int width, int height, int tileSize) {
 		Item item = data.dragItem();
 		if (item != null) {
 	    drawTextInfoName(graphics, item, NW);
-		  drawTextInfo(graphics, item.getDescription(), NW.x(), NW.y() + (int) (NW.y() * 0.30), 20);
-		  drawTextInfo(graphics, item.getEffect(), NW.x(), NW.y() + (int) ((SE.y() - NW.y()) / 2), 20);
+		  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 20);
+		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + (int) ((SE.y() - NW.y()) / 2), 20);
 
 		}
   }
@@ -265,7 +300,7 @@ public record GameView(int width, int height, int tileSize) {
   private void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH2());
     graphics.setFont(font);
-    graphics.setColor(switch(item.getRarity()) {
+    graphics.setColor(switch(item.rarity()) {
 	    case COMMON -> Color.GRAY;
 	    case RARE -> Color.GREEN;
 	    case SUPERARE -> Color.BLUE;
@@ -577,7 +612,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param box		 	 The boundingbox (border) of the item.
    */
   private void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
-	  switch (item.getID()) {
+	  switch (item.ID()) {
 		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75); 
 		  case 2 -> drawDragGold(graphics, data, item, box);
 			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMap().get("sword")); 
@@ -592,7 +627,7 @@ public record GameView(int width, int height, int tileSize) {
   
   private void drawDragGold(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
   	var itemGold = (Gold) item;
-  	switch (itemGold.getSizeCount()) {
+  	switch (itemGold.sizeCount()) {
   	case 3 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold3"));
   	case 2 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold2")); 
   	default -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold1"));

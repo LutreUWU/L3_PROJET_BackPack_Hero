@@ -107,6 +107,6 @@ public class Gnome implements Enemy{
 	
 	@Override
 	public String toString() {
-		return "Poulet malicieux";
+		return "Gnome méchant";
 	}
 }

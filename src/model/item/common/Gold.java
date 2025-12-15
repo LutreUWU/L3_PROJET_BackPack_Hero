@@ -8,106 +8,61 @@ import model.Rarity;
 import model.XY;
 import model.monster.Enemy;
 
-public class Gold implements Item {
-	private int gold;
-	private int sizeCount = 1; // 1, 2, or 3
-	private XY[] b = new XY[1]; 
-	private Direction direction = Direction.UP;
-	private final Rarity rarity = Rarity.COMMON;
-	private final int id = 2;
-	private final int score = -1;
-	private String description = "Comme dans la vraie vie, sans argent t'es dans la merde";
+public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int value, int sizeCount) implements Item{
+		public Gold(int value) {
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 2, -1, value, 1);
+	  }
+	
+		public Gold(XY coord, Direction direction, int value) {
+      this(initShape(coord, direction), direction, Rarity.COMMON, 2, -1, value, getSizeValue(value));
+    }
+		
+		public Gold(XY[] shape, Direction direction, int value) {
+      this(shape, direction, Rarity.COMMON, 2, -1, value, getSizeValue(value));
+    }
 
-	public Gold(int gold2) {
-		gold = gold2;
-		setXY(new XY(0, 0));
-	}
-	
-	public int getSizeCount() {
-		return sizeCount;
-	}
-	
-	public int getGold() {
-		return gold;
-	}
-
-	public void setGold(int gold2) {
-		if (gold < 0) throw new IllegalArgumentException("Gold must be not negative");
-		gold = gold2;
-	}
-
-	public void addGold(int value) {
-		gold += value;
-	}
-	
-	public void subGold(int value) {
-		gold -= value;
-	}
-	
-	public void updateGoldSize() {
-		if (gold <= 15) sizeCount = 1;
-		else if (gold <= 50) sizeCount = 2;
-		else sizeCount = 3;
-	}
-	
-	@Override
-	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-		// Can't be use with a click
-	}
-	
-  @Override
-  public void setDirection(Direction d) {
-    this.direction = d;
-  }
-	
-  @Override
-  public XY[] shape() {
+    private static XY[] initShape(XY coord, Direction direction) {
+      XY[] b = new XY[1];
+      b[0] = new XY(coord.x(), coord.y());
+      for (int i = 0; i < direction.ordinal(); i++) {
+      	b = rotate90(b, b[0]);
+      }
       return b;
-  }
+    }
+    
+    private static XY[] rotate90(XY[] shape, XY pivot) {
+      return shape;
+    }
+    
+    private static int getSizeValue(int value) {
+    	if (value <= 15) return 1;
+    	else if (value <= 50) return 2;
+    	else return 3;
+    }
+    
+    public Gold changeGoldValue(int value2) {
+    	int finalValue = value + value2;
+    	return new Gold(shape, direction, rarity, ID, score, finalValue, getSizeValue(finalValue));
+    }
+    
+    @Override
+    public Gold setXY(XY coord) {
+      return new Gold(coord, direction, value);
+    }
 
-  @Override
-  public Direction direction() {
-      return direction;
-  }
-  
-  @Override
-  public Rarity getRarity() {
-		return rarity;
-	}
-  
-  @Override
-  public int getScore() {
-		return score;
-	}
-  
-  @Override
-  public int getID() {
-		return id;
-	}
-  
-  @Override
-  public String getDescription() {
-  	return description;
-  }
-  
-  @Override
-  public String getEffect() {
-  	return "Il y a " + gold + " pièces" ;
-  }
-  
-  @Override
-	public void setXY(XY coord) {
-		b[0] = new XY(coord.x(), coord.y());
-	}
+    @Override
+    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+      //
+    }
+    
+    @Override
+    public Gold rotateXY() {
+      return new Gold(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, value, sizeCount);
+    }
 
-  @Override
-  public String toString() {
-  	return "Gold";
-  }
-  
-  @Override
-  public Item copy() {
-  	return null;
-  }
-	
+
+    @Override
+    public String toString() {
+      return "Gold";
+    }
 }

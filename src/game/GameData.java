@@ -7,7 +7,6 @@ import com.github.forax.zen.ScreenInfo;
 
 import game.data.GameDataClick;
 import game.data.GameDataHero;
-import game.data.GameDataMap;
 import loader.ImageLoader;
 import loader.MathLoader;
 import model.Backpack;
@@ -79,7 +78,6 @@ public class GameData {
 	  imgMap = ImageLoader.loadAllImage();
 	  new MathLoader(this);
     new GameDataHero(hero);
-    new GameDataMap(map);
     new GameDataClick(this);
 	}
 
@@ -100,8 +98,8 @@ public class GameData {
   	dragItemLst.remove(item);
   }
   
-  public static void rotateItem(Item item) {
-  	item.rotateXY();
+  public static Item rotateItem(Item item) {
+  	return item.rotateXY();
   }
   // ============
   // == GETTER ==

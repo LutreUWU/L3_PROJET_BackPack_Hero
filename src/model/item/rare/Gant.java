@@ -8,121 +8,64 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
-import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-/**
- * Class for the Sword item
- */
-public class Gant implements Item{
-	/**
-	 * ID of the weapon (Every weapon has a unique ID)
-	 */
-	private XY[] b = new XY[2]; 
-	private Direction direction = Direction.UP;
-	private Rarity rarity = Rarity.RARE; 
-	private int id = 7;
-	private int score = 10;
-	private final String description = "Des gants pour se protéger du froid hihihi";
-	private final String effect = "2AP : Heal 10PV";
-	/**
-	 * Initialize a sword. 
-	 * Since every items has their own shape, we do it manually
-	 */
-	public Gant() {
-		setXY(new XY(0, 0));
-	}
+public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+		public Gant() {
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 7, 10);
+	  }
 	
-	/**
-	 * Initialize the position of the item at the coordinate in parameter.
-	 * The center of the item is where the initialization start.
-	 * For example if we call setXY(2, 2), the methods will initialize the item at this coordinate :
-	 * 
-	 *  o # (2, 3)
-	 *  o # (2, 2)
-	 *  o # (2, 4)
-	 *  
-	 *  @param x Coordinate X
-	 *  @param y Coordinate Y
-	 */
-	@Override
-	public void setXY(XY coord) {
-		if (direction() == Direction.UP || direction() == Direction.DOWN) {
-			int y = direction() == Direction.UP ? 1 : -1; 
-			b[0] = new XY(coord.x(), coord.y());
-			b[1] = new XY(coord.x(), coord.y() - 1 * y);
-		}
-		else {
-			int x = direction() == Direction.RIGHT ? 1 : -1; 
-			b[0] = new XY(coord.x(), coord.y());
-			b[1] = new XY(coord.x() + 1 * x, coord.y());
-		}
-	}
-	
-	/**
-	 * Use this item on a enemy
-	 * 
-	 * @param enemy The enemy
-	 * 
-	 */
-	@Override
-	public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-		GameDataHero.sub("energy", 2);
-		GameDataHero.add("hp", 10);
-		GameDataCombat.setLog("Le héro porte de super gant ! Il gagne 10 PV");
-	}
-	
-  @Override
-  public void setDirection(Direction d) {
-    this.direction = d;
-  }
-	
-  @Override
-  public XY[] shape() {
+		public Gant(XY coord, Direction direction) {
+      this(initShape(coord, direction), direction, Rarity.RARE, 7, 10);
+    }
+		
+		public Gant(XY[] shape, Direction direction) {
+      this(shape, direction, Rarity.RARE, 7, 10);
+    }
+
+    private static XY[] initShape(XY coord, Direction direction) {
+      XY[] b = new XY[2];
+      b[0] = new XY(coord.x(), coord.y());
+      b[1] = new XY(coord.x(), coord.y() - 1);
+      for (int i = 0; i < direction.ordinal(); i++) {
+      	b = rotate90(b, b[0]);
+      }
       return b;
-  }
+    }
+    
+    private static XY[] rotate90(XY[] shape, XY pivot) {
+      XY[] rotated = new XY[shape.length];
+      for (int i = 0; i < shape.length; i++) {
+        int dx = shape[i].x() - pivot.x();
+        int dy = shape[i].y() - pivot.y();
+        int newX = -dy;
+        int newY = dx;
+        rotated[i] = new XY(pivot.x() + newX, pivot.y() + newY);
+      }
+      return rotated;
+    }
+    
+    @Override
+    public Gant setXY(XY coord) {
+      return new Gant(coord, direction);
+    }
 
-  @Override
-  public Direction direction() {
-      return direction;
-  }
-  
-  @Override
-  public Rarity getRarity() {
-		return rarity;
-	}
-  
-  @Override
-  public int getScore() {
-		return score;
-	}
-  
-  @Override
-  public int getID() {
-		return id;
-	}
-  @Override
-  public String getDescription() {
-		return description;
-	}
-  
-  @Override
-  public String toString() {
-  	return "Gant";
-  }
-  
-  @Override
-  public String getEffect() {
-  	return effect;
-  } 
-  
-  @Override
-  public Item copy() {
-  	return new Gant();
-  }  
-  
- 
+    @Override
+    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+      GameDataCombat.setLog("Le héro porte de super gant ! Il gagne 10 PV");
+      GameDataHero.sub("energy", 1);
+      GameDataHero.add("hp", 10);
+      enemy.subHP(30);
+    }
+    
+    @Override
+    public Gant rotateXY() {
+      return new Gant(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+    }
+
+
+    @Override
+    public String toString() {
+      return "Gant";
+    }
 }
-
-
-
