@@ -53,7 +53,7 @@ public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, in
 
     @Override
     public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-      GameDataCombat.setLog("Le héro FOUDROIE " + enemy + " (-30PV), mais en échange de 5PV");
+      GameDataCombat.addLog("Le héro FOUDROIE " + enemy + " (-30PV), mais en échange de 5PV");
       GameDataHero.sub("energy", 2);
       GameDataHero.sub("hp", 5);
       enemy.subHP(30);

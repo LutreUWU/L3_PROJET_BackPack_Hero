@@ -29,6 +29,8 @@ public class MathLoader {
 		getInfoItemValue();
 		getMapValue();
 		getEventValue();	
+		getEndTurnValue();
+		getBinValue();
 	}
 	
 // ================= ICON =====================
@@ -252,4 +254,38 @@ public class MathLoader {
 	}
 // ===========================================
 	
+//================= ENDTURN =====================
+	private static void getEndTurnValue() {
+		var img = data.imgMap().get("BG_ENDTURN");	
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scale = (screenWidth * 0.10) / width;
+		AffineTransform transform = new AffineTransform();
+	  double posX = screenWidth * 0.5 - (width * scale) / 2;
+	  double posY = renderDataGame.get("BG_BACKPACK").box().southEast().y() * 0.95 ;
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
+	  renderDataGame.put("BG_ENDTURN", new RenderData(transform, boundingBox));
+	}
+	
+//============================================
+	
+//================= BIN =====================
+	private static void getBinValue() {
+		var img = data.imgMap().get("BG_BIN_CLOSE");	
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scale = (screenWidth * 0.10) / width;
+		AffineTransform transform = new AffineTransform();
+	  double posX = screenWidth * 0.5 - (width * scale) / 2;
+	  double posY = renderDataGame.get("BG_BACKPACK").box().southEast().y() * 0.95 ;
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
+	  renderDataGame.put("BG_BIN_CLOSE", new RenderData(transform, boundingBox));
+		img = data.imgMap().get("BG_BIN_OPEN");	
+	  renderDataGame.put("BG_BIN_OPEN", new RenderData(transform, boundingBox));
+	}	
+
 }

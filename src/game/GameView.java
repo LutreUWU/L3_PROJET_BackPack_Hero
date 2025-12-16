@@ -705,6 +705,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param lstEnemy List of all enemy we fight
    */
   private void updateCombat(Graphics2D graphics, GameData data,  ArrayList<Enemy> lstEnemy) {
+  	drawEndTurnButton(graphics,  data.imgMap().get("BG_ENDTURN"));
   	lstEnemy.forEach(enemy -> drawEnemy(graphics, data, enemy));
   	drawLog(graphics, data, GameDataCombat.getLog());
   }
@@ -724,13 +725,23 @@ public record GameView(int width, int height, int tileSize) {
 		drawEnemyInfo(graphics, enemy, (int) boundingBox.northWest().x(), (int) (boundingBox.southEast().y()));
   }
   
-  private void drawLog(Graphics2D graphics, GameData data, String log) {
+  private void drawLog(Graphics2D graphics, GameData data, List<String> log) {
+  	int i = 0;
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setColor(Color.WHITE);
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
-    int textWidth = fm.stringWidth(log);
-	  graphics.drawString(log, width / 2 - textWidth / 2,	(int) (height * 0.9));
+    var iterator = log.iterator();
+    while (iterator.hasNext()) {
+    	var text = iterator.next();
+    	int textWidth = fm.stringWidth(text);
+    	double gap = fm.getAscent() * 1.5;
+  	  graphics.drawString(text, width / 2 - textWidth / 2,	(int) (gap * i++ + height * 0.8));
+    }
+  }
+  
+  private void drawEndTurnButton(Graphics2D graphics, BufferedImage img) {
+    graphics.drawImage(img, MathLoader.getMapEvent().get("BG_ENDTURN").transform(), null);
   }
   
   /**
@@ -863,35 +874,6 @@ public record GameView(int width, int height, int tileSize) {
     }
   }
   
-  /**
-   * Methods for drawing the game 
-   * 
-   * @param context		{@code ApplicationContext} of the game.
-   * @param data			GameData containing the game data. 
-   */
-  private void draw(Graphics2D graphics, GameData data) {
-		drawBG(graphics, data);
-		if (data.mapOrBag()) {
-			drawGrid(graphics, data);
-			drawItemBag(graphics, data);
-			drawItemInfo(graphics, data);
-			if(!data.dragItemLst().isEmpty()) {
-				updateDragItem(graphics, data);
-			}
-		} else {
-			drawMap(graphics, data);
-		}
-		drawHero(graphics, data);
-		drawButton(graphics, data);
-		// Draw enemy if we're in combat
-		if (GameDataCombat.combat()) {
-			updateCombat(graphics, data, GameDataCombat.getLstEnemy());
-		}
-		if (data.event() != null) {
-			drawEvent(graphics, data);	
-		}
- }
-  
   public static void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
   	var bestWay = new ArrayList<XY>();
   	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
@@ -929,6 +911,42 @@ public record GameView(int width, int height, int tileSize) {
     	}
   	}
   }
+  
+  private static void drawBinButton(Graphics2D graphics, GameData data) {
+  	BufferedImage img = data.imgMap().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("BG_BIN_CLOSE").transform(), null);
+  }
+  
+  /**
+   * Methods for drawing the game 
+   * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   */
+  private void draw(Graphics2D graphics, GameData data) {
+		drawBG(graphics, data);
+		if (data.mapOrBag()) {
+			drawGrid(graphics, data);
+			drawItemBag(graphics, data);
+			drawItemInfo(graphics, data);
+			drawBinButton(graphics, data);
+			if(!data.dragItemLst().isEmpty()) {
+				updateDragItem(graphics, data);
+			}
+		} else {
+			drawMap(graphics, data);
+		}
+		drawHero(graphics, data);
+		drawButton(graphics, data);
+		// Draw enemy if we're in combat
+		if (GameDataCombat.combat()) {
+			updateCombat(graphics, data, GameDataCombat.getLstEnemy());
+		}
+
+		if (data.event() != null) {
+			drawEvent(graphics, data);	
+		}
+ }
   
   public static void draw(ApplicationContext context, GameData data, GameView view) {
 		context.renderFrame(graphics -> view.draw(graphics, data));

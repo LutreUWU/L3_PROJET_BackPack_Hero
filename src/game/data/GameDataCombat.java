@@ -3,6 +3,7 @@ package game.data;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -11,6 +12,7 @@ import com.github.forax.zen.ScreenInfo;
 
 import game.GameData;
 import model.BoundingBox;
+import model.Hero;
 import model.Item;
 import model.RandomItem;
 import model.XY;
@@ -32,7 +34,7 @@ public class GameDataCombat {
 	private static Enemy target;
   private static ArrayList<Enemy> lstEnemy;
   private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
-  private static String log;
+  private static ArrayList<String> log = new ArrayList<>();
   private static int totalExp;
   private static int levelBeforeCombat;
 	/**
@@ -47,13 +49,15 @@ public class GameDataCombat {
 		}
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
+		data.resetDragItemLst();
 		lstEnemy = monsters;
 		totalExp = 0;
 		levelBeforeCombat = data.hero().getLevel();
 		getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
 		lstEnemy.forEach(monster -> monster.preAction());
 		setTarget(lstEnemy.get(0));
-		log = "Le combat démarre !";
+		log = new ArrayList<>();
+		log.add("Le combat démarre !");
 		combat = true;
 	}
 	
@@ -79,6 +83,7 @@ public class GameDataCombat {
 	 */
 	public static void heroAction(GameData data, XY coord) {
 		Objects.requireNonNull(data);
+		log = new ArrayList<>();
 		int id = data.bag().grid()[coord.y()][coord.x()];
 		// A changer, pas ouf je pense
 		Optional<Item> weapon = data.bag().bagItemLst().stream()
@@ -112,15 +117,20 @@ public class GameDataCombat {
 			}
 			else {
 				if(data.hero().getEnergy_point() <= 0) {
-					lstEnemy.forEach(enemy -> enemy.action());
-					if(data.hero().getHP() == 0) {
-						// TO DO 
-					}
-					GameDataHero.reset();
-					GameDataHero.add("energy", 3);
+					enemyAction(data.hero());
 				}
 			}
 		});
+	}
+	
+	public static void enemyAction(Hero hero) {
+		Objects.requireNonNull(hero);
+		lstEnemy.forEach(enemy -> enemy.action());
+		if(hero.getHP() == 0) {
+			// TO DO 
+		}
+		GameDataHero.reset();
+		GameDataHero.add("energy", 3 - hero.getEnergy_point());
 	}
 	
 	/**
@@ -147,11 +157,12 @@ public class GameDataCombat {
 		return enemyBox;
 	}
 	
-	public static void setLog(String log) {
-		GameDataCombat.log = log;
+	public static void addLog(String content) {
+		Objects.requireNonNull(content);
+		log.add(content);
 	}
 	
-	public static String getLog() {
-		return log;
+	public static List<String> getLog() {
+		return List.copyOf(log);
 	}
 }

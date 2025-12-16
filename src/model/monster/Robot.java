@@ -3,6 +3,7 @@ package model.monster;
 import java.util.List;
 import java.util.Random;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 
 /**
@@ -45,9 +46,18 @@ public class Robot implements Enemy{
 	@Override
 	public void action() {
 		switch(action) {
-			case "Hoo..." -> this.subHP(3);
-			case "HOHOHOH" -> GameDataHero.sub("HP", 15);
-			case "HEHEHEH" -> shield = 20;
+			case "Hoo..." -> {
+				this.subHP(3);
+				GameDataCombat.addLog("Robot n'a pas eu de chance et perd 3PV ...");
+			}
+			case "HOHOHOH" -> {
+				GameDataHero.sub("HP", 15);
+				GameDataCombat.addLog("Robot est content et inflige 15PV au héro");
+			}
+			case "HEHEHEH" -> {
+				shield = 20;
+				GameDataCombat.addLog("Robot est peureux et gagne 20 de shield");
+			}
 		}
 		preAction();
 	}

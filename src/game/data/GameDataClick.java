@@ -11,6 +11,7 @@ import model.Backpack;
 import model.BoundingBox;
 import model.Item;
 import model.XY;
+import model.item.common.Gold;
 import model.monster.Enemy;
 
 public class GameDataClick {
@@ -223,9 +224,9 @@ public class GameDataClick {
    */
   public static void addDragItem(Item item) {
   	dragItemMap.put(item, new BoundingBox(
-											new XY(screenInfo.width() / 2 - (getWidth(item) * backpack.getGridSize() / 2) , screenInfo.height() / 2 - (getHeight(item) * backpack.getGridSize() / 2) ),
-											new XY(screenInfo.width() / 2 + (getWidth(item) * backpack.getGridSize() / 2) , screenInfo.height() / 2 + (getHeight(item) * backpack.getGridSize() / 2) ))
-							 );
+											new XY(screenInfo.width() / 2 - (getWidth(item) * backpack.getGridSize() / 2) , (int) (screenInfo.height() / 1.6) - (getHeight(item) * backpack.getGridSize() / 2) ),
+											new XY(screenInfo.width() / 2 + (getWidth(item) * backpack.getGridSize() / 2) , (int) (screenInfo.height() / 1.6) + (getHeight(item) * backpack.getGridSize() / 2) ))
+							 		 );
   }
   
   public static void updateBoundingBox(Item item, int x, int y) {
@@ -301,6 +302,43 @@ public class GameDataClick {
   	}); ;
   }
   
+  private static void endButtonClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("BG_ENDTURN").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				GameDataCombat.enemyAction(data.hero());
+			}
+		}
+  }
+  
+  public static void binHover(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("BG_BIN_OPEN").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.setBin(true);
+				return;
+			}
+		}
+		data.setBin(false);
+  }
+  
+  private static void binClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("BG_BIN_OPEN").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.setBin(false);
+				data.dragItemLst().remove(data.dragItem());
+				return;
+			}
+		}
+  }
+  
   /**
    * Main function treating the click and returning information about what we clicks.
    * 
@@ -337,8 +375,43 @@ public class GameDataClick {
     }
     if (GameDataCombat.combat()) {
       mobClick(x, y);
+      endButtonClick(x, y);
     }
     return new ClickResult(ClickType.NOTHING, null);
+  }
+  
+  public static void clickUp(int x, int y) {
+  	XY coord = bagClick(x, y);
+  	if (coord != null) {
+			var item = 	data.dragItem().setXY(GameDataClick.bagClick(x, y));
+			if (data.bag().addItemToBackpack(item)) {
+				data.removeItemFromDrag(data.dragItem());
+			} else {
+				// Merge gold
+				switch (data.dragItem()) {
+				case Gold goldDrag -> {
+					var colideItem = data.bag().getItem(coord.x(), coord.y());
+					if (colideItem != null && goldDrag.ID() == colideItem.ID()) {
+						var goldCollide = (Gold) colideItem;
+						data.bag().removeItemFromBackpack(goldCollide);
+						goldCollide = goldCollide.changeGoldValue(goldDrag.value());
+						data.bag().addItemToBackpack(goldCollide);
+						data.dragItemLst().remove(goldDrag);
+						IO.println("Merge	gold : " + goldCollide.value());
+					} else {
+						GameDataClick.addDragItem(data.dragItem());
+					}
+				}
+				default -> {
+					GameDataClick.addDragItem(data.dragItem());
+					}
+				}
+			}
+			return;
+  	}
+  	if (!GameDataCombat.combat()) {
+  		binClick(x, y);
+  	}
   }
   
   public static LinkedHashMap<Item, BoundingBox> getDragItemMap() {

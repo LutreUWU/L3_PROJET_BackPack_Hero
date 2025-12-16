@@ -54,7 +54,7 @@ public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int 
 
   @Override
   public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-    GameDataCombat.setLog("Le héro gagne 10 Shield, mais en échange de 3PV ...");
+    GameDataCombat.addLog("Le héro gagne 10 Shield, mais en échange de 3PV ...");
     GameDataHero.sub("energy", 1);
     enemy.subHP(3);
   }

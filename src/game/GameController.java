@@ -169,39 +169,13 @@ public class GameController {
 					if (data.dragItem() != null) {
 						GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 						GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
+						GameDataClick.binHover(pointerEvent.location().x(), pointerEvent.location().y());
 					}
 				}
 				if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
 					int x = pointerEvent.location().x();
 					int y = pointerEvent.location().y();
-					var res = GameDataClick.bagClick(x, y);
-					if (res != null) {
-						var item = 	data.dragItem().setXY(GameDataClick.bagClick(x, y));
-						if (data.bag().addItemToBackpack(item)) {
-							data.removeItemFromDrag(data.dragItem());
-						} else {
-							// Merge gold
-							switch (data.dragItem()) {
-							case Gold goldDrag -> {
-								var colideItem = data.bag().getItem(res.x(), res.y());
-								if (colideItem != null && goldDrag.ID() == colideItem.ID()) {
-									var goldCollide = (Gold) colideItem;
-									data.bag().removeItemFromBackpack(goldCollide);
-									goldCollide = goldCollide.changeGoldValue(goldDrag.value());
-									data.bag().addItemToBackpack(goldCollide);
-									data.dragItemLst().remove(goldDrag);
-									IO.println("Merge	gold : " + goldCollide.value());
-								} else {
-									GameDataClick.addDragItem(data.dragItem());
-								}
-							}
-							default -> {
-								GameDataClick.addDragItem(data.dragItem());
-							}
-							}
-
-						}
-					}
+					GameDataClick.clickUp(x, y);
 					data.setDragItem(null);
 				}
 				GameView.draw(context, data, view);

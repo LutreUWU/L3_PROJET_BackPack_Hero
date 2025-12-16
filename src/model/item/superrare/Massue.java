@@ -53,7 +53,7 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
 
     @Override
     public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-      GameDataCombat.setLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
+      GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
       GameDataHero.sub("energy", 1);
       enemy.subHP(5);
     }

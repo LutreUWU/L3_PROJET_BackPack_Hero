@@ -41,6 +41,7 @@ public class GameData {
    * null if we're not adding.
    */
   private Item dragItem = null; 
+  private boolean onBin = false;
   private static LinkedHashMap<Item, BoundingBox> dragItemLst;
   /**
    * To know if we display map or bag
@@ -210,6 +211,10 @@ public class GameData {
   public Map<String, BufferedImage> imgMap(){
   	return imgMap;
   }
+  
+  public void resetDragItemLst() {
+  	dragItemLst = new LinkedHashMap<>();
+  }
 
 	public XY getMouseCoord() {
 		return mouseCoord;
@@ -217,5 +222,13 @@ public class GameData {
 
 	public void setMouseCoord(XY mouse_coord) {
 		this.mouseCoord = mouse_coord;
+	}
+	
+	public void setBin(boolean statut) {
+		this.onBin = statut;
+	}
+	
+	public boolean getBin() {
+		return onBin;
 	}
 }
