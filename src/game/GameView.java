@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import com.github.forax.zen.ApplicationContext;
 
+import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
 import loader.MathLoader;
@@ -256,28 +257,28 @@ public record GameView(int width, int height, int tileSize) {
   
   private String getDescriptionItem(Item item) {
   	return switch (item) {
-	  	case KeyDoor _ -> "Une épée simple et basique."; 
+	  	case KeyDoor _ -> "J'ai retrouvé mes clés de maison"; 
 	  	case Gold _ -> "Comme dans la vraie vie, sans argent c'est la merde";
 	  	case Sword _ -> "Une épée simple et basique.";
-	  	case DespairShield _ -> "Une épée simple et basique.";
-	  	case Mimicry _ -> "Une épée simple et basique.";
-	  	case Massue _ -> "Une épée simple et basique.";
-	  	case Gant _ -> "Une épée simple et basique.";
-	  	case Axe _ -> "Une épée simple et basique.";
+	  	case DespairShield _ -> "Un bouclier pas très gentil";
+	  	case Mimicry _ -> "GG, t'as finis le jeu";
+	  	case Massue _ -> "Une épée, mais c'est une masse";
+	  	case Gant _ -> "Un super gant pour l'hiver";
+	  	case Axe _ -> "Une HACHE AOUH AOUH";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
   
   private String getEffectItem(Item item) {
   	return switch (item) {
-	  	case KeyDoor _ -> "Une épée simple et basique."; 
-	  	case Gold g -> "Il y a " + g.value();
+	  	case KeyDoor _ -> "Déverouille une porte (1 fois)"; 
+	  	case Gold g -> "Il y a " + g.value() + " gold";
 	  	case Sword _ -> "1AP : Inflige -3 à l'ennemi";
-	  	case DespairShield _ -> "Une épée simple et basique.";
-	  	case Mimicry _ -> "Une épée simple et basique.";
-	  	case Massue _ -> "Une épée simple et basique.";
-	  	case Gant _ -> "Une épée simple et basique.";
-	  	case Axe _ -> "Une épée simple et basique.";
+	  	case DespairShield _ -> "1AP : Se met 10 Shield en échange de 3PV";
+	  	case Mimicry _ -> "-30 PV en échange de 5PV";
+	  	case Massue _ -> "2AP : Influge -30PV à l'ennemi en échange de 5PV";
+	  	case Gant _ -> "1AP : Régénère 10 PV";
+	  	case Axe _ -> "1AP : Inflige -10PV à l'ennemi";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -584,7 +585,7 @@ public record GameView(int width, int height, int tileSize) {
 													(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (tileSize * coord_acc.y()) + tileSize/2)));
   		}
   	}
-  	
+		
   	var shortestPath = data.getShortestPath();
   	if (shortestPath != null) {
   		graphics.setColor(Color.RED);
@@ -597,7 +598,7 @@ public record GameView(int width, int height, int tileSize) {
 						(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (tileSize * coord_acc.y()) + tileSize/2)));
   		}
   	}
-		
+  	
 		graphics.setColor(Color.WHITE);
 		var coord = data.map().getHeroPos();
 		graphics.drawImage(data.imgMap().get("ICON_HERO"), (int) (gap * coord.x()) + leftGrid.northWest().x() + (coord.x() * tileSize), (int) (gap * coord.y()) + leftGrid.northWest().y() + (coord.y() * tileSize), tileSize, tileSize, null);
@@ -612,7 +613,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param data     GameData containing the game data.
    */	
   private void updateDragItem(Graphics2D graphics, GameData data) {
-		data.dragItemLst().forEach((item, box) -> drawDrag(graphics, data, item, box));
+		GameDataClick.getDragItemMap().reversed().forEach((item, box) -> drawDrag(graphics, data, item, box));
   }
   
   /**
@@ -887,6 +888,43 @@ public record GameView(int width, int height, int tileSize) {
     }
   }
   
+  public static void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
+  	var bestWay = new ArrayList<XY>();
+  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
+  	heroMove(data.map().getGrid(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), bestWay, data.map());
+  	IO.println(bestWay.stream()
+  										.map(XY::toString)
+  										.collect(Collectors.joining(" -> ")));
+  	for (var coord : bestWay) {
+  		data.map().setHeroPos(coord);
+  		GameView.draw(context, data, view);
+  		try {
+				TimeUnit.MILLISECONDS.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+  	}
+  }
+  
+  private static void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
+  	IO.println("Meilleur : " + bestWay);
+  	if (coordCurrent.equals(coordFinal)) {
+  		if (currentWay.size() <= bestWay.size() || bestWay.isEmpty()) {
+  			bestWay.clear();
+  			bestWay.addAll(currentWay);
+  		}
+  	} else {
+  		for (var room : grid[coordCurrent.y()][coordCurrent.x()].getAccessible()) {
+  			if (floor.getHeroAccessible().contains(room) || floor.getHeroVisited().contains(room)) {
+  				if (!currentWay.contains(room)) {
+      			var newCurrentWay = new ArrayList<>(currentWay);
+      			newCurrentWay.add(room);
+      			heroMove(grid, room, coordFinal, bestWay, newCurrentWay, floor);
+      		}
+  			}
+    	}
+  	}
+  }
   
   private static void drawBinButton(Graphics2D graphics, GameData data) {
   	BufferedImage img = data.imgMap().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");
@@ -906,7 +944,7 @@ public record GameView(int width, int height, int tileSize) {
 			drawItemBag(graphics, data);
 			drawItemInfo(graphics, data);
 			drawBinButton(graphics, data);
-			if(!data.dragItemLst().isEmpty()) {
+			if(!GameDataClick.getDragItemMap().isEmpty()) {
 				updateDragItem(graphics, data);
 			}
 		} else {

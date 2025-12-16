@@ -49,7 +49,7 @@ public class GameDataCombat {
 		}
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
-		data.resetDragItemLst();
+		GameDataClick.resetDragItemLst();
 		lstEnemy = monsters;
 		totalExp = 0;
 		levelBeforeCombat = data.hero().getLevel();
@@ -104,6 +104,9 @@ public class GameDataCombat {
 					getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());	
 				}
 			}
+			if(data.hero().getEnergy_point() <= 0) {
+				enemyAction(data.hero());
+			}
 			if (lstEnemy.isEmpty()) {
 				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
 				GameDataHero.add("xp", totalExp);
@@ -114,11 +117,6 @@ public class GameDataCombat {
 				var itemGain = RandomItem.generate(data.floor());
 				GameDataClick.addDragItem(itemGain);
 				combat = false;
-			}
-			else {
-				if(data.hero().getEnergy_point() <= 0) {
-					enemyAction(data.hero());
-				}
 			}
 		});
 	}

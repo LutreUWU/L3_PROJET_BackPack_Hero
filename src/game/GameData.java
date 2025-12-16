@@ -1,6 +1,6 @@
 package game;
 import java.awt.image.BufferedImage;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +11,6 @@ import game.data.GameDataHero;
 import loader.ImageLoader;
 import loader.MathLoader;
 import model.Backpack;
-import model.BoundingBox;
 import model.Hero;
 import model.Item;
 import model.ItemRepository;
@@ -43,7 +42,6 @@ public class GameData {
    */
   private Item dragItem = null; 
   private boolean onBin = false;
-  private static LinkedHashMap<Item, BoundingBox> dragItemLst;
   /**
    * To know if we display map or bag
    * 
@@ -67,7 +65,7 @@ public class GameData {
   /**
    * Sortest Path
    */
-  private List<XY> shortestPath = null;
+  private List<XY> shortestPath = new ArrayList<>();
   /**
    * Initialize data of the game 
    * 
@@ -80,7 +78,6 @@ public class GameData {
 	  ItemRepository.createItemRepository();
 	  map = new Floor(floor);
 	  screenInfo = screenInfo_;
-	  dragItemLst = new LinkedHashMap<>();
 	  imgMap = ImageLoader.loadAllImage();
 	  new MathLoader(this);
     new GameDataHero(hero);
@@ -98,10 +95,6 @@ public class GameData {
   	} else {
   		mapOrBag = true;
   	}
-  }
-  
-  public void removeItemFromDrag(Item item) {
-  	dragItemLst.remove(item);
   }
   
   public List<XY> getShortestPath () {
@@ -217,17 +210,12 @@ public class GameData {
     return screenInfo;
   }
   
-  public LinkedHashMap<Item, BoundingBox> dragItemLst(){
-  	return dragItemLst;
-  }
   
   public Map<String, BufferedImage> imgMap(){
   	return imgMap;
   }
   
-  public void resetDragItemLst() {
-  	dragItemLst = new LinkedHashMap<>();
-  }
+
 
 	public XY getMouseCoord() {
 		return mouseCoord;

@@ -26,7 +26,7 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     private static XY[] initShape(XY coord, Direction direction) {
       XY[] b = new XY[3];
       b[0] = new XY(coord.x(), coord.y());
-      b[1] = new XY(coord.x(), coord.y()+- 1);
+      b[1] = new XY(coord.x(), coord.y() + 1);
       b[2] = new XY(coord.x(), coord.y() - 1);
       for (int i = 0; i < direction.ordinal(); i++) {
       	b = rotate90(b, b[0]);

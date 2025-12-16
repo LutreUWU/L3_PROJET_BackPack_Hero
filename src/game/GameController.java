@@ -212,7 +212,7 @@ public class GameController {
 
 					case Key.R -> {
 						if (data.dragItem() != null) {
-							data.removeItemFromDrag(data.dragItem());
+							GameDataClick.removeItemFromDrag(data.dragItem());
 							data.setDragItem(GameData.rotateItem(data.dragItem()));			
 							GameDataClick.addDragItem(data.dragItem());
 							GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());

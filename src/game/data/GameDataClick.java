@@ -34,7 +34,7 @@ public class GameDataClick {
 		data = dataGame;
 		backpack = data.bag();
 		screenInfo = data.screenInfo();
-		dragItemMap = data.dragItemLst();
+		dragItemMap = new LinkedHashMap<>();
 	}
 	
 	/**
@@ -229,6 +229,15 @@ public class GameDataClick {
 							 		 );
   }
   
+  
+  public static void removeItemFromDrag(Item item) {
+  	dragItemMap.remove(item);
+  }
+  
+  public static void resetDragItemLst() {
+  	dragItemMap = new LinkedHashMap<>();
+  }
+  
   public static void updateBoundingBox(Item item, int x, int y) {
   	int minX = x - (getWidth(item) * backpack.getGridSize() / 2);
     int minY = y - (getHeight(item) * backpack.getGridSize() / 2);
@@ -333,7 +342,7 @@ public class GameDataClick {
 		if (x >= NW.x() && x <= SE.x()) {
 			if (y >= NW.y() && y <= SE.y()) {
 				data.setBin(false);
-				data.dragItemLst().remove(data.dragItem());
+				removeItemFromDrag(data.dragItem());
 				return;
 			}
 		}
@@ -385,7 +394,7 @@ public class GameDataClick {
   	if (coord != null) {
 			var item = 	data.dragItem().setXY(GameDataClick.bagClick(x, y));
 			if (data.bag().addItemToBackpack(item)) {
-				data.removeItemFromDrag(data.dragItem());
+				removeItemFromDrag(data.dragItem());
 			} else {
 				// Merge gold
 				switch (data.dragItem()) {
@@ -396,7 +405,7 @@ public class GameDataClick {
 						data.bag().removeItemFromBackpack(goldCollide);
 						goldCollide = goldCollide.changeGoldValue(goldDrag.value());
 						data.bag().addItemToBackpack(goldCollide);
-						data.dragItemLst().remove(goldDrag);
+						removeItemFromDrag(goldDrag);
 						IO.println("Merge	gold : " + goldCollide.value());
 					} else {
 						GameDataClick.addDragItem(data.dragItem());
