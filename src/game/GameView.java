@@ -584,6 +584,19 @@ public record GameView(int width, int height, int tileSize) {
 													(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (tileSize * coord_acc.y()) + tileSize/2)));
   		}
   	}
+  	
+  	var shortestPath = data.getShortestPath();
+  	if (shortestPath != null) {
+  		graphics.setColor(Color.RED);
+  		for (int i = 0; i < shortestPath.size() - 1; i++) {
+  			var coord = shortestPath.get(i);
+  			var coord_acc = shortestPath.get(i + 1);
+  			graphics.drawLine((int) ((gap * coord.x()) + (leftGrid.northWest().x() + (tileSize * coord.x() + tileSize/2))), 
+						(int) ((gap * coord.y()) + (leftGrid.northWest().y() + (tileSize * coord.y() + tileSize/2))), 
+						(int) ((gap * coord_acc.x()) + (leftGrid.northWest().x() + (tileSize * coord_acc.x()) + tileSize/2)), 
+						(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (tileSize * coord_acc.y()) + tileSize/2)));
+  		}
+  	}
 		
 		graphics.setColor(Color.WHITE);
 		var coord = data.map().getHeroPos();
@@ -874,43 +887,6 @@ public record GameView(int width, int height, int tileSize) {
     }
   }
   
-  public static void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
-  	var bestWay = new ArrayList<XY>();
-  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
-  	heroMove(data.map().getGrid(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), bestWay, data.map());
-  	IO.println(bestWay.stream()
-  										.map(XY::toString)
-  										.collect(Collectors.joining(" -> ")));
-  	for (var coord : bestWay) {
-  		data.map().setHeroPos(coord);
-  		GameView.draw(context, data, view);
-  		try {
-				TimeUnit.MILLISECONDS.sleep(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-  	}
-  }
-  
-  private static void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
-  	IO.println("Meilleur : " + bestWay);
-  	if (coordCurrent.equals(coordFinal)) {
-  		if (currentWay.size() <= bestWay.size() || bestWay.isEmpty()) {
-  			bestWay.clear();
-  			bestWay.addAll(currentWay);
-  		}
-  	} else {
-  		for (var room : grid[coordCurrent.y()][coordCurrent.x()].getAccessible()) {
-  			if (floor.getHeroAccessible().contains(room) || floor.getHeroVisited().contains(room)) {
-  				if (!currentWay.contains(room)) {
-      			var newCurrentWay = new ArrayList<>(currentWay);
-      			newCurrentWay.add(room);
-      			heroMove(grid, room, coordFinal, bestWay, newCurrentWay, floor);
-      		}
-  			}
-    	}
-  	}
-  }
   
   private static void drawBinButton(Graphics2D graphics, GameData data) {
   	BufferedImage img = data.imgMap().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");

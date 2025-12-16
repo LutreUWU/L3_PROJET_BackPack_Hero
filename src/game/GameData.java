@@ -1,6 +1,7 @@
 package game;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.forax.zen.ScreenInfo;
@@ -62,7 +63,11 @@ public class GameData {
    * 
    */
   private final Map<String, BufferedImage> imgMap;
-
+  
+  /**
+   * Sortest Path
+   */
+  private List<XY> shortestPath = null;
   /**
    * Initialize data of the game 
    * 
@@ -97,6 +102,14 @@ public class GameData {
   
   public void removeItemFromDrag(Item item) {
   	dragItemLst.remove(item);
+  }
+  
+  public List<XY> getShortestPath () {
+  	return shortestPath;
+  }
+  
+  public void setShortestPath(List<XY> shortestPath2) {
+  	shortestPath = shortestPath2;
   }
   
   public static Item rotateItem(Item item) {

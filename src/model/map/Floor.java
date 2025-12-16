@@ -2,8 +2,11 @@ package model.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import model.XY;
 
@@ -214,6 +217,44 @@ public class Floor {
 		}
 	}
 
+	/**
+	 * Get the shortest Path
+	 * @param start
+	 * @param end
+	 * @return List of the best Way
+	 */
+	public List<XY> heroShortestPath(XY start, XY end) {
+		if (start.equals(end)) return List.of();
+		List<XY> queue = new ArrayList<>();
+		Set<XY> visited = new HashSet<>();
+		Map<XY, XY> parents = new HashMap<>();
+		List<XY> bestPath = new ArrayList<>();
+		
+		queue.add(start);
+		
+		while (queue.size() != 0) {
+			var first = queue.get(0);
+			for (var acc : grid[first.y()][first.x()].getAccessible()) {
+				if (!visited.contains(acc) && (heroAccessible.contains(acc) || heroVisited.contains(acc))) {
+					parents.put(acc, first);
+					queue.add(acc);
+					visited.add(acc);
+					if (acc.equals(end)) {
+						var enfant = acc;
+						while(!enfant.equals(start)) {
+							bestPath.add(enfant);
+							enfant = parents.get(enfant);
+						}
+						bestPath.add(enfant);
+						return List.copyOf(bestPath);
+					}
+				}
+			}
+			queue.remove(0);
+		}
+		return null;
+	}
+	
 	/**
 	 * Getter for grid
 	 * 

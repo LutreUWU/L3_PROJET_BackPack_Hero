@@ -3,6 +3,7 @@ package game;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;
@@ -105,7 +106,12 @@ public class GameController {
 						var coord = (XY) res.value();
 						if (coord.x() != -1 && coord.y() != -1) {
 							if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
-								GameView.heroMove(data, coord, context, view);
+								var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
+								data.setShortestPath(shortestPath);
+								IO.println(shortestPath);
+								IO.println(shortestPath.stream()
+																				.map(XY::toString)
+																				.collect(Collectors.joining(" --> ")));
 								data.map().setHeroPos(coord);
 								
 
