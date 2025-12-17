@@ -10,12 +10,13 @@ import model.Item;
 import model.RandomItem;
 import model.XY;
 import model.item.common.Gold;
+import model.map.eventManager.LinkedEvent;
 
 public final class Shop implements Room {
   private int floor;
   final private List<XY> accessible = new ArrayList<>();
   final private Map<Item, Integer> currentShop = new HashMap<>(); // Item : Price
-  
+
   /**
    * Constructor for the Shop
    * @param floor2
@@ -39,7 +40,6 @@ public final class Shop implements Room {
 					alreadyThere = true;
 				}
 			}
-			IO.println(currentShop);
 			// Créer une méthode pour calculer le prix en fonction du score et la rareté de l'item
 			if (!alreadyThere) currentShop.put(item, item.score()); 
 			alreadyThere = false;
@@ -55,6 +55,10 @@ public final class Shop implements Room {
   	GameDataClick.addDragItem(item);
   }
   
+  public Map<Item, Integer> getCurrentShop() {
+		return currentShop;
+	}
+  
   /**
 	 * Getter for accessibles
 	 * 
@@ -64,4 +68,5 @@ public final class Shop implements Room {
   public List<XY> getAccessible(){
 		return accessible;
 	}
+	
 }

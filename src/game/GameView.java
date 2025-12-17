@@ -10,8 +10,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import com.github.forax.zen.ApplicationContext;
 
@@ -72,10 +72,6 @@ public record GameView(int width, int height, int tileSize) {
    * @param data			GameData containing the game data. 
 	 */
 	private void drawBG(Graphics2D graphics, GameData data) {
-    // A ENLEVER
-		graphics.setColor(Color.GRAY);
-		graphics.fill(new Rectangle2D.Double(0, 0, width, height));
-		/////////////
 		BufferedImage img = data.imgMap().get("BG1");
 		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
 	}
@@ -272,7 +268,7 @@ public record GameView(int width, int height, int tileSize) {
   private String getEffectItem(Item item) {
   	return switch (item) {
 	  	case KeyDoor _ -> "Déverouille une porte (1 fois)"; 
-	  	case Gold g -> "Il y a " + g.value() + " gold";
+	  	case Gold g -> "Il y a " + g.value() + "gold";
 	  	case Sword _ -> "1AP : Inflige -3 à l'ennemi";
 	  	case DespairShield _ -> "1AP : Se met 10 Shield en échange de 3PV";
 	  	case Mimicry _ -> "-30 PV en échange de 5PV";
@@ -386,8 +382,10 @@ public record GameView(int width, int height, int tileSize) {
   private void drawHero(Graphics2D graphics, GameData data) {
   	double size_x = data.hero().getSizeX();
   	double size_y = data.hero().getSizeY();
-		BufferedImage img = data.imgMap().get("Roland");
-		drawElement(graphics, img, width * 0.20, height * 0.50, size_x, size_y, Direction.UP);
+  	if (!data.getShop()) {
+  		BufferedImage img = data.imgMap().get("Roland");
+  		drawElement(graphics, img, width * 0.20, height * 0.50, size_x, size_y, Direction.UP);
+  	}
 		drawHeroStats(graphics, data, (int) (width * 0.20 + size_x/2),  (int) (height * 0.50 + size_y));
   }
   
@@ -835,17 +833,17 @@ public record GameView(int width, int height, int tileSize) {
   		var img3 = data.imgMap().get("BG_CHOICE_END");
   		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
   		graphics.drawImage(img3, event3.transform(), null);
-		  drawTextEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+		  drawText(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
 		  															(int) event3.box().northWest().x() + width / 2, 
 		  															(int) (event3.box().northWest().y() + height * 0.5), 30);
   	}
   	else {
   		graphics.drawImage(img1, event1.transform(), null);
-  	  drawTextEvent(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+  	  drawText(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
   	  															(int) event1.box().northWest().x() + width / 2, 
   	  															(int) (event1.box().northWest().y() + height * 0.5), 30);
   		graphics.drawImage(img2, event2.transform(), null);
-  	  drawTextEvent(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
+  	  drawText(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
   	  															(int) event2.box().northWest().x() + width / 2, 
   	  															(int) (event2.box().northWest().y() + height * 0.5), 30);
   	}
@@ -862,7 +860,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param y				 The y coordinate of the text
    * @param maxChar  Number of char max per line
    */
-  private void drawTextEvent(Graphics2D graphics, GameData data, String content, int x, int y, int maxChar) {
+  private static void drawText(Graphics2D graphics, GameData data, String content, int x, int y, int maxChar) {
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
@@ -890,11 +888,11 @@ public record GameView(int width, int height, int tileSize) {
   
   public static void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
   	var bestWay = new ArrayList<XY>();
-  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
+//  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
   	heroMove(data.map().getGrid(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), bestWay, data.map());
-  	IO.println(bestWay.stream()
-  										.map(XY::toString)
-  										.collect(Collectors.joining(" -> ")));
+//  	IO.println(bestWay.stream()
+//  										.map(XY::toString)
+//  										.collect(Collectors.joining(" -> ")));
   	for (var coord : bestWay) {
   		data.map().setHeroPos(coord);
   		GameView.draw(context, data, view);
@@ -907,7 +905,7 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private static void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
-  	IO.println("Meilleur : " + bestWay);
+//  	IO.println("Meilleur : " + bestWay);
   	if (coordCurrent.equals(coordFinal)) {
   		if (currentWay.size() <= bestWay.size() || bestWay.isEmpty()) {
   			bestWay.clear();
@@ -931,6 +929,25 @@ public record GameView(int width, int height, int tileSize) {
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_BIN_CLOSE").transform(), null);
   }
   
+  private static void drawShop(Graphics2D graphics, GameData data) {
+  	BufferedImage img = data.imgMap().get("BG_SHOP");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("BG_SHOP").transform(), null);
+    drawTextBubble(graphics, data);
+  	img = data.imgMap().get("RolandBody");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("RolandBody").transform(), null);
+  	img = data.imgMap().get("ICON_EXIT_SHOP");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
+  }
+  
+  private static void drawTextBubble(Graphics2D graphics, GameData data) {
+    var bubbleBox = MathLoader.getMapEvent().get("BG_SHOP_BUBBLE").box();
+    int centerX = (bubbleBox.southEast().x() - bubbleBox.northWest().x()) / 2 ;
+    int centerY = (bubbleBox.southEast().y() - bubbleBox.northWest().y()) / 2;
+    int x = bubbleBox.northWest().x() + centerX;
+    int y = bubbleBox.northWest().y() + centerY;
+    drawText(graphics, data, "Bienvenues au shop mon frère", x, y, 23);
+  }
+  
   /**
    * Methods for drawing the game 
    * 
@@ -946,6 +963,9 @@ public record GameView(int width, int height, int tileSize) {
 			drawBinButton(graphics, data);
 			if(!GameDataClick.getDragItemMap().isEmpty()) {
 				updateDragItem(graphics, data);
+			}
+			if (data.getShop()) {
+				drawShop(graphics, data);
 			}
 		} else {
 			drawMap(graphics, data);

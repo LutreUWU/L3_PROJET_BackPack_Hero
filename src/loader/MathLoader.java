@@ -31,6 +31,7 @@ public class MathLoader {
 		getEventValue();	
 		getEndTurnValue();
 		getBinValue();
+		getShopValue();
 	}
 	
 // ================= ICON =====================
@@ -287,5 +288,61 @@ public class MathLoader {
 		img = data.imgMap().get("BG_BIN_OPEN");	
 	  renderDataGame.put("BG_BIN_OPEN", new RenderData(transform, boundingBox));
 	}	
+// ===================
+	
+//================= Shop =====================
+	private static void getShopValue() {
+		var img = data.imgMap().get("BG_SHOP");	
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scale = (screenHeight * 0.60) / height;
+		AffineTransform transform = new AffineTransform();
+	  double posX = screenWidth - (width * scale);
+	  double posY = screenHeight - (height * scale);
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
+	  renderDataGame.put("BG_SHOP", new RenderData(transform, boundingBox));
+	  getCharacterValue(width * scale, height * scale);
+	  getBubbleShopValue(width * scale, height * scale);
+	  getExitShopValue(width * scale, height * scale);
+	}	
+	
+	private static void getCharacterValue(double shopWidth, double shopHeight) {
+		var img = data.imgMap().get("RolandBody");
+		int width = img.getWidth();
+		int height = img.getHeight();
+		AffineTransform transform = new AffineTransform();
+	  double posX = screenWidth / 2 - (width / 2);
+	  double posY = screenHeight * 0.65;
+	  transform.translate(posX, posY);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width), screenHeight));
+	  renderDataGame.put("RolandBody", new RenderData(transform, boundingBox));
+	}
+	
+	private static void getBubbleShopValue(double shopWidth, double shopHeight) {
+		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
+		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.15;
+		double posY = shopBoundingBox.northWest().y() + shopHeight * 0.68;
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + shopWidth * 0.48), (int) (posY + shopHeight*0.17)));
+	  renderDataGame.put("BG_SHOP_BUBBLE", new RenderData(null, boundingBox));
+	}
+	
+	private static void getExitShopValue(double shopWidth, double shopHeight) {
+		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
+		var img = data.imgMap().get("ICON_EXIT_SHOP");
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scale = (screenHeight * 0.10) / height;
+	  double posX = shopBoundingBox.northWest().x() - (width*scale / 3);
+	  double posY = shopBoundingBox.northWest().y();
+		AffineTransform transform = new AffineTransform();
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width * scale), (int) (posY + height * scale)));
+	  renderDataGame.put("ICON_EXIT_SHOP", new RenderData(transform, boundingBox));
+	}
+	
+//===================
 
 }

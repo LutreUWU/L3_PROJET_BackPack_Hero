@@ -44,7 +44,7 @@ public class ImageLoader {
 		addFolder("data/item/weapon");
 		addFolder("data/item/other");
 		addFolder("data/icon");
-		bgImages.put("Roland", loadImg(new File("data/Roland.png")));
+		addFolder("data/Hero");
 		return bgImages;
 	}
 }

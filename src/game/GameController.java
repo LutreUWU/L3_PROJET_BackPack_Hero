@@ -14,6 +14,7 @@ import com.github.forax.zen.PointerEvent;
 
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
+import game.data.GameDataShop;
 import loader.FontLoader;
 import model.Item;
 import model.XY;
@@ -25,6 +26,7 @@ import model.map.EventRoom;
 import model.map.Exit;
 import model.map.Healer;
 import model.map.LockedDoor;
+import model.map.Shop;
 import model.map.Treasure;
 import model.monster.Chicken;
 import model.monster.Robot;
@@ -77,7 +79,7 @@ public class GameController {
 						GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
 					}
 					case MAP_OR_BAG -> {
-						if (!GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
+						if (!data.getShop() && !GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
 							data.swapMapOrBag();
 						}
 					}
@@ -113,8 +115,6 @@ public class GameController {
 																				.map(XY::toString)
 																				.collect(Collectors.joining(" --> ")));
 								data.map().setHeroPos(coord);
-								
-
 								var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
 								switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
 								case EnemyRoom room -> {
@@ -157,6 +157,10 @@ public class GameController {
 									var linkedEvent = roomExit.getEvent();
 									data.inEvent(linkedEvent);
 									data.map().updateMap(coord);
+								}
+								case Shop shop -> {
+									data.setShop(true);
+									new GameDataShop(shop, true, data);
 								}
 								default -> {
 									data.map().updateMap(coord);

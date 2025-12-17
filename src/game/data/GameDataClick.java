@@ -348,6 +348,19 @@ public class GameDataClick {
 		}
   }
   
+  private static void exitButtonClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("ICON_EXIT_SHOP").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.setShop(false);
+				removeItemFromDrag(data.dragItem());
+				return;
+			}
+		}
+  }
+  
   /**
    * Main function treating the click and returning information about what we clicks.
    * 
@@ -386,6 +399,10 @@ public class GameDataClick {
       mobClick(x, y);
       endButtonClick(x, y);
     }
+    if (data.getShop()) {
+    	exitButtonClick(x, y);
+    }
+    
     return new ClickResult(ClickType.NOTHING, null);
   }
   

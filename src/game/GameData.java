@@ -49,6 +49,7 @@ public class GameData {
    * - true : bag
    */
   private boolean mapOrBag = true;
+  private boolean shop = false;
   /**
    * To know if we're wurrently in a event or no
    * 
@@ -227,6 +228,15 @@ public class GameData {
 	
 	public void setBin(boolean statut) {
 		this.onBin = statut;
+	}
+	
+	public boolean getShop() {
+		return shop;
+	}
+	
+	public void setShop(boolean statut) {
+		if (statut) swapMapOrBag();
+		this.shop = statut;
 	}
 	
 	public boolean getBin() {
