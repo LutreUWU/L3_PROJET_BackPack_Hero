@@ -2,25 +2,23 @@ package model.item.superrare;
 
 import java.util.ArrayList;
 
+import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
 		public Massue() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.SUPERARE, 6, 10);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.SUPERARE, 6, 10, 4);
 	  }
 	
-		public Massue(XY coord, Direction direction) {
-      this(initShape(coord, direction), direction, Rarity.SUPERARE, 6, 10);
-    }
-		
-		public Massue(XY[] shape, Direction direction) {
-      this(shape, direction, Rarity.SUPERARE, 6, 10);
+		public Massue(XY coord, Direction direction, int durability) {
+      this(initShape(coord, direction), direction, Rarity.SUPERARE, 6, 10, durability);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -47,20 +45,38 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     }
     
     @Override
+    public Item addDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Massue(shape, direction, rarity, ID, score, durability + nb); 
+    }
+    
+    @Override
+    public Item subDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Massue(shape, direction, rarity, ID, score, durability - nb); 
+    }
+    
+    @Override
+    public boolean canMerge() {
+    	return false;
+    }
+    
+    @Override
     public Massue setXY(XY coord) {
-      return new Massue(coord, direction);
+      return new Massue(coord, direction, durability);
     }
 
     @Override
-    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
       GameDataHero.sub("energy", 1);
       enemy.subHP(5);
+      return subDurability(1);
     }
     
     @Override
     public Massue rotateXY() {
-      return new Massue(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+      return new Massue(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
     }
 
 

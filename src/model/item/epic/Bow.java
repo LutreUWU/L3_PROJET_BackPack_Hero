@@ -12,13 +12,13 @@ import model.XY;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
-	public DespairShield() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.EPIC, 4, 10, 3);
+public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
+	public Bow() {
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.EPIC, 10, 15, 10);
   }
 
-	public DespairShield(XY coord, Direction direction, int durability) {
-    this(initShape(coord, direction), direction, Rarity.EPIC, 4, 10, durability);
+	public Bow(XY coord, Direction direction, int durability) {
+    this(initShape(coord, direction), direction, Rarity.EPIC, 10, 15, durability);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {
@@ -48,13 +48,13 @@ public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int 
   @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new DespairShield(shape, direction, rarity, ID, score, durability + nb); 
+  	return new Bow(shape, direction, rarity, ID, score, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new DespairShield(shape, direction, rarity, ID, score, durability - nb); 
+  	return new Bow(shape, direction, rarity, ID, score, durability - nb); 
   }
   
   @Override
@@ -63,25 +63,23 @@ public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int 
   }
   
   @Override
-  public DespairShield setXY(XY coord) {
-    return new DespairShield(coord, direction, durability);
+  public Bow setXY(XY coord) {
+    return new Bow(coord, direction, durability);
   }
 
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
-    GameDataCombat.addLog("Le héro gagne 10 Shield, mais en échange de 3PV ...");
-    GameDataHero.sub("energy", 1);
-    enemy.subHP(3);
-    return subDurability(1);
+    GameDataCombat.addLog("Cliquez sur les flèches pour tirer !");
+    return new Bow(shape, direction, rarity, ID, score, durability);
   }
   
   @Override
-  public DespairShield rotateXY() {
-    return new DespairShield(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
+  public Bow rotateXY() {
+    return new Bow(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
   }
 
   @Override
   public String toString() {
-    return "Despair";
+    return "Bow";
   }
 }

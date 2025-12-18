@@ -413,6 +413,30 @@ public class GameDataClick {
 			if (data.bag().addItemToBackpack(item)) {
 				removeItemFromDrag(data.dragItem());
 			} else {
+				var itemDrag = data.dragItem();
+				var colideItem = data.bag().getItem(coord.x(), coord.y());
+				if (item.canMerge()) {
+					if (colideItem != null && itemDrag.ID() == colideItem.ID()) {
+						switch(itemDrag) {
+						case Gold goldDrag -> {
+							var goldCollide = (Gold) colideItem;
+							data.bag().removeItemFromBackpack(goldCollide);
+							goldCollide = goldCollide.changeGoldValue(goldDrag.value());
+							data.bag().addItemToBackpack(goldCollide);
+						}
+						default -> {
+							data.bag().removeItemFromBackpack(colideItem);
+							colideItem = colideItem.addDurability(itemDrag.durability());
+							IO.println(colideItem);
+							data.bag().addItemToBackpack(colideItem);
+						}
+						}
+						removeItemFromDrag(itemDrag);
+					}
+				} else {
+					GameDataClick.addDragItem(data.dragItem());
+				}
+				/*
 				// Merge gold
 				switch (data.dragItem()) {
 				case Gold goldDrag -> {
@@ -432,8 +456,8 @@ public class GameDataClick {
 					GameDataClick.addDragItem(data.dragItem());
 					}
 				}
+				*/
 			}
-			return;
   	}
   	if (!GameDataCombat.combat()) {
   		binClick(x, y);

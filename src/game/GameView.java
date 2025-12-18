@@ -23,9 +23,11 @@ import model.BoundingBox;
 import model.Direction;
 import model.Item;
 import model.XY;
+import model.item.common.Arrow;
 import model.item.common.Gold;
 import model.item.common.KeyDoor;
 import model.item.common.Sword;
+import model.item.epic.Bow;
 import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
@@ -237,6 +239,8 @@ public record GameView(int width, int height, int tileSize) {
 				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMap().get("massue")); 
 				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
 				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
+				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("arrow"));
+				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMap().get("bow"), 0.25, 0.25);
 				default ->{}
 		  }
 		}
@@ -244,7 +248,7 @@ public record GameView(int width, int height, int tileSize) {
   
   private void drawItemGold(Graphics2D graphics, GameData data, XY coordinate, Item item) {
   	var itemGold = (Gold) item;
-  	switch (itemGold.sizeCount()) {
+  	switch (getSizeGold(itemGold.value())) {
   	case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold3"));
   	case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold2"));
   	default -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold1"));
@@ -261,20 +265,25 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Massue _ -> "Une épée, mais c'est une masse";
 	  	case Gant _ -> "Un super gant pour l'hiver";
 	  	case Axe _ -> "Une HACHE AOUH AOUH";
+	  	case Arrow _ -> "Des flèches volées à Steeve";
+	  	case Bow _ -> "Un arc volé à Steeve";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
   
   private String getEffectItem(Item item) {
+  	var durabilityOrQuantityString = (item.canMerge() ? "Quantité : " : "Durabilité : ") + item.durability() + " ";
   	return switch (item) {
-	  	case KeyDoor _ -> "Déverouille une porte (1 fois)"; 
+	  	case KeyDoor _ -> durabilityOrQuantityString + "Déverouille une porte (1 fois)"; 
 	  	case Gold g -> "Il y a " + g.value() + "gold";
-	  	case Sword _ -> "1AP : Inflige -3 à l'ennemi";
-	  	case DespairShield _ -> "1AP : Se met 10 Shield en échange de 3PV";
-	  	case Mimicry _ -> "-30 PV en échange de 5PV";
-	  	case Massue _ -> "2AP : Influge -30PV à l'ennemi en échange de 5PV";
-	  	case Gant _ -> "1AP : Régénère 10 PV";
-	  	case Axe _ -> "1AP : Inflige -10PV à l'ennemi";
+	  	case Sword _ -> durabilityOrQuantityString + "1AP : Inflige -3 à l'ennemi";
+	  	case DespairShield _ -> durabilityOrQuantityString + "1AP : Se met 10 Shield en échange de 3PV";
+	  	case Mimicry _ -> durabilityOrQuantityString + "-30 PV en échange de 5PV";
+	  	case Massue _ -> durabilityOrQuantityString + "2AP : Influge -30PV à l'ennemi en échange de 5PV";
+	  	case Gant _ -> durabilityOrQuantityString + "1AP : Régénère 10 PV";
+	  	case Axe _ -> durabilityOrQuantityString + "1AP : Inflige -10PV à l'ennemi";
+	  	case Arrow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
+	  	case Bow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -633,13 +642,21 @@ public record GameView(int width, int height, int tileSize) {
 			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMap().get("massue")); 
 			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
 			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
+			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("arrow"));
+			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMap().get("bow"), 0.25, 0.25); 
 			default ->{}
 	  }
 	}
   
+  private int getSizeGold(int value) {
+  	if (value <= 15) return 1;
+  	else if (value <= 50) return 2;
+  	else return 3;
+  }
+  
   private void drawDragGold(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
   	var itemGold = (Gold) item;
-  	switch (itemGold.sizeCount()) {
+  	switch (getSizeGold(itemGold.value())) {
   	case 3 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold3"));
   	case 2 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold2")); 
   	default -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold1"));

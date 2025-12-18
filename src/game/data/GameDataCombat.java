@@ -1,6 +1,7 @@
 package game.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,14 +84,22 @@ public class GameDataCombat {
 	 */
 	public static void heroAction(GameData data, XY coord) {
 		Objects.requireNonNull(data);
+		Objects.requireNonNull(coord);
 		log = new ArrayList<>();
-		int id = data.bag().grid()[coord.y()][coord.x()];
-		// A changer, pas ouf je pense
-		Optional<Item> weapon = data.bag().bagItemLst().stream()
+		// int id = data.bag().grid()[coord.y()][coord.x()];
+		// A changer, pas ouf je pense (Je change :), ca posait problème si on avait deux fois le meme item)
+		/*Optional<Item> weapon = data.bag().bagItemLst().stream()
 																											 .filter(item -> item.ID() == id)
-																											 .findFirst();
+																											 .findFirst();*/
+		/*
 		weapon.ifPresent(item -> {
 			item.use(target, lstEnemy);
+			*/
+		var item = data.bag().getItem(coord.x(), coord.y());
+			data.bag().removeItemFromBackpack(item);
+			var newItem = item.use(target, lstEnemy, data);
+			if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
+			
 			Iterator<Enemy> it = lstEnemy.iterator();
 			while (it.hasNext()) {
 		    Enemy enemy = it.next();
@@ -117,8 +126,8 @@ public class GameDataCombat {
 				var itemGain = RandomItem.generate(data.floor());
 				GameDataClick.addDragItem(itemGain);
 				combat = false;
-			}
-		});
+			
+		}
 	}
 	
 	public static void enemyAction(Hero hero) {

@@ -2,10 +2,13 @@ package model.item.common;
 
 import java.util.ArrayList;
 
+import game.GameData;
+import game.data.GameDataCombat;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
 public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
@@ -17,9 +20,6 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
       this(initShape(coord, direction), direction, Rarity.COMMON, 1, -1);
     }
 		
-		public KeyDoor(XY[] shape, Direction direction) {
-      this(shape, direction, Rarity.COMMON, 1, -1);
-    }
 
     private static XY[] initShape(XY coord, Direction direction) {
       XY[] b = new XY[2];
@@ -44,13 +44,34 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
     }
     
     @Override
+    public Item addDurability(int nb) {
+    	return null; 
+    }
+    
+    @Override
+    public Item subDurability(int nb) {
+    	return null;
+    }
+    
+    @Override
+    public boolean canMerge() {
+    	return false;
+    }
+    
+    @Override
     public KeyDoor setXY(XY coord) {
       return new KeyDoor(coord, direction);
     }
 
     @Override
-    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-      //
+    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    	GameDataCombat.addLog("Garde ta clef précieusement au lieu de jouer avec !");
+      return new KeyDoor(shape, direction, rarity, ID, score);
+    }
+    
+    @Override
+    public int durability() {
+      return -1;
     }
     
     @Override

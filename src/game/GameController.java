@@ -18,7 +18,10 @@ import game.data.GameDataShop;
 import loader.FontLoader;
 import model.Item;
 import model.XY;
+import model.item.common.Arrow;
 import model.item.common.Gold;
+import model.item.common.KeyDoor;
+import model.item.epic.Bow;
 import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.map.EnemyRoom;
@@ -161,10 +164,9 @@ public class GameController {
 								case Shop shop -> {
 									data.setShop(true);
 									new GameDataShop(shop, true, data);
-								}
-								default -> {
 									data.map().updateMap(coord);
 								}
+								default -> {}
 								}
 							}
 						}
@@ -203,9 +205,9 @@ public class GameController {
 					switch (key.key()) {
 					case Key.A -> {
 						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-							GameDataClick.addDragItem(new Axe());
 							GameDataClick.addDragItem(new Gold(12));
-							GameDataClick.addDragItem(new DespairShield());
+							GameDataClick.addDragItem(new Bow());
+							GameDataClick.addDragItem(new Arrow());
 						}
 					}
 					case Key.I -> {

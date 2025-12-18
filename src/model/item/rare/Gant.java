@@ -2,25 +2,23 @@ package model.item.rare;
 
 import java.util.ArrayList;
 
+import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
 		public Gant() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 7, 10);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 7, 10, 5);
 	  }
 	
-		public Gant(XY coord, Direction direction) {
-      this(initShape(coord, direction), direction, Rarity.RARE, 7, 10);
-    }
-		
-		public Gant(XY[] shape, Direction direction) {
-      this(shape, direction, Rarity.RARE, 7, 10);
+		public Gant(XY coord, Direction direction, int durability) {
+      this(initShape(coord, direction), direction, Rarity.RARE, 7, 10, durability);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -46,21 +44,39 @@ public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int s
     }
     
     @Override
+    public Item addDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Gant(shape, direction, rarity, ID, score, durability + nb); 
+    }
+    
+    @Override
+    public Item subDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Gant(shape, direction, rarity, ID, score, durability - nb); 
+    }
+    
+    @Override
+    public boolean canMerge() {
+    	return false;
+    }
+    
+    @Override
     public Gant setXY(XY coord) {
-      return new Gant(coord, direction);
+      return new Gant(coord, direction, durability);
     }
 
     @Override
-    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro porte de super gant ! Il gagne 10 PV");
       GameDataHero.sub("energy", 1);
       GameDataHero.add("hp", 10);
       enemy.subHP(30);
+      return subDurability(1);
     }
     
     @Override
     public Gant rotateXY() {
-      return new Gant(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+      return new Gant(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
     }
 
 

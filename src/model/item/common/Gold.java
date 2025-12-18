@@ -2,23 +2,23 @@ package model.item.common;
 
 import java.util.ArrayList;
 
+import game.GameData;
+import game.data.GameDataCombat;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int value, int sizeCount) implements Item{
-		public Gold(int value) {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 2, -1, value, 1);
+public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int value) implements Item{
+	
+	public Gold(int value) {
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 2, -1, value);
 	  }
 	
 		public Gold(XY coord, Direction direction, int value) {
-      this(initShape(coord, direction), direction, Rarity.COMMON, 2, -1, value, getSizeValue(value));
-    }
-		
-		public Gold(XY[] shape, Direction direction, int value) {
-      this(shape, direction, Rarity.COMMON, 2, -1, value, getSizeValue(value));
+      this(initShape(coord, direction), direction, Rarity.COMMON, 2, -1, value);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -34,15 +34,24 @@ public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int s
       return shape;
     }
     
-    private static int getSizeValue(int value) {
-    	if (value <= 15) return 1;
-    	else if (value <= 50) return 2;
-    	else return 3;
-    }
-    
     public Gold changeGoldValue(int value2) {
     	int finalValue = value + value2;
-    	return new Gold(shape, direction, rarity, ID, score, finalValue, getSizeValue(finalValue));
+    	return new Gold(shape, direction, rarity, ID, score, finalValue);
+    }
+    
+    @Override
+    public Item addDurability(int nb) {
+    	return null; 
+    }
+    
+    @Override
+    public Item subDurability(int nb) {
+    	return null; 
+    }
+    
+    @Override
+    public boolean canMerge() {
+    	return true;
     }
     
     @Override
@@ -51,13 +60,19 @@ public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int s
     }
 
     @Override
-    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
-      //
+    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    	GameDataCombat.addLog("Tu comptes lui jeter des pièces dessus ????");
+    	return new Gold(shape, direction, rarity, ID, score, value);
     }
     
     @Override
     public Gold rotateXY() {
-      return new Gold(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, value, sizeCount);
+      return new Gold(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, value);
+    }
+    
+    @Override
+    public int durability() {
+      return -1;
     }
 
 

@@ -2,25 +2,23 @@ package model.item.common;
 
 import java.util.ArrayList;
 
+import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
 	public Sword() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 3, 10);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 3, 10, 3);
   }
 
-	public Sword(XY coord, Direction direction) {
-    this(initShape(coord, direction), direction, Rarity.COMMON, 3, 10);
-  }
-	
-	public Sword(XY[] shape, Direction direction) {
-    this(shape, direction, Rarity.COMMON, 3, 10);
+	public Sword(XY coord, Direction direction, int durability) {
+    this(initShape(coord, direction), direction, Rarity.COMMON, 3, 10, durability);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {
@@ -47,20 +45,38 @@ public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   }
   
   @Override
+  public Item addDurability(int nb) {
+  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	return new Sword(shape, direction, rarity, ID, score, durability + nb); 
+  }
+  
+  @Override
+  public Item subDurability(int nb) {
+  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	return new Sword(shape, direction, rarity, ID, score, durability - nb); 
+  }
+  
+  @Override
+  public boolean canMerge() {
+  	return false;
+  }
+  
+  @Override
   public Sword setXY(XY coord) {
-    return new Sword(coord, direction);
+    return new Sword(coord, direction, durability);
   }
 
   @Override
-  public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée");
     GameDataHero.sub("energy", 1);
     enemy.subHP(3);
+    return subDurability(1);
   }
   
   @Override
   public Sword rotateXY() {
-    return new Sword(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+    return new Sword(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
   }
 
 

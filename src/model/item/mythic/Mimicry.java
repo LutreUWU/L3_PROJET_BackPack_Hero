@@ -2,25 +2,23 @@ package model.item.mythic;
 
 import java.util.ArrayList;
 
+import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
 		public Mimicry() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.MYTHIC, 5, 100);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.MYTHIC, 5, 100, 2);
 	  }
 	
-		public Mimicry(XY coord, Direction direction) {
-      this(initShape(coord, direction), direction, Rarity.MYTHIC, 5, 100);
-    }
-		
-		public Mimicry(XY[] shape, Direction direction) {
-      this(shape, direction, Rarity.MYTHIC, 5, 100);
+		public Mimicry(XY coord, Direction direction, int durability) {
+      this(initShape(coord, direction), direction, Rarity.MYTHIC, 5, 100, durability);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -47,21 +45,39 @@ public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, in
     }
     
     @Override
+    public Item addDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Mimicry(shape, direction, rarity, ID, score, durability + nb); 
+    }
+    
+    @Override
+    public Item subDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Mimicry(shape, direction, rarity, ID, score, durability - nb); 
+    }
+    
+    @Override
+    public boolean canMerge() {
+    	return false;
+    }
+    
+    @Override
     public Mimicry setXY(XY coord) {
-      return new Mimicry(coord, direction);
+      return new Mimicry(coord, direction, durability);
     }
 
     @Override
-    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro FOUDROIE " + enemy + " (-30PV), mais en échange de 5PV");
       GameDataHero.sub("energy", 2);
       GameDataHero.sub("hp", 5);
       enemy.subHP(30);
+      return subDurability(1);
     }
     
     @Override
     public Mimicry rotateXY() {
-      return new Mimicry(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+      return new Mimicry(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
     }
 
 

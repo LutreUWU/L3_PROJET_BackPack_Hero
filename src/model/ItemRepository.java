@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.item.common.Arrow;
 import model.item.common.Gold;
+import model.item.epic.Bow;
 import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
@@ -22,10 +24,12 @@ public class ItemRepository {
     
     // Trier du moins rare au plus rare
     public static void createItemRepository() {
-  	  registerWeapon(new Gold(1)); // Common 
+  	  registerWeapon(new Gold(10)); // Common 
+  	  registerWeapon(new Arrow()); // Common 
   	  registerWeapon(new Gant()); // Rare
   	  registerWeapon(new Massue()); // SuperRare
   	  registerWeapon(new DespairShield()); // Epic
+  	  registerWeapon(new Bow()); // Epic
   	  registerWeapon(new Axe()); // Legendary
   	  registerWeapon(new Mimicry()); // Mythics
   	  createRankingWeapon();

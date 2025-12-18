@@ -2,6 +2,7 @@ package model.item.legendary;
 
 import java.util.ArrayList;
 
+import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Direction;
@@ -10,18 +11,14 @@ import model.Rarity;
 import model.XY;
 import model.monster.Enemy;
 
-public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
 
 		public Axe() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.LEGENDARY, 8, 15);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.LEGENDARY, 8, 15, 3);
 	  }
 	
-		public Axe(XY coord, Direction direction) {
-      this(initShape(coord, direction), direction, Rarity.LEGENDARY, 8, 15);
-    }
-		
-		public Axe(XY[] shape, Direction direction) {
-      this(shape, direction, Rarity.LEGENDARY, 8, 15);
+		public Axe(XY coord, Direction direction, int durability) {
+      this(initShape(coord, direction), direction, Rarity.LEGENDARY, 8, 15, durability);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -50,20 +47,38 @@ public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
     }
     
     @Override
+    public Item addDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Axe(shape, direction, rarity, ID, score, durability + nb); 
+    }
+    
+    @Override
+    public Item subDurability(int nb) {
+    	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+    	return new Axe(shape, direction, rarity, ID, score, durability - nb); 
+    }
+    
+    @Override
+    public boolean canMerge() {
+    	return false;
+    }
+    
+    @Override
     public Axe setXY(XY coord) {
-      return new Axe(coord, direction);
+      return new Axe(coord, direction, durability);
     }
 
     @Override
-    public void use(Enemy enemy, ArrayList<Enemy> lstEnemy) {
+    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro EXPLOSE " + enemy + " avec SA GROSSE HACHE (-10PV)");
       GameDataHero.sub("energy", 1);
       enemy.subHP(10);
+      return subDurability(1);
     }
     
     @Override
     public Axe rotateXY() {
-      return new Axe(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+      return new Axe(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
     }
 
 
