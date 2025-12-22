@@ -32,6 +32,8 @@ import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
 import model.item.rare.Gant;
+import model.item.rare.PoisonArrow;
+import model.item.superrare.Bomb;
 import model.item.superrare.Massue;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
@@ -241,6 +243,8 @@ public record GameView(int width, int height, int tileSize) {
 				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
 				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("arrow"));
 				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMap().get("bow"), 0.25, 0.25);
+				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("poisonArrow"));
+				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("bomb"));
 				default ->{}
 		  }
 		}
@@ -267,6 +271,8 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Axe _ -> "Une HACHE AOUH AOUH";
 	  	case Arrow _ -> "Des flèches volées à Steeve";
 	  	case Bow _ -> "Un arc volé à Steeve";
+	  	case PoisonArrow _ -> "Des flèches volées à Steeve";
+	  	case Bomb _ -> "Bombe volé à Mario";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -283,7 +289,9 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Gant _ -> durabilityOrQuantityString + "1AP : Régénère 10 PV";
 	  	case Axe _ -> durabilityOrQuantityString + "1AP : Inflige -10PV à l'ennemi";
 	  	case Arrow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
+	  	case PoisonArrow _ -> durabilityOrQuantityString + "1AP : Inflige -6PV à l'ennemi et empoisonne l'ennemi";
 	  	case Bow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
+	  	case Bomb _ -> durabilityOrQuantityString + "2AP : Inflige -6PV à tous les ennemies";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -644,6 +652,8 @@ public record GameView(int width, int height, int tileSize) {
 			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
 			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("arrow"));
 			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMap().get("bow"), 0.25, 0.25); 
+			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("poisonArrow"));
+			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("bomb"));
 			default ->{}
 	  }
 	}
@@ -789,6 +799,11 @@ public record GameView(int width, int height, int tileSize) {
 	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
 	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
 	  graphics.drawString("ACTION : " + String.valueOf(enemy.getAction()), x,	y + size * 3);
+	  var i = 0;
+	  for (var effect : enemy.getEffects().keySet()) {
+	  	i++;
+	  	graphics.drawString(effect + " : " + enemy.getEffects().get(effect), x,	y + size * (3 + i));
+	  }
   }
   
   /**

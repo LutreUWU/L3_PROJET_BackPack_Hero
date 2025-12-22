@@ -61,11 +61,6 @@ public class Backpack {
 		return bagItemLst;
 	}
 	
-	/**
-	 * Return an ArrayList of all item in the backpack
-	 * 
-	 * @return ArrayList<Item_Object>
-	 */
 	public int getGridSize(){
 		return gridSize;
 	}
