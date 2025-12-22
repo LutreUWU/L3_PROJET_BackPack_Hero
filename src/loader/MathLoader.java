@@ -249,10 +249,7 @@ public class MathLoader {
 	  renderDataGame.put("BG_CHOICE_END", new RenderData(transform, boundingBox));
 	}
 	
-	// Getter Event
-	public static LinkedHashMap<String, RenderData> getMapEvent() {
-		return renderDataGame;
-	}
+	
 // ===========================================
 	
 //================= ENDTURN =====================
@@ -308,7 +305,11 @@ public class MathLoader {
 	  getExitShopValue(width * scale, height * scale);
 	  getArticleShopValue(width * scale, height * scale);
 	  getSellArticleShopValue(width * scale, height * scale);
-
+	  var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
+		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
+		int articleWidth = articleBoundingBox.southEast().x() - articleBoundingBox.northWest().x();
+	  getButtonShopValue(articleWidth, articleHeight);
+	  getBuyButtonShopValue(articleWidth, articleHeight);
 	}	
 	
 	private static void getCharacterValue(double shopWidth, double shopHeight) {
@@ -362,8 +363,47 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width * scale), (int) (posY + height * scale)));
 	  renderDataGame.put("ICON_EXIT_SHOP", new RenderData(transform, boundingBox));
 	}
+	
+	private static void getButtonShopValue(double articleWidth, double articleHeight) {
+		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
+		var img = data.imgMap().get("ICON_SHOP_LEFT");
+		var scale = (articleHeight * 0.20) / img.getHeight();
+	  double posX = articleBoundingBox.northWest().x() + articleWidth * 0.05;
+	  double posY = articleBoundingBox.northWest().y() + articleHeight * 0.75;
+		AffineTransform transform = new AffineTransform();
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scale), (int) (posY + img.getHeight() * scale)));
+	  renderDataGame.put("ICON_SHOP_LEFT", new RenderData(transform, boundingBox));
+	  img = data.imgMap().get("ICON_SHOP_RIGHT");
+	  posX = articleBoundingBox.southEast().x() - img.getWidth() * scale - articleWidth * 0.05;
+	  transform = new AffineTransform();
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scale), (int) (posY + img.getHeight() * scale)));
+	  renderDataGame.put("ICON_SHOP_RIGHT", new RenderData(transform, boundingBox));
+	}
+	
+	private static void getBuyButtonShopValue(double articleWidth, double articleHeight) {
+		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
+		var img = data.imgMap().get("ICON_SHOP_BUY");
+		var scaleY = (articleHeight * 0.20) / img.getHeight();
+		var imgButton = data.imgMap().get("ICON_SHOP_LEFT");
+		var widthButton = imgButton.getWidth() * (articleHeight * 0.20) / imgButton.getHeight();
+		var scaleX = (articleWidth - articleWidth * 0.15 - widthButton * 2) / img.getWidth();
+	  double posX = articleBoundingBox.northWest().x() + articleWidth * 0.5 - img.getWidth() * scaleX / 2;
+	  double posY = articleBoundingBox.northWest().y() + articleHeight * 0.75;
+		AffineTransform transform = new AffineTransform();
+	  transform.translate(posX, posY);
+	  transform.scale(scaleX, scaleY);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scaleX), (int) (posY + img.getHeight() * scaleY)));
+	  renderDataGame.put("ICON_SHOP_BUY", new RenderData(transform, boundingBox));
+	}
 
 //============================================	
-
+//Getter Event
+	public static LinkedHashMap<String, RenderData> getMapEvent() {
+		return renderDataGame;
+	}
 	
 }

@@ -86,15 +86,6 @@ public class GameDataCombat {
 		Objects.requireNonNull(data);
 		Objects.requireNonNull(coord);
 		log = new ArrayList<>();
-		// int id = data.bag().grid()[coord.y()][coord.x()];
-		// A changer, pas ouf je pense (Je change :), ca posait problème si on avait deux fois le meme item)
-		/*Optional<Item> weapon = data.bag().bagItemLst().stream()
-																											 .filter(item -> item.ID() == id)
-																											 .findFirst();*/
-		/*
-		weapon.ifPresent(item -> {
-			item.use(target, lstEnemy);
-			*/
 		var item = data.bag().getItem(coord.x(), coord.y());
 		if (item != null) {
 			data.bag().removeItemFromBackpack(item);

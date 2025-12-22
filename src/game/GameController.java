@@ -207,10 +207,10 @@ public class GameController {
 					switch (key.key()) {
 					case Key.A -> {
 						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-							GameDataClick.addDragItem(new Bomb());
-							// GameDataClick.addDragItem(new Bow());
-							// GameDataClick.addDragItem(new Arrow());
-							// GameDataClick.addDragItem(new PoisonArrow());
+//							GameDataClick.addDragItem(new Bomb());
+							 GameDataClick.addDragItem(new Bow());
+							 GameDataClick.addDragItem(new Arrow());
+							 GameDataClick.addDragItem(new PoisonArrow());
 						}
 					}
 					case Key.I -> {

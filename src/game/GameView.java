@@ -966,9 +966,12 @@ public record GameView(int width, int height, int tileSize) {
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_SHOP").transform(), null);
     drawTextBubble(graphics, data);
     drawArticleBubble(graphics, data);
+    drawButtonShop(graphics, data);
     drawSellArticle(graphics, data);
   	img = data.imgMap().get("RolandBody");
     graphics.drawImage(img, MathLoader.getMapEvent().get("RolandBody").transform(), null);
+    img = data.imgMap().get("ICON_EXIT_SHOP");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
   }
   
   private static void drawTextBubble(Graphics2D graphics, GameData data) {
@@ -985,6 +988,15 @@ public record GameView(int width, int height, int tileSize) {
     var width = bubbleBox.southEast().x() - bubbleBox.northWest().x();
     var height = bubbleBox.southEast().y() - bubbleBox.northWest().y();
     graphics.drawRect(bubbleBox.northWest().x(), bubbleBox.northWest().y(), width, height);
+  }
+  
+  private static void drawButtonShop(Graphics2D graphics, GameData data) {
+  	var img = data.imgMap().get("ICON_SHOP_LEFT");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_LEFT").transform(), null);
+    img = data.imgMap().get("ICON_SHOP_RIGHT");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_RIGHT").transform(), null);
+    img = data.imgMap().get("ICON_SHOP_BUY");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_BUY").transform(), null);
   }
   
   private static void drawSellArticle(Graphics2D graphics, GameData data) {
