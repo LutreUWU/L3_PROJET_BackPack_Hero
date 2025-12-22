@@ -6,9 +6,9 @@ import java.util.Random;
 
 import game.GameData;
 import model.monster.Enemy;
-import model.monster.Gnome;
 import model.monster.Robot;
 import model.monster.Soldat;
+
 
 public class LinkedEvent {
 
