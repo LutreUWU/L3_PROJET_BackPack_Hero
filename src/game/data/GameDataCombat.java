@@ -96,10 +96,10 @@ public class GameDataCombat {
 			item.use(target, lstEnemy);
 			*/
 		var item = data.bag().getItem(coord.x(), coord.y());
+		if (item != null) {
 			data.bag().removeItemFromBackpack(item);
 			var newItem = item.use(target, lstEnemy, data);
 			if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
-			
 			Iterator<Enemy> it = lstEnemy.iterator();
 			while (it.hasNext()) {
 		    Enemy enemy = it.next();
@@ -127,6 +127,7 @@ public class GameDataCombat {
 				GameDataClick.addDragItem(itemGain);
 				combat = false;
 			
+			}
 		}
 	}
 	

@@ -306,6 +306,9 @@ public class MathLoader {
 	  getCharacterValue(width * scale, height * scale);
 	  getBubbleShopValue(width * scale, height * scale);
 	  getExitShopValue(width * scale, height * scale);
+	  getArticleShopValue(width * scale, height * scale);
+	  getSellArticleShopValue(width * scale, height * scale);
+
 	}	
 	
 	private static void getCharacterValue(double shopWidth, double shopHeight) {
@@ -328,6 +331,23 @@ public class MathLoader {
 	  renderDataGame.put("BG_SHOP_BUBBLE", new RenderData(null, boundingBox));
 	}
 	
+	private static void getArticleShopValue(double shopWidth, double shopHeight) {
+		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
+		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.1;
+		double posY = shopBoundingBox.northWest().y() + shopHeight * 0.1;
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + shopWidth * 0.7), (int) (posY + shopHeight * 0.55)));
+	  renderDataGame.put("SHOP_ARTICLE", new RenderData(null, boundingBox));
+	}
+	
+	private static void getSellArticleShopValue(double shopWidth, double shopHeight) {
+		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
+		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.81;
+		double posY = shopBoundingBox.northWest().y() + shopHeight * 0.1;
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + shopWidth * 0.1), (int) (posY + shopHeight * 0.30)));
+	  renderDataGame.put("SHOP_SELL_ARTICLE", new RenderData(null, boundingBox));
+	}
+	
+	
 	private static void getExitShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		var img = data.imgMap().get("ICON_EXIT_SHOP");
@@ -342,7 +362,8 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width * scale), (int) (posY + height * scale)));
 	  renderDataGame.put("ICON_EXIT_SHOP", new RenderData(transform, boundingBox));
 	}
-	
-//===================
 
+//============================================	
+
+	
 }
