@@ -272,7 +272,7 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Arrow _ -> "Des flèches volées à Steeve";
 	  	case Bow _ -> "Un arc volé à Steeve";
 	  	case PoisonArrow _ -> "Des flèches volées à Steeve";
-	  	case Bomb _ -> "Bombe volé à Mario";
+	  	case Bomb _ -> "Bombe volée à Mario";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -291,7 +291,7 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Arrow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
 	  	case PoisonArrow _ -> durabilityOrQuantityString + "1AP : Inflige -6PV à l'ennemi et empoisonne l'ennemi";
 	  	case Bow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
-	  	case Bomb _ -> durabilityOrQuantityString + "2AP : Inflige -6PV à tous les ennemies";
+	  	case Bomb _ -> durabilityOrQuantityString + "2AP : Inflige -6PV à tous les ennemies + 1PV par bombe qui l'entoure";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }

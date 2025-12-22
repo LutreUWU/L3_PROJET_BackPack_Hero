@@ -37,9 +37,11 @@ public class Synergy {
 			for (var i = -1; i < 2; i++) {
 				for (var j = -1; j < 2; j++) {
 					if (indexInBagPack(data, coord.x(), coord.y())) {
+						IO.println(coord.x() + i + " : " + (coord.y() + j));
 						var itemNeighbor = data.bag().getItem(coord.x() + i, coord.y() + j);
 						if (itemNeighbor != null) {
 							neighbor.add(itemNeighbor);
+							IO.println(coord.x() + i + " : " + (coord.y() + j));
 						}
 					}
 				}
@@ -57,7 +59,7 @@ public class Synergy {
 		return true;
 	}
 	
-	public int getBonusDmg() {
+	public static int getBonusDmg() {
 		return bonusDmg;
 	}
 }
