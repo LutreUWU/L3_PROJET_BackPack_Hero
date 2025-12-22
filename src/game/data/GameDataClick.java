@@ -317,7 +317,7 @@ public class GameDataClick {
 		var SE = boundingBox.southEast();
 		if (x >= NW.x() && x <= SE.x()) {
 			if (y >= NW.y() && y <= SE.y()) {
-				GameDataCombat.enemyAction(data.hero());
+				GameDataCombat.endTour(data);
 			}
 		}
   }
@@ -432,31 +432,10 @@ public class GameDataClick {
 						}
 						}
 						removeItemFromDrag(itemDrag);
-					}
+					} else addDragItem(data.dragItem());
 				} else {
-					GameDataClick.addDragItem(data.dragItem());
+					addDragItem(data.dragItem());
 				}
-				/*
-				// Merge gold
-				switch (data.dragItem()) {
-				case Gold goldDrag -> {
-					var colideItem = data.bag().getItem(coord.x(), coord.y());
-					if (colideItem != null && goldDrag.ID() == colideItem.ID()) {
-						var goldCollide = (Gold) colideItem;
-						data.bag().removeItemFromBackpack(goldCollide);
-						goldCollide = goldCollide.changeGoldValue(goldDrag.value());
-						data.bag().addItemToBackpack(goldCollide);
-						removeItemFromDrag(goldDrag);
-						IO.println("Merge	gold : " + goldCollide.value());
-					} else {
-						GameDataClick.addDragItem(data.dragItem());
-					}
-				}
-				default -> {
-					GameDataClick.addDragItem(data.dragItem());
-					}
-				}
-				*/
 			}
   	}
   	if (!GameDataCombat.combat()) {

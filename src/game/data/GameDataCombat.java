@@ -99,20 +99,10 @@ public class GameDataCombat {
 			data.bag().removeItemFromBackpack(item);
 			var newItem = item.use(target, lstEnemy, data);
 			if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
-			
-			Iterator<Enemy> it = lstEnemy.iterator();
-			while (it.hasNext()) {
-		    Enemy enemy = it.next();
-				if(enemy.getHP() <= 0) {
-					totalExp += enemy.getXP();
-					it.remove();
-					enemyBox.remove(enemy);
-					if (target == enemy && !lstEnemy.isEmpty()) {
-						setTarget(lstEnemy.getFirst());
-					}
-					getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());	
-				}
+			if(data.hero().getEnergy_point() <= 0) {
+				applyEffects();
 			}
+			killMonster(data);
 			if(data.hero().getEnergy_point() <= 0) {
 				enemyAction(data.hero());
 			}
@@ -127,6 +117,42 @@ public class GameDataCombat {
 				GameDataClick.addDragItem(itemGain);
 				combat = false;
 			
+		}
+	}
+	
+	public static void killMonster(GameData data) {
+		Iterator<Enemy> it = lstEnemy.iterator();
+		while (it.hasNext()) {
+	    Enemy enemy = it.next();
+			if(enemy.getHP() <= 0) {
+				totalExp += enemy.getXP();
+				it.remove();
+				enemyBox.remove(enemy);
+				if (target == enemy && !lstEnemy.isEmpty()) {
+					setTarget(lstEnemy.getFirst());
+				}
+				getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());	
+			}
+		}
+	}
+	
+	public static void endTour(GameData data) {
+		log = new ArrayList<>();
+		applyEffects();
+		killMonster(data);
+		enemyAction(data.hero());
+	}
+	
+
+	
+	private static void applyEffects() {
+		for (var enemy : lstEnemy) { 
+			for (var effect : enemy.getEffects().keySet()) {
+				var dmg = effect.getDamage();
+				enemy.subHP(dmg);
+				addLog(enemy + " recoit " + dmg + " dégats grâce à l'effet " + effect);
+			}
+			enemy.updateEffects();
 		}
 	}
 	

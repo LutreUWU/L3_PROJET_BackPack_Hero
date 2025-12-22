@@ -13,6 +13,8 @@ import model.item.epic.DespairShield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
 import model.item.rare.Gant;
+import model.item.rare.PoisonArrow;
+import model.item.superrare.Bomb;
 import model.item.superrare.Massue;
 
 public class ItemRepository {
@@ -27,7 +29,9 @@ public class ItemRepository {
   	  registerWeapon(new Gold(10)); // Common 
   	  registerWeapon(new Arrow()); // Common 
   	  registerWeapon(new Gant()); // Rare
+  	  registerWeapon(new PoisonArrow()); // Rare 
   	  registerWeapon(new Massue()); // SuperRare
+  	  registerWeapon(new Bomb()); // SuperRare
   	  registerWeapon(new DespairShield()); // Epic
   	  registerWeapon(new Bow()); // Epic
   	  registerWeapon(new Axe()); // Legendary

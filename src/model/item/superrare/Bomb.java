@@ -1,4 +1,4 @@
-package model.item.common;
+package model.item.superrare;
 
 import java.util.ArrayList;
 
@@ -13,13 +13,13 @@ import model.Synergy;
 import model.XY;
 import model.monster.Enemy;
 
-public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
-	public Arrow() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 9, 10, 5);
+public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
+	public Bomb() {
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 12, 25, 1);
   }
 
-	public Arrow(XY coord, Direction direction, int durability) {
-    this(initShape(coord, direction), direction, Rarity.COMMON, 9, 10, durability);
+	public Bomb(XY coord, Direction direction, int durability) {
+    this(initShape(coord, direction), direction, Rarity.COMMON, 12, 20, durability);
   }
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -38,44 +38,44 @@ public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new Arrow(shape, direction, rarity, ID, score, durability + nb); 
+  	return new Bomb(shape, direction, rarity, ID, score, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new Arrow(shape, direction, rarity, ID, score, durability - nb); 
+  	return new Bomb(shape, direction, rarity, ID, score, durability - nb); 
   }
   
   @Override
   public boolean canMerge() {
-  	return true;
+  	return false;
   }
   
   @Override
-  public Arrow setXY(XY coord) {
-    return new Arrow(coord, direction, durability);
+  public Bomb setXY(XY coord) {
+    return new Bomb(coord, direction, durability);
   }
 
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
-  		GameDataCombat.addLog("Vous tirez sur l'ennemi (-8HP) !");
-      GameDataHero.sub("energy", 1);
-      enemy.subHP(8);
-      return subDurability(1);
+  		GameDataCombat.addLog("EXPLOSION ! Chaque ennemi perd 6 PV");
+    	data.hero().sub("energy", 2);
+    	for (var target : lstEnemy) {
+    		target.subHP(6);
+    	}
   	}
-  	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");
-  	return new Arrow(shape, direction, rarity, ID, score, durability);
+  	return subDurability(1);
   }
   
   @Override
-  public Arrow rotateXY() {
-    return new Arrow(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
+  public Bomb rotateXY() {
+    return new Bomb(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
   }
 
   @Override
   public String toString() {
-    return "Arrow";
+    return "Bombe";
   }
 }

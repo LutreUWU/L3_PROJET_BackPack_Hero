@@ -1,9 +1,12 @@
 package model.monster;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import game.data.GameDataHero;
+import model.Effect;
 
 /**
  * Class of a Chicken
@@ -21,11 +24,38 @@ public class Gnome implements Enemy{
 	private final int xp = 4;
 	private final List<String> lstAttack = List.of("Slash", "Abattage");
 	private String action;
+	private final Map<Effect, Integer> effects = new HashMap<>();
 	// For graphism
 	private final String img = "gnome";
 	private final double sizeX = 1;
 	private final double sizeY = 0.8;
 
+	/**
+	 * Add an effect to the enemy
+	 * @param effect (Enum of all item)
+	 * @param value (Number of time the effect will be used)
+	 */
+	@Override
+	public void addEffect(Effect effect, int value) {
+		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
+	}
+	
+	
+	/**
+	 * Update all effects and remove them if necessary
+	 */
+	@Override
+	public void updateEffects() {
+		for (var effect : effects.keySet()) {
+			var value = effects.get(effect);
+			if (value <= 1) {
+				effects.remove(effect);
+			} else {
+				effects.put(effect, value - 1);
+			}
+		}
+	}
+		
 	
 	/**
 	 * Chose randomly an action between all attacks the enemy has.
@@ -73,6 +103,11 @@ public class Gnome implements Enemy{
 	@Override
 	public int getHP() {
 		return HP;
+	}
+	
+	@Override
+	public Map<Effect, Integer> getEffects() {
+		return effects;
 	}
 	
 	@Override

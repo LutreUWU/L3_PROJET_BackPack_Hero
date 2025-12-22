@@ -1,9 +1,17 @@
 package model.monster;
 
+import java.util.List;
+import java.util.Map;
+
+import model.Effect;
+
 /**
  * Interface for enemies in the game.
  */
 public interface Enemy {
+	void addEffect(Effect effect, int value);
+	void updateEffects();
+	Map<Effect, Integer> getEffects();
 	/**
 	 * Sub the current HP of the mob by it's value 
 	 * 
