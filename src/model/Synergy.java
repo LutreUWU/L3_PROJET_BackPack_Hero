@@ -36,26 +36,26 @@ public class Synergy {
 		for (var coord : item.shape()) {
 			for (var i = -1; i < 2; i++) {
 				for (var j = -1; j < 2; j++) {
-					if (indexInBagPack(data, coord.x(), coord.y())) {
-						IO.println(coord.x() + i + " : " + (coord.y() + j));
+					if (indexInBagPack(data, coord.x() + i, coord.y() + j)) {
 						var itemNeighbor = data.bag().getItem(coord.x() + i, coord.y() + j);
+						IO.println(coord.x() + i + " : " + (coord.y() + j) + " ITEM " + itemNeighbor);
 						if (itemNeighbor != null) {
 							neighbor.add(itemNeighbor);
-							IO.println(coord.x() + i + " : " + (coord.y() + j));
+							// IO.println(coord.x() + i + " : " + (coord.y() + j));
 						}
 					}
 				}
 			}
 		}
 		
-		return neighbor.size() - 1;
+		return neighbor.size();
 	}
 	
 	private static boolean indexInBagPack(GameData data, int x, int y) {
 		if (x < 0) return false;
 		if (y < 0) return false;
-		if (x > data.bag().grid()[0].length) return false;
-		if (y > data.bag().grid().length) return false;
+		if (x >= data.bag().grid()[0].length) return false;
+		if (y >= data.bag().grid().length) return false;
 		return true;
 	}
 	
