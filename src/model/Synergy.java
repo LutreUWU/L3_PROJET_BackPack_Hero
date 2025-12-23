@@ -38,8 +38,8 @@ public class Synergy {
 				for (var j = -1; j < 2; j++) {
 					if (indexInBagPack(data, coord.x() + i, coord.y() + j)) {
 						var itemNeighbor = data.bag().getItem(coord.x() + i, coord.y() + j);
-						IO.println(coord.x() + i + " : " + (coord.y() + j) + " ITEM " + itemNeighbor);
-						if (itemNeighbor != null) {
+						// IO.println(coord.x() + i + " : " + (coord.y() + j) + " ITEM " + itemNeighbor);
+						if (itemNeighbor != null && itemNeighbor.ID() == item.ID()) {
 							neighbor.add(itemNeighbor);
 							// IO.println(coord.x() + i + " : " + (coord.y() + j));
 						}

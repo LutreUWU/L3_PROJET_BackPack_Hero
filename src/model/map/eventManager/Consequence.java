@@ -6,6 +6,7 @@ import game.GameData;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.Hero;
+import model.RandomItem;
 import model.item.common.Gold;
 import model.item.common.KeyDoor;
 import model.item.superrare.Massue;
@@ -57,7 +58,7 @@ public class Consequence {
 		switch (idConsequence) {
 		case "sub_hp" -> conseqSubHP(hero);
 		case "add_gold" -> GameDataClick.addDragItem(new Gold(floor * 5 * (int) bonus));
-		case "add_weapon" -> GameDataClick.addDragItem(new Massue());
+		case "add_weapon" -> GameDataClick.addDragItem(RandomItem.generate(data.floor()));
 		case "key" -> consequenceKeyEvent(data);
 		case "lifeExchangeGold" -> consequenceHealer(data);
 		case "openTreasure" -> consequenceTreasure(data);
