@@ -354,7 +354,7 @@ public class GameDataClick {
 		var SE = boundingBox.southEast();
 		if (x >= NW.x() && x <= SE.x()) {
 			if (y >= NW.y() && y <= SE.y()) {
-				data.setShop(false);
+				data.setShop(false, null);
 				removeItemFromDrag(data.dragItem());
 				return;
 			}

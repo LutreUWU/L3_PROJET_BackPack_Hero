@@ -8,8 +8,11 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import model.Item;
+
 public class ImageLoader {	
 	private final static Map<String, BufferedImage> bgImages = new HashMap<>();
+	private final static Map<Integer, BufferedImage> itemImagesByID = new HashMap<>();
 	
 	private static BufferedImage loadImg(File name) {
     try {
@@ -31,20 +34,47 @@ public class ImageLoader {
 		if (files != null) {
 		    for (File f : files) {
 		        String fileName = f.getName();
-		        // Retirer l'extension
 		        String key = fileName.substring(0, fileName.lastIndexOf('.'));
-		        bgImages.put(key, loadImg(f));
+		        if (pathFolder.equals("data/item/weapon")) {
+		        	itemImagesByID.put(getItem(key), loadImg(f));
+		        }
+		        else {
+		        	bgImages.put(key, loadImg(f));
+		        }
 		    }
 		}
 	}
 	
+	private static int getItem(String name) {
+		return switch (name) {
+		case "keyDoor" -> 1;
+		// case gold -> 2
+	  case "sword" -> 3;
+	  case "despairShield" -> 4;
+	  case "mimicry" -> 5;
+	  case "massue" -> 6;
+	  case "gant" -> 7;
+	  case "axe" -> 8;
+		case "arrow" -> 9;
+	  case "bow"   -> 10;
+	  case "poisonArrow" -> 11;
+	  case "bomb" -> 12;
+		default -> throw new IllegalArgumentException("Unexpected value: " + name);
+		};
+	}
+	
+	
 	public static Map<String, BufferedImage> loadAllImage() {
 		addFolder("data/BG");
 		addFolder("data/monster");
-		addFolder("data/item/weapon");
-		addFolder("data/item/other");
 		addFolder("data/icon");
 		addFolder("data/Hero");
+		addFolder("data/item/other");
 		return bgImages;
+	}
+	
+	public static Map<Integer, BufferedImage> loadAllImageByID() {
+		addFolder("data/item/weapon");
+		return itemImagesByID;
 	}
 }

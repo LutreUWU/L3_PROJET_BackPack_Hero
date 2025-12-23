@@ -16,6 +16,7 @@ import model.Item;
 import model.ItemRepository;
 import model.XY;
 import model.map.Floor;
+import model.map.Shop;
 import model.map.eventManager.LinkedEvent;
 
  /**
@@ -50,6 +51,7 @@ public class GameData {
    */
   private boolean mapOrBag = true;
   private boolean shop = false;
+  private Shop shopLst;
   /**
    * To know if we're wurrently in a event or no
    * 
@@ -62,6 +64,7 @@ public class GameData {
    * 
    */
   private final Map<String, BufferedImage> imgMap;
+  private final Map<Integer, BufferedImage> imgMapByID;
   
   /**
    * Sortest Path
@@ -80,6 +83,7 @@ public class GameData {
 	  map = new Floor(floor);
 	  screenInfo = screenInfo_;
 	  imgMap = ImageLoader.loadAllImage();
+	  imgMapByID = ImageLoader.loadAllImageByID();
 	  new MathLoader(this);
     new GameDataHero(hero);
     new GameDataClick(this);
@@ -216,6 +220,9 @@ public class GameData {
   	return imgMap;
   }
   
+  public Map<Integer, BufferedImage> imgMapByID(){
+  	return imgMapByID;
+  }
 
 
 	public XY getMouseCoord() {
@@ -234,9 +241,14 @@ public class GameData {
 		return shop;
 	}
 	
-	public void setShop(boolean statut) {
+	public void setShop(boolean statut, Shop shop) {
 		if (statut) swapMapOrBag();
 		this.shop = statut;
+		this.shopLst = shop;
+	}
+	
+	public Shop getShopLst() {
+		return shopLst;
 	}
 	
 	public boolean getBin() {

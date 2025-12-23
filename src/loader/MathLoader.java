@@ -292,6 +292,25 @@ public class MathLoader {
 		var img = data.imgMap().get("BG_SHOP");	
 		int width = img.getWidth();
 		int height = img.getHeight();
+		double scale = getBGshopValue();
+	  getCharacterValue(width * scale, height * scale);
+	  getBubbleShopValue(width * scale, height * scale);
+	  getExitShopValue(width * scale, height * scale);
+	  getArticleAreaShopValue(width * scale, height * scale);
+	  getSellArticleShopValue(width * scale, height * scale);
+	  var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
+		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
+		int articleWidth = articleBoundingBox.southEast().x() - articleBoundingBox.northWest().x();
+	  getButtonShopValue(articleWidth, articleHeight);
+	  getBuyButtonShopValue(articleWidth, articleHeight);
+	  getArticleShopValue();
+	  
+	}	
+	
+	private static double getBGshopValue() {
+		var img = data.imgMap().get("BG_SHOP");	
+		int width = img.getWidth();
+		int height = img.getHeight();
 		var scale = (screenHeight * 0.60) / height;
 		AffineTransform transform = new AffineTransform();
 	  double posX = screenWidth - (width * scale);
@@ -300,17 +319,8 @@ public class MathLoader {
 	  transform.scale(scale, scale);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
 	  renderDataGame.put("BG_SHOP", new RenderData(transform, boundingBox));
-	  getCharacterValue(width * scale, height * scale);
-	  getBubbleShopValue(width * scale, height * scale);
-	  getExitShopValue(width * scale, height * scale);
-	  getArticleShopValue(width * scale, height * scale);
-	  getSellArticleShopValue(width * scale, height * scale);
-	  var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
-		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
-		int articleWidth = articleBoundingBox.southEast().x() - articleBoundingBox.northWest().x();
-	  getButtonShopValue(articleWidth, articleHeight);
-	  getBuyButtonShopValue(articleWidth, articleHeight);
-	}	
+	  return scale;
+	}
 	
 	private static void getCharacterValue(double shopWidth, double shopHeight) {
 		var img = data.imgMap().get("RolandBody");
@@ -332,7 +342,7 @@ public class MathLoader {
 	  renderDataGame.put("BG_SHOP_BUBBLE", new RenderData(null, boundingBox));
 	}
 	
-	private static void getArticleShopValue(double shopWidth, double shopHeight) {
+	private static void getArticleAreaShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.1;
 		double posY = shopBoundingBox.northWest().y() + shopHeight * 0.1;
@@ -347,6 +357,35 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + shopWidth * 0.1), (int) (posY + shopHeight * 0.30)));
 	  renderDataGame.put("SHOP_SELL_ARTICLE", new RenderData(null, boundingBox));
 	}
+	
+	private static void getArticleShopValue() {
+		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
+		getArticleNameHolderShopValue(articleBoundingBox);
+	  getArticleImageHolderShopValue(articleBoundingBox);
+	}
+	
+	private static void getArticleNameHolderShopValue(BoundingBox articleBoundingBox) {
+		var buttonBoundingBox = renderDataGame.get("ICON_SHOP_BUY").box();
+		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
+		double posX = buttonBoundingBox.northWest().x();
+		double posY = articleBoundingBox.northWest().y() + 0.01 * articleHeight;
+		int width = buttonBoundingBox.southEast().x() - (int) posX;
+		int height = (int) (articleBoundingBox.northWest().y() + 0.15 * articleHeight - posY);
+	  var newBoundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width), (int) (posY + height)));
+	  renderDataGame.put("SHOP_ARTICLE_NAME_HOLDER", new RenderData(null, newBoundingBox));
+	}
+	
+	private static void getArticleImageHolderShopValue(BoundingBox articleBoundingBox) {
+		var buttonBoundingBox = renderDataGame.get("ICON_SHOP_BUY").box();
+		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
+		int posX = buttonBoundingBox.northWest().x();
+		int posY = (int) (articleBoundingBox.northWest().y() + 0.16 * articleHeight);
+		int width = buttonBoundingBox.southEast().x() - posX;
+		int height = buttonBoundingBox.northWest().y() - posY;
+	  var newBoundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width), (int) (posY + height)));
+	  renderDataGame.put("SHOP_ARTICLE_IMAGE_HOLDER", new RenderData(null, newBoundingBox));
+	}
+	
 	
 	
 	private static void getExitShopValue(double shopWidth, double shopHeight) {

@@ -164,7 +164,7 @@ public class GameController {
 									data.map().updateMap(coord);
 								}
 								case Shop shop -> {
-									data.setShop(true);
+									data.setShop(true, shop);
 									new GameDataShop(shop, true, data);
 									data.map().updateMap(coord);
 								}
@@ -208,9 +208,9 @@ public class GameController {
 					case Key.A -> {
 						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 							GameDataClick.addDragItem(new Bomb());
-//							 GameDataClick.addDragItem(new Bow());
-//							 GameDataClick.addDragItem(new Arrow());
-//							 GameDataClick.addDragItem(new PoisonArrow());
+							GameDataClick.addDragItem(new Bow());
+							GameDataClick.addDragItem(new Arrow());
+							GameDataClick.addDragItem(new PoisonArrow());
 						}
 					}
 					case Key.I -> {

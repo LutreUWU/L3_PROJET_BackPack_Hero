@@ -9,8 +9,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.github.forax.zen.ApplicationContext;
@@ -233,18 +234,18 @@ public record GameView(int width, int height, int tileSize) {
 		for (var item : itemLst) {
 			XY coordinate = item.shape()[0];
 		  switch (item.ID()) {
-			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75);
+			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75);
 			  case 2 -> drawItemGold(graphics, data, coordinate, item);
-				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMap().get("sword")); 
-				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMap().get("despairShield"), 0.25, 0.25); 
-				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
-				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMap().get("massue")); 
-				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
-				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
-				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("arrow"));
-				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMap().get("bow"), 0.25, 0.25);
-				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("poisonArrow"));
-				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("bomb"));
+				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
+				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
+				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
+				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
+				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75); 
+				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), data.imgMapByID().get(item.ID()), 0.20, 0.5); 
+				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25);
+				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
 				default ->{}
 		  }
 		}
@@ -323,7 +324,6 @@ public record GameView(int width, int height, int tileSize) {
 	    case MYTHIC -> Color.PINK;
     });
 	  graphics.drawString(item.toString().toUpperCase(), NW.x(),	NW.y() + (int) (NW.y() * 0.10));
-
   }
   
   private void drawTextInfo(Graphics2D graphics, String content, int x, int y, int maxChar) {
@@ -642,18 +642,18 @@ public record GameView(int width, int height, int tileSize) {
    */
   private void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
 	  switch (item.ID()) {
-		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMap().get("keyDoor"), 0.5, 0.75); 
+		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75); 
 		  case 2 -> drawDragGold(graphics, data, item, box);
-			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMap().get("sword")); 
-			case 4 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMap().get("despairShield"), 0.25, 0.25); 
-			case 5 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMap().get("mimicry")); 
-			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMap().get("massue")); 
-			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMap().get("gant"), 0.5, 0.75); 
-			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), data.imgMap().get("axe"), 0.20, 0.5); 
-			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("arrow"));
-			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMap().get("bow"), 0.25, 0.25); 
-			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("poisonArrow"));
-			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("bomb"));
+			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
+			case 4 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
+			case 5 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
+			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
+			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75); 
+			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), data.imgMapByID().get(item.ID()), 0.20, 0.5); 
+			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
+			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
 			default ->{}
 	  }
 	}
@@ -861,21 +861,23 @@ public record GameView(int width, int height, int tileSize) {
   	var event2 = MathLoader.getMapEvent().get("BG_CHOICE2");
   	int width = event1.box().southEast().x() - event1.box().northWest().x();
   	int height = event1.box().southEast().y() - event1.box().northWest().y();
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+    graphics.setFont(font);
   	if (data.event().getRoot().getChoice2() == null){
   		var img3 = data.imgMap().get("BG_CHOICE_END");
   		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
   		graphics.drawImage(img3, event3.transform(), null);
-		  drawText(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+		  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
 		  															(int) event3.box().northWest().x() + width / 2, 
 		  															(int) (event3.box().northWest().y() + height * 0.5), 30);
   	}
   	else {
   		graphics.drawImage(img1, event1.transform(), null);
-  	  drawText(graphics, data, data.event().getRoot().getChoice1().getAnswer(), 
+  	  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
   	  															(int) event1.box().northWest().x() + width / 2, 
   	  															(int) (event1.box().northWest().y() + height * 0.5), 30);
   		graphics.drawImage(img2, event2.transform(), null);
-  	  drawText(graphics, data, data.event().getRoot().getChoice2().getAnswer(), 
+  	  drawText(graphics, data.event().getRoot().getChoice2().getAnswer(), 
   	  															(int) event2.box().northWest().x() + width / 2, 
   	  															(int) (event2.box().northWest().y() + height * 0.5), 30);
   	}
@@ -886,39 +888,39 @@ public record GameView(int width, int height, int tileSize) {
    * The text is draw at the center of the box choice.
    * 
    * @param graphics {@code Graphics2D} of the game.
-   * @param data		 {@code GameData} containing all informations about the game
    * @param content	 Text we wants to write.
-   * @param x				 The x coordinate of the text
-   * @param y				 The y coordinate of the text
+   * @param x				 The x coordinate center of the text
+   * @param y				 The y coordinate center of the text
    * @param maxChar  Number of char max per line
    */
-  private static void drawText(Graphics2D graphics, GameData data, String content, int x, int y, int maxChar) {
-    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
-    graphics.setFont(font);
-    FontMetrics fm = graphics.getFontMetrics();
-    graphics.setColor(Color.WHITE);
-    int maxCharsPerLine = maxChar;
+  private void drawText(Graphics2D g, String content, int x, int y, int maxCharsPerLine) {
+    FontMetrics fm = g.getFontMetrics();
     String[] words = content.split(" ");
-    StringBuilder line = new StringBuilder();
-    int lineCount = 0;
+    List<String> lines = new ArrayList<>();
+    StringBuilder currentLine = new StringBuilder();
     for (String word : words) {
-        if (line.length() + word.length() + 1 > maxCharsPerLine) {
-            int lineWidth = fm.stringWidth(line.toString());
-            graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());
-            line = new StringBuilder(word);
-            lineCount++;
+        if (currentLine.length() + word.length() + 1 > maxCharsPerLine) {
+            lines.add(currentLine.toString());
+            currentLine = new StringBuilder(word);
         } else {
-            if (line.length() > 0) line.append(" ");
-            line.append(word);
+            if (currentLine.length() > 0) currentLine.append(" ");
+            currentLine.append(word);
         }
     }
-    if (line.length() > 0) {
-        int lineWidth = fm.stringWidth(line.toString());
-        graphics.drawString(line.toString(), x - lineWidth / 2, y + lineCount * fm.getHeight());
+    if (currentLine.length() > 0) {
+        lines.add(currentLine.toString());
     }
-  }
+    int totalHeight = lines.size() * fm.getAscent();
+    int startY = y + totalHeight / 2;
+    // Dessin centré
+    for (int i = 0; i < lines.size(); i++) {
+        String line = lines.get(lines.size() - 1 - i );
+        int lineWidth = fm.stringWidth(line);
+        g.drawString(line, x - lineWidth / 2, startY - i * fm.getAscent());
+    }
+}
   
-  public static void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
+  public void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
   	var bestWay = new ArrayList<XY>();
 //  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
   	heroMove(data.map().getGrid(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), bestWay, data.map());
@@ -936,7 +938,7 @@ public record GameView(int width, int height, int tileSize) {
   	}
   }
   
-  private static void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
+  private void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
 //  	IO.println("Meilleur : " + bestWay);
   	if (coordCurrent.equals(coordFinal)) {
   		if (currentWay.size() <= bestWay.size() || bestWay.isEmpty()) {
@@ -956,41 +958,46 @@ public record GameView(int width, int height, int tileSize) {
   	}
   }
   
-  private static void drawBinButton(Graphics2D graphics, GameData data) {
+  private void drawBinButton(Graphics2D graphics, GameData data) {
   	BufferedImage img = data.imgMap().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_BIN_CLOSE").transform(), null);
   }
   
-  private static void drawShop(Graphics2D graphics, GameData data) {
+  private void drawShop(Graphics2D graphics, GameData data) {
   	BufferedImage img = data.imgMap().get("BG_SHOP");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_SHOP").transform(), null);
+    img = data.imgMap().get("RolandBody");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("RolandBody").transform(), null);
+    img = data.imgMap().get("ICON_EXIT_SHOP");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
     drawTextBubble(graphics, data);
     drawArticleBubble(graphics, data);
     drawButtonShop(graphics, data);
     drawSellArticle(graphics, data);
-  	img = data.imgMap().get("RolandBody");
-    graphics.drawImage(img, MathLoader.getMapEvent().get("RolandBody").transform(), null);
-    img = data.imgMap().get("ICON_EXIT_SHOP");
-    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
+    drawArticle(graphics, data);
+  	
   }
   
-  private static void drawTextBubble(Graphics2D graphics, GameData data) {
+  private void drawTextBubble(Graphics2D graphics, GameData data) {
     var bubbleBox = MathLoader.getMapEvent().get("BG_SHOP_BUBBLE").box();
     int centerX = (bubbleBox.southEast().x() - bubbleBox.northWest().x()) / 2 ;
     int centerY = (bubbleBox.southEast().y() - bubbleBox.northWest().y()) / 2;
     int x = bubbleBox.northWest().x() + centerX;
     int y = bubbleBox.northWest().y() + centerY;
-    drawText(graphics, data, "Bienvenues au shop mon frère", x, y, 23);
+    graphics.setColor(Color.WHITE);
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+    graphics.setFont(font);
+    drawText(graphics, "Bienvenues au shop mon frère", x, y, 23);
   }
   
-  private static void drawArticleBubble(Graphics2D graphics, GameData data) {
+  private void drawArticleBubble(Graphics2D graphics, GameData data) {
     var bubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE").box();
     var width = bubbleBox.southEast().x() - bubbleBox.northWest().x();
     var height = bubbleBox.southEast().y() - bubbleBox.northWest().y();
     graphics.drawRect(bubbleBox.northWest().x(), bubbleBox.northWest().y(), width, height);
   }
   
-  private static void drawButtonShop(Graphics2D graphics, GameData data) {
+  private void drawButtonShop(Graphics2D graphics, GameData data) {
   	var img = data.imgMap().get("ICON_SHOP_LEFT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_LEFT").transform(), null);
     img = data.imgMap().get("ICON_SHOP_RIGHT");
@@ -999,11 +1006,44 @@ public record GameView(int width, int height, int tileSize) {
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_BUY").transform(), null);
   }
   
-  private static void drawSellArticle(Graphics2D graphics, GameData data) {
+  private void drawSellArticle(Graphics2D graphics, GameData data) {
     var bubbleBox = MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").box();
     var width = bubbleBox.southEast().x() - bubbleBox.northWest().x();
     var height = bubbleBox.southEast().y() - bubbleBox.northWest().y();
     graphics.drawRect(bubbleBox.northWest().x(), bubbleBox.northWest().y(), width, height);
+  }
+  
+  private void drawArticle(Graphics2D graphics, GameData data) {
+  	Iterator<Map.Entry<Item, Integer>> it = data.getShopLst().getCurrentShop().entrySet().iterator();
+  	Item item = it.next().getKey();
+    var imageBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_IMAGE_HOLDER").box();
+    drawItemShopImage(graphics, data, data.imgMapByID().get(item.ID()), imageBubbleBox);
+    var titleBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
+    drawItemShopName(graphics, item, titleBubbleBox);
+  }
+  
+  private void drawItemShopImage(Graphics2D graphics, GameData data, BufferedImage img, BoundingBox bubbleBox) {
+  	XY northWest = bubbleBox.northWest();
+  	XY southEast = bubbleBox.southEast();
+  	double width = southEast.x() - northWest.x();
+  	double height = southEast.y() - northWest.y();
+		drawElement(graphics, img, northWest.x(), northWest.y(), width, height, Direction.UP);
+	}
+  
+  private void drawItemShopName(Graphics2D graphics, Item item, BoundingBox titleBubbleBox) {
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
+    graphics.setFont(font);
+    graphics.setColor(switch(item.rarity()) {
+	    case COMMON -> Color.GRAY;
+	    case RARE -> Color.GREEN;
+	    case SUPERARE -> Color.BLUE;
+	    case EPIC -> Color.MAGENTA;
+	    case LEGENDARY -> Color.YELLOW;
+	    case MYTHIC -> Color.PINK;
+    });
+    int centerX = (titleBubbleBox.southEast().x() - titleBubbleBox.northWest().x()) / 2;
+    int centerY = (titleBubbleBox.southEast().y() - titleBubbleBox.northWest().y()) / 2;
+    drawText(graphics, item.toString().toUpperCase(), titleBubbleBox.northWest().x() + centerX, titleBubbleBox.northWest().y() + centerY, 10);
   }
   
   /**
