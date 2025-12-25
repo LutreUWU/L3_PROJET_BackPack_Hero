@@ -11,6 +11,7 @@ import com.github.forax.zen.Event;
 import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
+import com.github.forax.zen.PointerEvent.Location;
 
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
@@ -50,9 +51,7 @@ public class GameController {
 	/**
 	 * Default constructor, which does basically nothing.
 	 */
-	public GameController() {
-	}
-
+	public GameController() {}
 	/**
 	 * Goes once in the game loop, which consists in retrieving user actions,
 	 * transmitting it to the GameView and GameData, and dealing with time events.
@@ -68,108 +67,7 @@ public class GameController {
 			case PointerEvent pointerEvent -> {
 				// If we click down on the screen
 				if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) {
-					var res = GameDataClick.click(pointerEvent.location().x(), pointerEvent.location().y());
-					switch (res.type()) {
-					case ITEM -> {
-						var currentItem = (Item) res.value();
-						data.setDragItem(currentItem);
-						GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-						GameDataClick.updateBoundingBox(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-					}
-					case MAP_OR_BAG -> {
-						if (!data.getShop() && !GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
-							data.swapMapOrBag();
-						}
-					}
-					case BAG -> {
-						if (data.mapOrBag() && GameDataCombat.combat()) {
-							GameDataCombat.heroAction(data, (XY) res.value());
-						}
-						data.bag().unlockCaseBackpack((XY) res.value());
-					}
-					case EVENT_CHOICE -> {
-						if ((int) res.value() == 1) {
-							data.event().choose1(data);
-						}
-						if ((int) res.value() == 2) {
-							data.event().choose2(data);
-						}
-						if ((int) res.value() == 3) { // Quand on clique sur le bouton de fin
-							// Ajouter les conséquences de fin d'event
-							data.event().restartEvent();
-							data.outEvent();
-						}
-						;
-
-					}
-					case MAP -> {
-						var coord = (XY) res.value();
-						if (coord != null) {
-							if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
-								var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
-								data.setShortestPath(shortestPath);
-								IO.println(shortestPath);
-								IO.println(shortestPath.stream()
-																				.map(XY::toString)
-																				.collect(Collectors.joining(" --> ")));
-								data.map().setHeroPos(coord);
-								var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
-								switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
-								case EnemyRoom room -> {
-									if (!room.getAlreadyVisited()) {
-										data.swapMapOrBag();
-										GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())), data);
-										data.map().updateMap(coord);
-										room.nowVisited();
-									}
-								}
-								case EventRoom eventRoom -> {
-									if (!eventRoom.getAlreadyVisited()) {
-										var linkedEvent = eventRoom.getEvent();
-										data.inEvent(linkedEvent);
-										data.map().updateMap(coord);
-										eventRoom.visitedEvent();
-									}
-								}
-								case LockedDoor roomDoor -> {
-									if (roomDoor.getLock()) {
-										var linkedEvent = roomDoor.getEvent();
-										data.inEvent(linkedEvent);
-									}
-								}
-								case Healer healerRoom -> {
-									if (!healerRoom.getAlreadyVisited()) {
-										var linkedEvent = healerRoom.getEvent();
-										data.inEvent(linkedEvent);
-										data.map().updateMap(coord);
-									}
-								}
-								case Treasure treasure -> {
-									if (!treasure.getAlreadyVisited()) {
-										var linkedEvent = treasure.getEvent();
-										data.inEvent(linkedEvent);
-										data.map().updateMap(coord);
-									}
-								}
-								case Exit roomExit -> {
-									var linkedEvent = roomExit.getEvent();
-									data.inEvent(linkedEvent);
-									data.map().updateMap(coord);
-								}
-								case Shop shop -> {
-									data.setShop(true, shop);
-									new GameDataShop(shop, true, data);
-									data.map().updateMap(coord);
-								}
-								default -> {}
-								}
-							}
-						}
-					}
-					case NOTHING -> {
-					}
-					default -> throw new IllegalArgumentException("Unexpected value: " + res.type());
-					}
+					checkPointerDown(data, pointerEvent.location());
 				}
 
 				if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
@@ -221,8 +119,7 @@ public class GameController {
 					case Key.E -> {
 						return false;
 					}
-					default -> {
-					}
+					default -> {}
 					}
 					GameView.draw(context, data, view);
 				}
@@ -233,6 +130,117 @@ public class GameController {
 		return true;
 	}
 
+	/**
+	 * Check where the mouse is when we click down,
+	 * and update the game in consequence.
+	 * 
+	 * @param data					{@code GameData} of the game.
+	 * @param mouse					{@code Location} containing the coordinate of the mouse.
+	 */
+	private static void checkPointerDown(GameData data, Location mouse) {
+		var res = GameDataClick.click(mouse.x(), mouse.y());
+		switch (res.type()) {
+		case ITEM -> newDragItem(data, (Item) res.value(), mouse.x(), mouse.y());
+		case MAP_OR_BAG -> swapMapOrBag(data);
+		case BAG -> actionBag(data, (XY) res.value());
+		case EVENT_CHOICE -> applyEvent(data, (int) res.value());
+		case MAP -> applyMap(data, (XY) res.value());
+		case NOTHING -> {}
+		default -> throw new IllegalArgumentException("Unexpected value: " + res.type());
+		}
+	}
+	
+	private static void applyMap(GameData data, XY coord) {
+		if (coord != null) {
+			if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
+				var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
+				data.setShortestPath(shortestPath);
+				data.map().setHeroPos(coord);
+				var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
+				switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
+				case EnemyRoom room -> {
+					if (!room.getAlreadyVisited()) {
+						data.swapMapOrBag();
+						GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())), data);
+						data.map().updateMap(coord);
+						room.nowVisited();
+					}
+				}
+				case EventRoom eventRoom -> {
+					if (!eventRoom.getAlreadyVisited()) {
+						var linkedEvent = eventRoom.getEvent();
+						data.inEvent(linkedEvent);
+						data.map().updateMap(coord);
+						eventRoom.visitedEvent();
+					}
+				}
+				case LockedDoor roomDoor -> {
+					if (roomDoor.getLock()) {
+						var linkedEvent = roomDoor.getEvent();
+						data.inEvent(linkedEvent);
+					}
+				}
+				case Healer healerRoom -> {
+					if (!healerRoom.getAlreadyVisited()) {
+						var linkedEvent = healerRoom.getEvent();
+						data.inEvent(linkedEvent);
+						data.map().updateMap(coord);
+					}
+				}
+				case Treasure treasure -> {
+					if (!treasure.getAlreadyVisited()) {
+						var linkedEvent = treasure.getEvent();
+						data.inEvent(linkedEvent);
+						data.map().updateMap(coord);
+					}
+				}
+				case Exit roomExit -> {
+					var linkedEvent = roomExit.getEvent();
+					data.inEvent(linkedEvent);
+					data.map().updateMap(coord);
+				}
+				case Shop shop -> {
+					data.setShop(true, shop);
+					new GameDataShop(shop, true, data);
+					data.map().updateMap(coord);
+				}
+				default -> {}
+				}
+			}
+		}
+		
+	}
+	private static void applyEvent(GameData data, int choice) {
+		if (choice == 1) {
+			data.event().choose1(data);
+		}
+		if (choice== 2) {
+			data.event().choose2(data);
+		}
+		if (choice == 3) {
+			data.event().restartEvent();
+			data.outEvent();
+		}
+	}
+	
+	private static void newDragItem(GameData data, Item item, int mouseX, int mouseY) {
+		data.setDragItem(item);
+		GameDataClick.setOldPosition(mouseX, mouseY);
+		GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
+	}
+	
+	private static void swapMapOrBag(GameData data) {
+		if (!data.getShop() && !GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
+			data.swapMapOrBag();
+		}
+	}
+	
+	private static void actionBag(GameData data, XY coord) {
+		if (data.mapOrBag() && GameDataCombat.combat()) {
+			GameDataCombat.heroAction(data, coord);
+		}
+		data.bag().unlockCaseBackpack(coord);
+	}
 	/**
 	 * Sets up the game, then launches the game loop.
 	 * 
@@ -259,6 +267,6 @@ public class GameController {
 	 * @param args Spurious arguments.
 	 */
 	public static void main(String[] args) {
-		Application.run(Color.WHITE, GameController::memoryGame);
+		Application.run(Color.GRAY, GameController::memoryGame);
 	}
 }
