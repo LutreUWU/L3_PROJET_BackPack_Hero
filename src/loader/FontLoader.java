@@ -49,7 +49,7 @@ public class FontLoader {
 		add_folder("data/font");
 		h1 = (int) (screenInfo.width() * 0.025);
 		h2 = (int) (screenInfo.width() * 0.02);
-		h3 = (int) (screenInfo.width() * 0.015);
+		h3 = (int) (screenInfo.width() * 0.013);
 		span = (int) (screenInfo.width() * 0.008);
 	}
 	

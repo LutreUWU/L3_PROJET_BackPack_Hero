@@ -18,14 +18,7 @@ import game.data.GameDataShop;
 import loader.FontLoader;
 import model.Item;
 import model.XY;
-import model.item.common.Arrow;
 import model.item.common.Gold;
-import model.item.common.KeyDoor;
-import model.item.epic.Bow;
-import model.item.epic.DespairShield;
-import model.item.legendary.Axe;
-import model.item.rare.PoisonArrow;
-import model.item.superrare.Bomb;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -207,10 +200,7 @@ public class GameController {
 					switch (key.key()) {
 					case Key.A -> {
 						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-							GameDataClick.addDragItem(new Bomb());
-							GameDataClick.addDragItem(new Bow());
-							GameDataClick.addDragItem(new Arrow());
-							GameDataClick.addDragItem(new PoisonArrow());
+							GameDataClick.addDragItem(new Gold(50));
 						}
 					}
 					case Key.I -> {

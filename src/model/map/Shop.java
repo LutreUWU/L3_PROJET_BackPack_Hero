@@ -1,22 +1,24 @@
 package model.map;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import game.data.GameDataClick;
+import model.Backpack;
 import model.Item;
 import model.RandomItem;
 import model.XY;
 import model.item.common.Gold;
-import model.map.eventManager.LinkedEvent;
+import model.item.common.Sword;
 
 public final class Shop implements Room {
   private int floor;
   final private List<XY> accessible = new ArrayList<>();
-  final private Map<Item, Integer> currentShop = new HashMap<>(); // Item : Price
-
+  final private Map<Item, Integer> currentShop = new LinkedHashMap<>(); // Item : Price
+  private String logShop = "Bienvenue au shop !";
   /**
    * Constructor for the Shop
    * @param floor2
@@ -50,14 +52,59 @@ public final class Shop implements Room {
    * Buy an item of the shop
    * @param item
    */
-  public void buy(Item item) {
-  	currentShop.put(item, -1);
-  	GameDataClick.addDragItem(item);
+  public void buy(Backpack backpack) {
+		var map = currentShop;
+	  Iterator<Map.Entry<Item, Integer>> it = map.entrySet().iterator();
+    var item = it.next();
+    if (backpack.getGoldInBag() >= item.getValue()) {
+    	logShop = setLog(item.getKey());
+    	backpack.subGoldInBag(item.getValue());
+    	it.remove();
+    	GameDataClick.addDragItem(item.getKey());
+    }
+    else {
+    	logShop = "T'as pas la thune pour acheter ça";
+    }
+    if (map.isEmpty()) {
+    	logShop = "Y a plus rien à acheter, reviens plus tard";
+    }
+  }
+  
+  private String setLog(Item item) {
+  	return switch(item) {
+  	case Sword _ -> "T'es sah à acheter ça ?";
+  	case Gold _ -> "Depuis quand je vends de l'argent contre de l'argent ?";
+		default ->  "Très bon achat mon frère";
+  	};
   }
   
   public Map<Item, Integer> getCurrentShop() {
 		return currentShop;
 	}
+  
+  public void rightShiftShop() {
+		var map = currentShop;
+	  Iterator<Map.Entry<Item, Integer>> it = map.entrySet().iterator();
+    Map.Entry<Item, Integer> last = null;
+    while (it.hasNext()) {
+    	last = it.next();
+    }
+    map.remove(last.getKey());
+    LinkedHashMap<Item, Integer> copy = new LinkedHashMap<>();
+    copy.put(last.getKey(), last.getValue());
+    copy.putAll(map);
+    map.clear();
+    map.putAll(copy);
+
+  }
+  
+  public void leftShiftShop() {
+  	var map = currentShop;
+    Iterator<Map.Entry<Item, Integer>> it = map.entrySet().iterator();
+    Map.Entry<Item, Integer> first = it.next();
+    it.remove();
+    map.put(first.getKey(), first.getValue());
+  }
   
   /**
 	 * Getter for accessibles
@@ -67,6 +114,10 @@ public final class Shop implements Room {
 	@Override
   public List<XY> getAccessible(){
 		return accessible;
+	}
+	
+	public String getLogShop() {
+		return logShop;
 	}
 	
 }

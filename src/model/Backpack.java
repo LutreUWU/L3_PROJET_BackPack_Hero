@@ -72,7 +72,7 @@ public class Backpack {
             .sum();
 	}
 	
-	public boolean subGoldInBag(int value) {
+	public boolean fuseGoldInBag(int value) {
 		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.ID() == 2).map(item -> (Gold) item).toList();
 		for (Gold gold : goldItems) {
 			if (gold.value() > value) {
@@ -87,6 +87,24 @@ public class Backpack {
 			}
 		}
 		return false;
+	}
+	
+	public void subGoldInBag(int value) {
+		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.ID() == 2).map(item -> (Gold) item).toList();
+		for (Gold gold : goldItems) {
+			if (gold.value() > value) {
+				Gold newGold = new Gold(gold.shape(), gold.direction(), gold.value() - value);
+				removeItemFromBackpack(gold);
+        addItemToBackpack(newGold);
+			}
+			else {
+				value -= gold.value();
+				removeItemFromBackpack(gold);
+			}
+			if (value == 0) {
+				return;
+			}
+		}
 	}
 	
   /**

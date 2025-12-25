@@ -279,20 +279,19 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private String getEffectItem(Item item) {
-  	var durabilityOrQuantityString = (item.canMerge() ? "Quantité : " : "Durabilité : ") + item.durability() + " ";
   	return switch (item) {
-	  	case KeyDoor _ -> durabilityOrQuantityString + "Déverouille une porte (1 fois)"; 
+	  	case KeyDoor _ -> "Déverouille une porte (1 fois)"; 
 	  	case Gold g -> "Il y a " + g.value() + "gold";
-	  	case Sword _ -> durabilityOrQuantityString + "1AP : Inflige -3 à l'ennemi";
-	  	case DespairShield _ -> durabilityOrQuantityString + "1AP : Se met 10 Shield en échange de 3PV";
-	  	case Mimicry _ -> durabilityOrQuantityString + "-30 PV en échange de 5PV";
-	  	case Massue _ -> durabilityOrQuantityString + "2AP : Influge -30PV à l'ennemi en échange de 5PV";
-	  	case Gant _ -> durabilityOrQuantityString + "1AP : Régénère 10 PV";
-	  	case Axe _ -> durabilityOrQuantityString + "1AP : Inflige -10PV à l'ennemi";
-	  	case Arrow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
-	  	case PoisonArrow _ -> durabilityOrQuantityString + "1AP : Inflige -6PV à l'ennemi et empoisonne l'ennemi";
-	  	case Bow _ -> durabilityOrQuantityString + "1AP : Inflige -8PV à l'ennemi";
-	  	case Bomb _ -> durabilityOrQuantityString + "2AP : Inflige -6PV à tous les ennemies + 1PV par bombe qui l'entoure";
+	  	case Sword _ -> "Inflige -3 à l'ennemi";
+	  	case DespairShield _ ->  "Se met 10 Shield en échange de 3PV";
+	  	case Mimicry _ -> "-30 PV en échange de 5PV";
+	  	case Massue _ -> "Influge -5PV à l'ennemi";
+	  	case Gant _ -> "Régénère 10 PV";
+	  	case Axe _ -> "Inflige -10PV à l'ennemi";
+	  	case Arrow _ -> "Inflige -8PV à l'ennemi";
+	  	case PoisonArrow _ -> "Inflige -6PV à l'ennemi et empoisonne l'ennemi";
+	  	case Bow _ -> "Inflige -8PV à l'ennemi";
+	  	case Bomb _ -> "Inflige -6PV à tous les ennemies + 1PV par bombe qui l'entoure";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -304,16 +303,27 @@ public record GameView(int width, int height, int tileSize) {
   	XY SE = itemInfoBoundingBox.southEast();
 		graphics.drawImage(imgItemInfo, MathLoader.getMapEvent().get("BG_INFO_ITEM").transform(), null);
 		Item item = data.dragItem();
+		if (item == null && data.getShop() && !data.getShopLst().getCurrentShop().isEmpty()) {
+			item = data.getShopLst().getCurrentShop().keySet().iterator().next();
+		}
+		int height = SE.y() - NW.y();
 		if (item != null) {
 	    drawTextInfoName(graphics, item, NW);
+	    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+	    graphics.setFont(font);
+	    FontMetrics fm = graphics.getFontMetrics();
+	    graphics.setColor(Color.WHITE);
 		  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 20);
-		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + (int) ((SE.y() - NW.y()) / 2), 20);
-
+		  graphics.setColor(Color.GREEN);
+		  drawTextInfo(graphics, "AP : " + item.AP(), NW.x(), NW.y() + height / 3, 20);
+		  drawTextInfo(graphics, "Durability : " + item.durability(), NW.x(), NW.y() + height / 3 + (int) (fm.getAscent() * 1.5), 20);
+		  graphics.setColor(Color.WHITE);
+		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + height / 3 + (int) (fm.getAscent() * 4), 23);
 		}
   }
   
   private void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
-  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH2());
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setFont(font);
     graphics.setColor(switch(item.rarity()) {
 	    case COMMON -> Color.GRAY;
@@ -327,10 +337,7 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private void drawTextInfo(Graphics2D graphics, String content, int x, int y, int maxChar) {
-    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getSpan());
-    graphics.setFont(font);
     FontMetrics fm = graphics.getFontMetrics();
-    graphics.setColor(Color.WHITE);
     int maxCharsPerLine = maxChar;
     String[] words = content.split(" ");
     StringBuilder line = new StringBuilder();
@@ -971,11 +978,14 @@ public record GameView(int width, int height, int tileSize) {
     img = data.imgMap().get("ICON_EXIT_SHOP");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
     drawTextBubble(graphics, data);
-    drawArticleBubble(graphics, data);
+    if (data.getShopLst().getCurrentShop().isEmpty()) {
+    	drawNoItemShop(graphics, data);
+    }
+    else {
+      drawArticle(graphics, data);
+    }  	
     drawButtonShop(graphics, data);
     drawSellArticle(graphics, data);
-    drawArticle(graphics, data);
-  	
   }
   
   private void drawTextBubble(Graphics2D graphics, GameData data) {
@@ -987,14 +997,19 @@ public record GameView(int width, int height, int tileSize) {
     graphics.setColor(Color.WHITE);
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
-    drawText(graphics, "Bienvenues au shop mon frère", x, y, 23);
+    drawText(graphics, data.getShopLst().getLogShop(), x, y, 30);
   }
   
-  private void drawArticleBubble(Graphics2D graphics, GameData data) {
-    var bubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE").box();
-    var width = bubbleBox.southEast().x() - bubbleBox.northWest().x();
-    var height = bubbleBox.southEast().y() - bubbleBox.northWest().y();
-    graphics.drawRect(bubbleBox.northWest().x(), bubbleBox.northWest().y(), width, height);
+  private void drawNoItemShop(Graphics2D graphics, GameData data) {
+  	var img = data.imgMap().get("ICON_SOLDOUT");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SOLDOUT").transform(), null);
+    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
+    graphics.setFont(font);
+    graphics.setColor(Color.WHITE);
+    var titleBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
+    int centerX = (titleBubbleBox.southEast().x() - titleBubbleBox.northWest().x()) / 2;
+    int centerY = (titleBubbleBox.southEast().y() - titleBubbleBox.northWest().y()) / 2;
+    drawText(graphics, "Y A PLUS RIEN", titleBubbleBox.northWest().x() + centerX, titleBubbleBox.northWest().y() + centerY, 15);
   }
   
   private void drawButtonShop(Graphics2D graphics, GameData data) {
@@ -1015,11 +1030,17 @@ public record GameView(int width, int height, int tileSize) {
   
   private void drawArticle(Graphics2D graphics, GameData data) {
   	Iterator<Map.Entry<Item, Integer>> it = data.getShopLst().getCurrentShop().entrySet().iterator();
-  	Item item = it.next().getKey();
+  	Map.Entry<Item, Integer> entry = it.next();
+  	Item item = entry.getKey();
+  	int price = entry.getValue();
     var imageBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_IMAGE_HOLDER").box();
+		if (data.imgMapByID().get(item.ID()) == null) {
+			throw new IllegalArgumentException("Can't fint img : " + item.toString());
+		}
     drawItemShopImage(graphics, data, data.imgMapByID().get(item.ID()), imageBubbleBox);
     var titleBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
     drawItemShopName(graphics, item, titleBubbleBox);
+    drawItemShopInfo(graphics, item, price, data.getShopLst().getCurrentShop().size());    
   }
   
   private void drawItemShopImage(Graphics2D graphics, GameData data, BufferedImage img, BoundingBox bubbleBox) {
@@ -1046,6 +1067,25 @@ public record GameView(int width, int height, int tileSize) {
     drawText(graphics, item.toString().toUpperCase(), titleBubbleBox.northWest().x() + centerX, titleBubbleBox.northWest().y() + centerY, 10);
   }
   
+  private void drawItemShopInfo(Graphics2D graphics, Item item, int price, int nbItem) {
+  	var bubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_IMAGE_HOLDER").box();
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+  	graphics.setFont(font);
+  	graphics.setColor(Color.BLACK);
+  	FontMetrics fm = graphics.getFontMetrics();
+  	int centerX = bubbleBox.northWest().x() + (bubbleBox.southEast().x() - bubbleBox.northWest().x()) / 2; 
+  	int centerY = bubbleBox.southEast().y() - fm.getAscent() / 2; 
+    drawText(graphics, "Price : " + price + " Golds", centerX, centerY + (int) (fm.getAscent()*0.2), 20);
+  	graphics.setColor(Color.YELLOW);
+    drawText(graphics, "Price : " + price + " Golds", centerX, centerY, 20);
+  	bubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
+  	centerX = bubbleBox.northWest().x() + (bubbleBox.southEast().x() - bubbleBox.northWest().x()) / 2; 
+  	centerY = bubbleBox.northWest().y(); 
+  	graphics.setColor(Color.WHITE);
+    drawText(graphics, "Items restants : " + nbItem, centerX, centerY - fm.getAscent()/2, 20);
+  }
+  
+  
   /**
    * Methods for drawing the game 
    * 
@@ -1065,7 +1105,6 @@ public record GameView(int width, int height, int tileSize) {
 			if(!GameDataClick.getDragItemMap().isEmpty()) {
 				updateDragItem(graphics, data);
 			}
-			
 		} else {
 			drawMap(graphics, data);
 		}

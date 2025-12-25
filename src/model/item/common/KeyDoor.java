@@ -11,16 +11,19 @@ import model.XY;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, int score) implements Item{
+public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int AP) implements Item{
 		public KeyDoor() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 1, -1);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 1, -1, 0);
 	  }
 	
-		public KeyDoor(XY coord, Direction direction) {
-      this(initShape(coord, direction), direction, Rarity.COMMON, 1, -1);
+		public KeyDoor(XY[] shape, Direction direction) {
+      this(shape, direction, Rarity.COMMON, 1, -1, 0);
     }
 		
-
+		public KeyDoor(XY coord, Direction direction) {
+      this(initShape(coord, direction), direction, Rarity.COMMON, 1, -1, 0);
+    }
+		
     private static XY[] initShape(XY coord, Direction direction) {
       XY[] b = new XY[2];
       b[0] = new XY(coord.x(), coord.y());
@@ -66,7 +69,7 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
     @Override
     public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     	GameDataCombat.addLog("Garde ta clef précieusement au lieu de jouer avec !");
-      return new KeyDoor(shape, direction, rarity, ID, score);
+      return new KeyDoor(shape, direction);
     }
     
     @Override
@@ -76,7 +79,7 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
     
     @Override
     public KeyDoor rotateXY() {
-      return new KeyDoor(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score);
+      return new KeyDoor(rotate90(shape(), shape()[0]), direction.next());
     }
 
 

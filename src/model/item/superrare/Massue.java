@@ -12,13 +12,17 @@ import model.XY;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
+public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
 		public Massue() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.SUPERARE, 6, 10, 4);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.SUPERARE, 6, 10, 4, 1);
 	  }
 	
+		public Massue(XY[] shape, Direction direction, int durability) {
+      this(shape, direction, Rarity.SUPERARE, 6, 10, durability, 1);
+    }
+		
 		public Massue(XY coord, Direction direction, int durability) {
-      this(initShape(coord, direction), direction, Rarity.SUPERARE, 6, 10, durability);
+      this(initShape(coord, direction), direction, Rarity.SUPERARE, 6, 10, durability, 1);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -47,13 +51,13 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     @Override
     public Item addDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-    	return new Massue(shape, direction, rarity, ID, score, durability + nb); 
+    	return new Massue(shape, direction, durability + nb); 
     }
     
     @Override
     public Item subDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-    	return new Massue(shape, direction, rarity, ID, score, durability - nb); 
+    	return new Massue(shape, direction, durability - nb); 
     }
     
     @Override
@@ -76,7 +80,7 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     
     @Override
     public Massue rotateXY() {
-      return new Massue(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
+      return new Massue(rotate90(shape(), shape()[0]), direction.next(), durability);
     }
 
 

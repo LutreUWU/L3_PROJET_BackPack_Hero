@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 
 import game.GameData;
 import model.BoundingBox;
+import model.Direction;
 import model.XY;
 
 /**
@@ -141,7 +142,7 @@ public class MathLoader {
 //================== INFO ITEM ================
 	private static  void getInfoItemValue() {
 		var size = data.bag().getGridSize();
-		var dimX = size * 3.0;
+		var dimX = size * 5.0;
 		var dimY = size * 5.0;
 		var NW = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size, renderDataGame.get("BG_BACKPACK").box().northWest().y());
 		var SE = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size + (int) dimX, renderDataGame.get("BG_BACKPACK").box().southEast().y() );
@@ -153,7 +154,7 @@ public class MathLoader {
 	  AffineTransform transform = new AffineTransform();
 		transform.translate(NW.x(), NW.y());
 	  transform.scale(scaleX, scaleY);
-	  var realNW = new XY((int) (NW.x() + size * 0.9), NW.y() + size/2);
+	  var realNW = new XY((int) (NW.x() + size * 0.9), NW.y() + (int) (dimY*0.15));
 	  var realSE = new XY((int) (SE.x() + size * 0.9), SE.y() + size/2);
 		renderDataGame.put("BG_INFO_ITEM", new RenderData(transform, new BoundingBox(realNW, realSE)));
 	}
@@ -304,7 +305,7 @@ public class MathLoader {
 	  getButtonShopValue(articleWidth, articleHeight);
 	  getBuyButtonShopValue(articleWidth, articleHeight);
 	  getArticleShopValue();
-	  
+	  getSoldOutShopValue(articleWidth, articleHeight);
 	}	
 	
 	private static double getBGshopValue() {
@@ -437,6 +438,21 @@ public class MathLoader {
 	  transform.scale(scaleX, scaleY);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scaleX), (int) (posY + img.getHeight() * scaleY)));
 	  renderDataGame.put("ICON_SHOP_BUY", new RenderData(transform, boundingBox));
+	}
+	
+	private static void getSoldOutShopValue(double articleWidth, double articleHeight) {
+		var img = data.imgMap().get("ICON_SOLDOUT");
+		var shopBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scale = articleWidth / width;
+	  double posX = shopBoundingBox.northWest().x();
+	  double posY = shopBoundingBox.northWest().y() + articleHeight/2 - (height * scale)/2;
+		AffineTransform transform = new AffineTransform();
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scale), (int) (posY + img.getHeight() * scale)));
+	  renderDataGame.put("ICON_SOLDOUT", new RenderData(transform, boundingBox));
 	}
 
 //============================================	

@@ -11,16 +11,18 @@ import model.Rarity;
 import model.XY;
 import model.monster.Enemy;
 
-public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
+public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
 
 		public Axe() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.LEGENDARY, 8, 15, 3);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.LEGENDARY, 8, 15, 3, 1);
 	  }
-	
-		public Axe(XY coord, Direction direction, int durability) {
-      this(initShape(coord, direction), direction, Rarity.LEGENDARY, 8, 15, durability);
+		public Axe(XY[] shape, Direction direction, int durability) {
+      this(shape, direction, Rarity.LEGENDARY, 8, 15, durability, 1);
     }
-
+		
+		public Axe(XY coord, Direction direction, int durability) {
+      this(initShape(coord, direction), direction, Rarity.LEGENDARY, 8, 15, durability, 1);
+    }
     private static XY[] initShape(XY coord, Direction direction) {
       XY[] b = new XY[4];
       b[0] = new XY(coord.x(), coord.y());
@@ -49,13 +51,13 @@ public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
     @Override
     public Item addDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-    	return new Axe(shape, direction, rarity, ID, score, durability + nb); 
+    	return new Axe(shape, direction, durability + nb); 
     }
     
     @Override
     public Item subDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-    	return new Axe(shape, direction, rarity, ID, score, durability - nb); 
+    	return new Axe(shape, direction, durability - nb); 
     }
     
     @Override
@@ -78,7 +80,7 @@ public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
     
     @Override
     public Axe rotateXY() {
-      return new Axe(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
+      return new Axe(rotate90(shape(), shape()[0]), direction.next(), durability);
     }
 
 

@@ -12,13 +12,17 @@ import model.XY;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item{
+public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
 	public Bow() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.EPIC, 10, 15, 10);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.EPIC, 10, 15, 10, 0);
   }
 
+	public Bow(XY[] shape, Direction direction, int durability) {
+    this(shape, direction, Rarity.EPIC, 10, 15, durability, 0);
+  }
+	
 	public Bow(XY coord, Direction direction, int durability) {
-    this(initShape(coord, direction), direction, Rarity.EPIC, 10, 15, durability);
+    this(initShape(coord, direction), direction, Rarity.EPIC, 10, 15, durability, 0);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {
@@ -48,13 +52,13 @@ public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
   @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new Bow(shape, direction, rarity, ID, score, durability + nb); 
+  	return new Bow(shape, direction, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new Bow(shape, direction, rarity, ID, score, durability - nb); 
+  	return new Bow(shape, direction, durability - nb); 
   }
   
   @Override
@@ -70,12 +74,12 @@ public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Cliquez sur les flèches pour tirer !");
-    return new Bow(shape, direction, rarity, ID, score, durability);
+    return new Bow(shape, direction, durability);
   }
   
   @Override
   public Bow rotateXY() {
-    return new Bow(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
+    return new Bow(rotate90(shape(), shape()[0]), direction.next(), durability);
   }
 
   @Override

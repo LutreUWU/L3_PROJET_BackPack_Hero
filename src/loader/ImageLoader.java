@@ -48,7 +48,7 @@ public class ImageLoader {
 	private static int getItem(String name) {
 		return switch (name) {
 		case "keyDoor" -> 1;
-		// case gold -> 2
+		case "gold" -> 2;
 	  case "sword" -> 3;
 	  case "despairShield" -> 4;
 	  case "mimicry" -> 5;

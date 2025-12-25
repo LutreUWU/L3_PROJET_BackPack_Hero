@@ -13,13 +13,17 @@ import model.Synergy;
 import model.XY;
 import model.monster.Enemy;
 
-public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability) implements Item {
+public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item {
 	public Bomb() {
-		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 12, 25, 1);
+		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 12, 25, 1, 2);
 	}
 
+	public Bomb(XY[] shape, Direction direction, int durability) {
+		this(shape, direction, Rarity.COMMON, 12, 20, durability, 2);
+	}
+	
 	public Bomb(XY coord, Direction direction, int durability) {
-		this(initShape(coord, direction), direction, Rarity.COMMON, 12, 20, durability);
+		this(initShape(coord, direction), direction, Rarity.COMMON, 12, 20, durability, 2);
 	}
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -39,14 +43,14 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 	public Item addDurability(int nb) {
 		if (nb <= 0)
 			throw new IllegalArgumentException("! Not Negative value !");
-		return new Bomb(shape, direction, rarity, ID, score, durability + nb);
+		return new Bomb(shape, direction, durability + nb);
 	}
 
 	@Override
 	public Item subDurability(int nb) {
 		if (nb <= 0)
 			throw new IllegalArgumentException("! Not Negative value !");
-		return new Bomb(shape, direction, rarity, ID, score, durability - nb);
+		return new Bomb(shape, direction, durability - nb);
 	}
 
 	@Override
@@ -74,7 +78,7 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 
 	@Override
 	public Bomb rotateXY() {
-		return new Bomb(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability);
+		return new Bomb(rotate90(shape(), shape()[0]), direction.next(), durability);
 	}
 
 	@Override

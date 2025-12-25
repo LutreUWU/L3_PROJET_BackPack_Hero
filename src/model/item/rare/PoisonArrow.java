@@ -13,13 +13,17 @@ import model.Synergy;
 import model.XY;
 import model.monster.Enemy;
 
-public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, Effect effect) implements Item{
+public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP, Effect effect) implements Item{
 	public PoisonArrow() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 11, 15, 5, Effect.POISON);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 11, 15, 5, 1, Effect.POISON);
   }
 
+	public PoisonArrow(XY[] shape, Direction direction, int durability, Effect effect) {
+    this(shape, direction, Rarity.RARE, 11, 15, durability, 1, effect);
+  }
+	
 	public PoisonArrow(XY coord, Direction direction, int durability, Effect effect) {
-    this(initShape(coord, direction), direction, Rarity.RARE, 11, 15, durability, effect);
+    this(initShape(coord, direction), direction, Rarity.RARE, 11, 15, durability, 1, effect);
   }
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -38,13 +42,13 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
   @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new PoisonArrow(shape, direction, rarity, ID, score, durability + nb, effect); 
+  	return new PoisonArrow(shape, direction, durability + nb, effect); 
   }
   
   @Override
   public Item subDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new PoisonArrow(shape, direction, rarity, ID, score, durability - nb, effect); 
+  	return new PoisonArrow(shape, direction, durability - nb, effect); 
   }
   
   @Override
@@ -67,12 +71,12 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
       return subDurability(1);
   	}
   	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");
-  	return new PoisonArrow(shape, direction, rarity, ID, score, durability, effect);
+  	return new PoisonArrow(shape, direction, durability, effect);
   }
   
   @Override
   public PoisonArrow rotateXY() {
-    return new PoisonArrow(rotate90(shape(), shape()[0]), direction.next(), rarity, ID, score, durability, effect);
+    return new PoisonArrow(rotate90(shape(), shape()[0]), direction.next(), durability, effect);
   }
 
   @Override

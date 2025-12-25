@@ -1,5 +1,6 @@
 package game.data;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,7 +13,6 @@ import model.BoundingBox;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
-import model.monster.Enemy;
 
 public class GameDataClick {
 	private static GameData data;
@@ -361,6 +361,45 @@ public class GameDataClick {
 		}
   }
   
+  private static void arrowButtonClick(int x, int y) {
+  	leftArrowButtonClick(x, y);
+  	rightArrowButtonClick(x, y);
+  }
+  
+  private static void leftArrowButtonClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("ICON_SHOP_LEFT").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.getShopLst().leftShiftShop();
+			}
+		}
+  }
+  
+  private static void rightArrowButtonClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("ICON_SHOP_RIGHT").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.getShopLst().rightShiftShop();
+			}
+		}
+  }
+  
+  private static void buyButtonClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("ICON_SHOP_BUY").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.getShopLst().buy(data.bag());
+			}
+		}
+  }
+  
+  
   /**
    * Main function treating the click and returning information about what we clicks.
    * 
@@ -375,17 +414,14 @@ public class GameDataClick {
     if (item != null) {
         return new ClickResult(ClickType.ITEM, item);
     }
-
     XY bag = bagClick(x, y);
     if (bag != null) {
         return new ClickResult(ClickType.BAG, bag);
     }
-
     XY mapPos = floorClick(x, y);
     if (mapPos.x() != -1) {
         return new ClickResult(ClickType.MAP, mapPos);
     }
-    
     int mapOrBag = mapOrBagClick(x, y);
     if (mapOrBag != 0) {
         return new ClickResult(ClickType.MAP_OR_BAG, mapOrBag);
@@ -400,6 +436,10 @@ public class GameDataClick {
       endButtonClick(x, y);
     }
     if (data.getShop()) {
+    	if (!data.getShopLst().getCurrentShop().isEmpty()) {
+    		arrowButtonClick(x, y);
+      	buyButtonClick(x, y);
+    	}
     	exitButtonClick(x, y);
     }
     

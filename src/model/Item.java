@@ -11,6 +11,7 @@ public interface Item {
 		Direction direction();
 		int durability();
     int score();
+    int AP();
     boolean canMerge();
     Item addDurability(int nb);
     Item subDurability(int nb);
