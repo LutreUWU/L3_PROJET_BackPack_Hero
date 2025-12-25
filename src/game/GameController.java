@@ -104,7 +104,7 @@ public class GameController {
 					}
 					case MAP -> {
 						var coord = (XY) res.value();
-						if (coord.x() != -1 && coord.y() != -1) {
+						if (coord != null) {
 							if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
 								var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
 								data.setShortestPath(shortestPath);

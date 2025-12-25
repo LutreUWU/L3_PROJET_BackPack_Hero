@@ -1,8 +1,8 @@
 package game.data;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import com.github.forax.zen.ScreenInfo;
 
@@ -20,7 +20,6 @@ public class GameDataClick {
 	private static ScreenInfo screenInfo;
 	/**
    * Has a record {@code XY} containing the mouse coordinate before moving the cursor.
-   * 
    */
   private static XY oldPosition;
 	/**
@@ -42,8 +41,8 @@ public class GameDataClick {
    * @param x					 Coordinate x we click
    * @param y 				 Coordinate y we click
    * 
-   * @return -2 if we click a lock case, -1 if we click a free case else, ID of the weapon
-   * 				  0 if we click outside of the bag.
+   * @return  {@code XY} containing the coordinate of the tile we click.
+   * 				  null if we click outside of the bag.
    */
   public static XY bagClick(int x, int y) {
   	int size = backpack.getGridSize();
@@ -64,15 +63,15 @@ public class GameDataClick {
   
   
   /**
-	 * Check the column of the the clicked position inside the grid
+	 * Check the column of the clicked position inside the grid
 	 * 
-	 * <p>The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.</br>
-	 * This method determines in which row the x-coordinate of a mouse click falls.</p>
+	 * The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.
+	 * This method determines in which row the x-coordinate of a mouse click falls.
 	 * 
 	 * @param leftGrid The x-coordinate of the top of the grid.
 	 * @param gridSize The height of each grid cell.
-	 * @param gap       The horizontal gap between two grid cells.
-	 * @param x         The x-coordinate of the click.
+	 * @param gap      The horizontal gap between two grid cells.
+	 * @param x        The x-coordinate of the click.
 	
 	 * @return The column index (0 to 11), or -1 if the click is outside the grid cells.
 	 */
@@ -92,11 +91,11 @@ public class GameDataClick {
   /**
 	 * Check the row of the the clicked position inside the grid
 	 * 
-	 * <p>The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.</br>
-	 * This method determines in which row the y-coordinate of a mouse click falls.</p>
+	 * The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.
+	 * This method determines in which row the y-coordinate of a mouse click falls.
 	 * 
 	 * @param topGrid   The y-coordinate of the top of the grid.
-	 * @param gridSize The height of each grid cell.
+	 * @param gridSize  The height of each grid cell.
 	 * @param gap       The horizontal gap between two grid cells.
 	 * @param xy        The y-coordinate of the click.
 	
@@ -118,8 +117,11 @@ public class GameDataClick {
   /**
    * Methods to check if we click inside the floor map
    * 
-   * @param x					 Coordinate x we click
-   * @param y 				 Coordinate y we click
+   * @param x Coordinate x we click
+   * @param y	Coordinate y we click
+   * 
+   * @return {@code XY} containing the coordinate of the tile we click in the map.
+   * 				 null if we click outside of the map.
    */
   private static XY floorClick(int x, int y) {
   	int size = backpack.getGridSize();
@@ -129,11 +131,10 @@ public class GameDataClick {
   	if(x < leftGrid || x > (leftGrid + 11 * size + 10 * gap) ||
    		 y < topGrid   || y > (topGrid + 5 * size + 4 * gap)
    		) {
-   		return new XY(-1, -1);
+   		return null;
    	}
   	return new XY(checkMapAbsClick(leftGrid, size, gap, x), checkMapOrdClick(topGrid, size, gap, y));
   }
-  
   
   /**
    * To know if we click the button to switch the display of the map/bag
@@ -153,18 +154,20 @@ public class GameDataClick {
   }
   
   /**
-   * Main function that look if we click on a items draggable on the screen
+   * Method that look if we click on a item draggable on the screen
    * 
    * @param x	Coordinate x we click
    * @param y Coordinate y we click
    * 
-   * @return {@code Item} 
+   * @return {@code Item} we click
+   * 				 null if no item was clicked
    */
   private static Item itemClick(int x, int y) {
   	if (GameDataCombat.combat()) {
   		return null;
   	}
   	Item item;
+  	// For each item outside the bag
   	for (Map.Entry<Item, BoundingBox> entry : dragItemMap.entrySet()) {
       item = entry.getKey();
       BoundingBox box = entry.getValue();
@@ -173,6 +176,7 @@ public class GameDataClick {
           return item;
       }
   	}
+  	// For each item inside the bag 
   	var res = bagClick(x,y);
   	if (res != null) {
   		if ((item = backpack.getItem(res.x(), res.y())) == null) {
@@ -186,7 +190,7 @@ public class GameDataClick {
   }
   
   /**
-   * Register the the position of the mouse before moving the cursor
+   * Register the position of the mouse before moving the cursor
    * 
    * @param x	Old coordinate x before we move
    * @param y Old coordinate y before we move
@@ -195,17 +199,31 @@ public class GameDataClick {
   	oldPosition = new XY(x, y);
   }
   
+  /**
+   * Get the number of tile horizontally that the item held in the backpack
+   * 
+   * @param item we wants to check the width
+   * 
+   * @return number of tile horizontally
+   */
   private static int getWidth(Item item) {
     XY[] b = item.shape();
     int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
     for (XY block : b) {
-        int x = block.x();
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
+      int x = block.x();
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
     }
     return maxX - minX + 1;
-}
+  }
 
+  /**
+   * Get the number of tile vertically that the item held in the backpack
+   * 
+   * @param item we wants to check the height
+   * 
+   * @return number of tile vertically
+   */
   private static int getHeight(Item item) {
     XY[] b = item.shape();
     int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
@@ -218,27 +236,48 @@ public class GameDataClick {
 }
   
   /**
-   * Add an item in the list of items draggable.
+   * Add an item in the list of draggable item.
    * 
-   * @param item item we wants to move
+   * @param item we wants to move
    */
   public static void addDragItem(Item item) {
+  	Objects.requireNonNull(item);
   	dragItemMap.put(item, new BoundingBox(
 											new XY(screenInfo.width() / 2 - (getWidth(item) * backpack.getGridSize() / 2) , (int) (screenInfo.height() / 1.6) - (getHeight(item) * backpack.getGridSize() / 2) ),
 											new XY(screenInfo.width() / 2 + (getWidth(item) * backpack.getGridSize() / 2) , (int) (screenInfo.height() / 1.6) + (getHeight(item) * backpack.getGridSize() / 2) ))
 							 		 );
   }
   
-  
+  /**
+   * Remove an item from the list of draggable item.
+   * 
+   * @param item we wants to remove
+   */
   public static void removeItemFromDrag(Item item) {
+  	Objects.requireNonNull(item);
   	dragItemMap.remove(item);
   }
   
+  
+  /**
+   * Reset the list of draggable item. 
+   */
   public static void resetDragItemLst() {
   	dragItemMap = new LinkedHashMap<>();
   }
   
+  /**
+   * Update the boundingBox of the {@code Item} in argument at
+   * the designed location.
+   * 
+   * We call this method when rotating an {@code Item}.
+   * 
+   * @param item item we wants to modify the boundingBox
+   * @param x		 x location
+   * @param y		 y location
+   */
   public static void updateBoundingBox(Item item, int x, int y) {
+  	Objects.requireNonNull(item);
   	int minX = x - (getWidth(item) * backpack.getGridSize() / 2);
     int minY = y - (getHeight(item) * backpack.getGridSize() / 2);
   	int maxX = x + (getWidth(item) * backpack.getGridSize() / 2);
@@ -252,6 +291,7 @@ public class GameDataClick {
    * @param item item we wants to move
    */
   public static void addDragItemFromBag(Item item, int x, int y) {
+  	Objects.requireNonNull(item);
   	var size = backpack.getGridSize();
   	var northWest = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)), (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * (y - 1))));
   	var southEast = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + getWidth(item) * size, (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * y) + getHeight(item) * size));
@@ -259,13 +299,15 @@ public class GameDataClick {
   }
   
   /**
-   * Updata the BoundingBox of the items we're currently moving. 
+   * Update the BoundingBox of the items when moving it. 
+   * To update the boundingbox, we use the old and new coordinate of the item to calculate the new value.
    * 
    * @param item item we wants to move
-   * @param x	New coordinate x when moving. 
-   * @param y New coordinate y when moving.
+   * @param x		 New coordinate x when moving. 
+   * @param y 	 New coordinate y when moving.
    */
   public static void moveDragItem(Item item, int x, int y) {
+  	Objects.requireNonNull(item);
   	int addX = x - oldPosition.x();
   	int addY = y - oldPosition.y();
   	var newNorthWest = new XY(dragItemMap.get(item).northWest().x() + addX, dragItemMap.get(item).northWest().y() + addY);
@@ -273,10 +315,23 @@ public class GameDataClick {
   	dragItemMap.put(item, new BoundingBox(newNorthWest, newSouthEast));
   }
   
+  /**
+   * Check if we click in a choice during an event.
+   * Everyone event has 2 buttons, and a button to end an event.
+   * First we check if we click the end button event.
+   * Then we check if we click a choice event.
+   * 
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   * @return 1 or 2 if we click a choice
+   * 				 3 if we click the end button
+   */
   public static int eventChoiceClick(int x, int y) {
   	if (data.event() == null) {
   		return -1;
   	}
+  	// End button
   	var boundingBox = MathLoader.getMapEvent().get("BG_CHOICE_END").box();
   	if (data.event().getRoot().getChoice2() == null) {
     	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
@@ -285,6 +340,7 @@ public class GameDataClick {
     		}
     	}
   	}
+  	// Choice button
   	else {
     	for (int i = 0; i < 2; i++) {
     		String key = "BG_CHOICE" + Integer.toString(i + 1);
@@ -299,6 +355,12 @@ public class GameDataClick {
   	return -1;
   }
   
+  /**
+   * Check if we click in a mob during a combat, and swap the target to him.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void mobClick(int x, int y) {
   	GameDataCombat.getEnemyBox().forEach((enemy, boundingBox) -> {
   		var NW = boundingBox.northWest();
@@ -311,6 +373,12 @@ public class GameDataClick {
   	}); ;
   }
   
+  /**
+   * Check if we click the end button during a combat.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void endButtonClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("BG_ENDTURN").box();
 		var NW = boundingBox.northWest();
@@ -322,6 +390,13 @@ public class GameDataClick {
 		}
   }
   
+  /**
+   * Check if we hover the bin button.
+   * We use this method to create the animation with the bin when holding an item above
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   public static void binHover(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("BG_BIN_OPEN").box();
 		var NW = boundingBox.northWest();
@@ -335,6 +410,13 @@ public class GameDataClick {
 		data.setBin(false);
   }
   
+  /**
+   * Check if after releasing the mouseclick, we're above the bin button.
+   * If that, remove the item definetely from the game.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void binClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("BG_BIN_OPEN").box();
 		var NW = boundingBox.northWest();
@@ -348,6 +430,13 @@ public class GameDataClick {
 		}
   }
   
+  /**
+   * Check if we click the exit button in the shop.
+   * If that, exit the shop.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void exitButtonClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("ICON_EXIT_SHOP").box();
 		var NW = boundingBox.northWest();
@@ -355,17 +444,30 @@ public class GameDataClick {
 		if (x >= NW.x() && x <= SE.x()) {
 			if (y >= NW.y() && y <= SE.y()) {
 				data.setShop(false, null);
-				removeItemFromDrag(data.dragItem());
 				return;
 			}
 		}
   }
   
+  /**
+   * Check if we click the arrow button in the shop.
+   * We call the method for the left and right arrow.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void arrowButtonClick(int x, int y) {
   	leftArrowButtonClick(x, y);
   	rightArrowButtonClick(x, y);
   }
   
+  /**
+   * Check if we click the left button in the shop.
+   * If that, swipe the item lst by one in the left.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void leftArrowButtonClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("ICON_SHOP_LEFT").box();
 		var NW = boundingBox.northWest();
@@ -377,6 +479,13 @@ public class GameDataClick {
 		}
   }
   
+  /**
+   * Check if we click the right button in the shop.
+   * If that, swipe the item lst by one in the right.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void rightArrowButtonClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("ICON_SHOP_RIGHT").box();
 		var NW = boundingBox.northWest();
@@ -388,6 +497,13 @@ public class GameDataClick {
 		}
   }
   
+  /**
+   * Check if we click the buy button in the shop.
+   * If that, buy the item and remove it from the shop.
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   */
   private static void buyButtonClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("ICON_SHOP_BUY").box();
 		var NW = boundingBox.northWest();
@@ -419,7 +535,7 @@ public class GameDataClick {
         return new ClickResult(ClickType.BAG, bag);
     }
     XY mapPos = floorClick(x, y);
-    if (mapPos.x() != -1) {
+    if (mapPos != null) {
         return new ClickResult(ClickType.MAP, mapPos);
     }
     int mapOrBag = mapOrBagClick(x, y);
@@ -442,10 +558,16 @@ public class GameDataClick {
     	}
     	exitButtonClick(x, y);
     }
-    
     return new ClickResult(ClickType.NOTHING, null);
   }
   
+  /**
+   * Check where the mouse is when we release the mouse.
+   * We call this method when releasing an item above the bin button for exemple.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   */
   public static void clickUp(int x, int y) {
   	XY coord = bagClick(x, y);
   	if (coord != null) {
@@ -467,7 +589,6 @@ public class GameDataClick {
 						default -> {
 							data.bag().removeItemFromBackpack(colideItem);
 							colideItem = colideItem.addDurability(itemDrag.durability());
-							IO.println(colideItem);
 							data.bag().addItemToBackpack(colideItem);
 						}
 						}

@@ -38,6 +38,7 @@ public class GameDataCombat {
   private static ArrayList<String> log = new ArrayList<>();
   private static int totalExp;
   private static int levelBeforeCombat;
+  
 	/**
 	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
 	 * 
@@ -62,7 +63,16 @@ public class GameDataCombat {
 		combat = true;
 	}
 	
-	private static void getEnemyBox(ArrayList<Enemy> lstEnemy, ScreenInfo screenInfo,  int heroSizeX, int heroSizeY) {
+	/**
+	 * Get the boundingBox of every enemy in the fight.
+	 * Since every enemy size is based from the hero's size, we need this value
+	 * 
+	 * @param lstEnemy		list of enemies
+	 * @param screenInfo	{@code screenInfo} of the window
+	 * @param heroSizeX		sizeX of the Hero
+	 * @param heroSizeY		sizeY of the Hero
+	 */
+	private static void getEnemyBox(ArrayList<Enemy> lstEnemy, ScreenInfo screenInfo, int heroSizeX, int heroSizeY) {
 		for (int i = 0; i < lstEnemy.size(); i++) {
 			var enemy = lstEnemy.get(i);
 			double sizeX = heroSizeX * enemy.getSizeX();
@@ -80,7 +90,7 @@ public class GameDataCombat {
 	 * This methods take an ID in parameter, it will checks in the bag if a weapon correspond to the ID, then it we'll use it.
 	 * 
 	 * @param data		The data of the game.
-	 * @param object			The ID of the item we click in the backpack.
+	 * @param object	The ID of the item we click in the backpack.
 	 */
 	public static void heroAction(GameData data, XY coord) {
 		Objects.requireNonNull(data);
@@ -113,7 +123,13 @@ public class GameDataCombat {
 		}
 	}
 	
-	public static void killMonster(GameData data) {
+	/**
+	 * Check the list of monster, and kill him if he has below 0 PV.
+	 * Add the exp, update the bounding box and swap the target if necessary.
+	 * 
+	 * @param data {@code data} of the game
+	 */
+	private static void killMonster(GameData data) {
 		Iterator<Enemy> it = lstEnemy.iterator();
 		while (it.hasNext()) {
 	    Enemy enemy = it.next();
@@ -129,15 +145,23 @@ public class GameDataCombat {
 		}
 	}
 	
+	/**
+	 * End the hero's turn, apply effects and trigger enemies action.
+	 * Also reset the log.
+	 * 
+	 * @param data {@code data} of the game
+	 */
 	public static void endTour(GameData data) {
+		Objects.requireNonNull(data);
 		log = new ArrayList<>();
 		applyEffects();
 		killMonster(data);
 		enemyAction(data.hero());
 	}
 	
-
-	
+	/**
+	 * Apply effects that was on enemies.
+	 */
 	private static void applyEffects() {
 		for (var enemy : lstEnemy) { 
 			for (var effect : enemy.getEffects().keySet()) {
@@ -149,6 +173,11 @@ public class GameDataCombat {
 		}
 	}
 	
+	/**
+	 * Apply the action of each enemies.
+	 * 
+	 * @param hero 
+	 */
 	public static void enemyAction(Hero hero) {
 		Objects.requireNonNull(hero);
 		lstEnemy.forEach(enemy -> enemy.action());
