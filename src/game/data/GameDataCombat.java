@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
@@ -61,6 +62,16 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		log.add("Le combat démarre !");
 		combat = true;
+	}
+	
+	private static void useAllPassive(GameData data) {
+		ListIterator<Item> it = data.bag().bagItemLst().listIterator();
+		while (it.hasNext()) {
+			var item = it.next();
+			
+			var newItem = item.usePassive(target, lstEnemy, data);
+			it.set(newItem);
+		}
 	}
 	
 	/**

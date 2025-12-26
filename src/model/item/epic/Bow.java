@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import model.Curse;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -71,6 +72,12 @@ public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
     return new Bow(coord, direction, durability);
   }
 
+  @Override
+  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  	return new Bow(shape, direction, durability);
+  }
+
+  
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Cliquez sur les flèches pour tirer !");

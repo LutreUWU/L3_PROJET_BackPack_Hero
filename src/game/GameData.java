@@ -241,6 +241,7 @@ public class GameData {
 		return shop;
 	}
 	
+	
 	public void setShop(boolean statut, Shop shop) {
 		if (statut) swapMapOrBag();
 		this.shop = statut;

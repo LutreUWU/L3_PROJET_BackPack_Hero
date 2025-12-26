@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import model.Curse;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -69,6 +70,12 @@ public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   public Sword setXY(XY coord) {
     return new Sword(coord, direction, durability);
   }
+  
+  @Override
+  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  	return new Sword(shape, direction, durability);
+  }
+
 
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {

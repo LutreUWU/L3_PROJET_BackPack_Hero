@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import game.GameData;
 import game.data.GameDataCombat;
+import model.Curse;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -61,6 +62,11 @@ public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int s
   @Override
   public Gold setXY(XY coord) {
     return new Gold(coord, direction, value);
+  }
+  
+  @Override
+  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  	return new Curse(shape, direction, value);
   }
 
   @Override

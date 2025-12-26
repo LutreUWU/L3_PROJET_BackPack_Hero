@@ -11,7 +11,9 @@ public class Hero {
 	private int currentProtection = 0; // damage countered
 	private int currentArmor = 0; // as a percentage (between 0 and 100%)
 	private int energyPoint = 3;
+	private int maxEnergyPoint = 3;
 	private int manaPoint = 0;
+	private int maxManaPoint = 3;
 	private int curseRefuse = 0;
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
@@ -110,6 +112,10 @@ public class Hero {
 
 	public int getManaPoint() {
 		return manaPoint;
+	}
+	
+	public int getMaxEnergyPoint() {
+		return maxEnergyPoint;
 	}
 
 	public int getXp() {

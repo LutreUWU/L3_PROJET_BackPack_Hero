@@ -69,6 +69,11 @@ public record Curse(XY[] shape, Direction direction, Rarity rarity, int ID, int 
     public Curse setXY(XY coord) {
       return new Curse(coord, direction, durability);
     }
+    
+    @Override
+    public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    	return new Curse(shape, direction, durability);
+    }
 
     @Override
     public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {

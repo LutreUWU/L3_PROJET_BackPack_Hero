@@ -6,6 +6,7 @@ import java.util.Comparator;
 import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import model.Curse;
 import model.Direction;
 import model.Effect;
 import model.Item;
@@ -60,6 +61,11 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
   @Override
   public PoisonArrow setXY(XY coord) {
     return new PoisonArrow(coord, direction, durability, effect);
+  }
+  
+  @Override
+  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  	return new PoisonArrow(shape, direction, durability, effect);
   }
 
   @Override

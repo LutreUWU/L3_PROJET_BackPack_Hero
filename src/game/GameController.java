@@ -23,6 +23,8 @@ import model.XY;
 import model.item.common.Arrow;
 import model.item.common.Gold;
 import model.item.epic.Bow;
+import model.item.epic.DespairShield;
+import model.item.epic.Shield;
 import model.item.legendary.Axe;
 import model.item.rare.PoisonArrow;
 import model.item.superrare.Bomb;
@@ -300,10 +302,10 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				GameDataClick.addDragItem(new Curse());
+				// GameDataClick.addDragItem(new Curse());
 				// GameDataClick.addDragItem(new Bow());
-				GameDataClick.addDragItem(new Axe());
-				GameDataClick.addDragItem(new PoisonArrow());
+				GameDataClick.addDragItem(new Shield());
+				GameDataClick.addDragItem(new DespairShield());
 			}
 		}
 		case Key.I -> {

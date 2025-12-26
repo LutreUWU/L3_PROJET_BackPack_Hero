@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import model.Curse;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -70,12 +71,19 @@ public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int 
   public DespairShield setXY(XY coord) {
     return new DespairShield(coord, direction, durability);
   }
+  
+  @Override
+  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  	return new DespairShield(shape, direction, durability);
+  }
+
 
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro gagne 10 Shield, mais en échange de 3PV ...");
     GameDataHero.sub("energy", 1);
     enemy.subHP(3);
+    data.hero().add("protection", 10);
     return subDurability(1);
   }
   

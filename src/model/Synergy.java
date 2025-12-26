@@ -17,6 +17,7 @@ public class Synergy {
 		switch(item) {
 		case Arrow _, PoisonArrow _ -> {return containBow(data);}
 		case Bomb _ -> {bonusDmg = numberOfBombArround(data, item); return true;}
+		case Shield _ -> {bonusDmg = 2; return true;}
 		default -> {return true;}
 		}
 	}

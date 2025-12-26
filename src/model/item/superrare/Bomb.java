@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import model.Curse;
 import model.Direction;
 import model.Effect;
 import model.Item;
@@ -62,6 +63,11 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 	public Bomb setXY(XY coord) {
 		return new Bomb(coord, direction, durability);
 	}
+	
+	@Override
+  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  	return new Bomb(shape, direction, durability);
+  }
 
 	@Override
 	public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import game.GameData;
 import game.data.GameDataCombat;
+import model.Curse;
 import model.Direction;
 import model.Item;
 import model.Rarity;
@@ -65,6 +66,12 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
     public KeyDoor setXY(XY coord) {
       return new KeyDoor(coord, direction);
     }
+    
+    @Override
+    public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    	return new KeyDoor(shape, direction);
+    }
+
 
     @Override
     public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
