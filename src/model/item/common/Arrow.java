@@ -1,6 +1,8 @@
 package model.item.common;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Optional;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -67,6 +69,14 @@ public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   		GameDataCombat.addLog("Vous tirez sur l'ennemi (-8HP) !");
       GameDataHero.sub("energy", 1);
       enemy.subHP(8);
+      // Sub durability to the bow
+      var bow = data.bag().bagItemLst().stream()
+																				.filter(item -> item.ID() == 10)
+																				.min(Comparator.comparingInt(Item::durability))
+																				.orElseThrow();
+      																						
+      data.bag().removeItemFromBackpack(bow);
+      if (bow.durability() - bow.AP() > 0) data.bag().addItemToBackpack(bow.subDurability(bow.AP()));
       return subDurability(1);
   	}
   	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");

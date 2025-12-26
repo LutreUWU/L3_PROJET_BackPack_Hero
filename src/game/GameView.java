@@ -21,6 +21,7 @@ import game.data.GameDataCombat;
 import loader.FontLoader;
 import loader.MathLoader;
 import model.BoundingBox;
+import model.Curse;
 import model.Direction;
 import model.Item;
 import model.XY;
@@ -246,6 +247,7 @@ public record GameView(int width, int height, int tileSize) {
 				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25);
 				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
 				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.2); 
 				default ->{}
 		  }
 		}
@@ -274,6 +276,7 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Bow _ -> "Un arc volé à Steeve";
 	  	case PoisonArrow _ -> "Des flèches volées à Steeve";
 	  	case Bomb _ -> "Bombe volée à Mario";
+	  	case Curse _ -> "Malédiction que t'a jeté un ennemi";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -285,13 +288,14 @@ public record GameView(int width, int height, int tileSize) {
 	  	case Sword _ -> "Inflige -3 à l'ennemi";
 	  	case DespairShield _ ->  "Se met 10 Shield en échange de 3PV";
 	  	case Mimicry _ -> "-30 PV en échange de 5PV";
-	  	case Massue _ -> "Influge -5PV à l'ennemi";
+	  	case Massue _ -> "Inflige -5PV à l'ennemi";
 	  	case Gant _ -> "Régénère 10 PV";
 	  	case Axe _ -> "Inflige -10PV à l'ennemi";
 	  	case Arrow _ -> "Inflige -8PV à l'ennemi";
 	  	case PoisonArrow _ -> "Inflige -6PV à l'ennemi et empoisonne l'ennemi";
 	  	case Bow _ -> "Inflige -8PV à l'ennemi";
 	  	case Bomb _ -> "Inflige -6PV à tous les ennemies + 1PV par bombe qui l'entoure";
+	  	case Curse _ -> "Utilise la malédiction pour t'en débarasser";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -444,10 +448,10 @@ public record GameView(int width, int height, int tileSize) {
 	  graphics.setColor(Color.GRAY);
     graphics.fill(new Rectangle2D.Double(logoWidth, logoHeight / 2 - size / 2 , width * 0.20, size));
     graphics.setColor(Color.GREEN);
-    graphics.fill(new Rectangle2D.Double(logoWidth, logoHeight / 2 - size / 2, width * 0.20 * data.hero().getHP() / data.hero().getMax_HP(), size));
+    graphics.fill(new Rectangle2D.Double(logoWidth, logoHeight / 2 - size / 2, width * 0.20 * data.hero().getHP() / data.hero().getMaxHP(), size));
     graphics.setColor(Color.WHITE);
     graphics.draw(new Rectangle2D.Double(logoWidth, logoHeight / 2 - size / 2, width * 0.20, size));
-	  graphics.drawString(data.hero().getHP() + "/" + data.hero().getMax_HP(), (int) (logoWidth + width * 0.205), logoHeight / 2 + size / 2);
+	  graphics.drawString(data.hero().getHP() + "/" + data.hero().getMaxHP(), (int) (logoWidth + width * 0.205), logoHeight / 2 + size / 2);
   }
   
   private void drawHeroShield(Graphics2D graphics, GameData data) {
@@ -462,10 +466,10 @@ public record GameView(int width, int height, int tileSize) {
 	  graphics.setColor(Color.GRAY);
     graphics.fill(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + logoHeight / 2 - size / 2, width * 0.20, size));
     graphics.setColor(Color.BLUE);
-    graphics.fill(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + logoHeight / 2 - size / 2, width * 0.20 * data.hero().getCurrent_protection() / data.hero().getMax_HP(), size));
+    graphics.fill(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + logoHeight / 2 - size / 2, width * 0.20 * data.hero().getCurrentProtection() / data.hero().getMaxHP(), size));
     graphics.setColor(Color.WHITE);
     graphics.draw(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + logoHeight / 2 - size / 2, width * 0.20, size));
-	  graphics.drawString(data.hero().getCurrent_protection() + "/" + data.hero().getMax_HP(), (int) (logoWidth + width * 0.205), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
+	  graphics.drawString(data.hero().getCurrentProtection() + "/" + data.hero().getMaxHP(), (int) (logoWidth + width * 0.205), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
   private void drawHeroMana(Graphics2D graphics, GameData data) {
@@ -478,7 +482,7 @@ public record GameView(int width, int height, int tileSize) {
     BufferedImage img = data.imgMap().get("ICON_MANA");
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.CYAN);
-	  graphics.drawString(data.hero().getMana_point() + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
+	  graphics.drawString(data.hero().getManaPoint() + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
   private void drawHeroAction(Graphics2D graphics, GameData data) {
@@ -490,8 +494,8 @@ public record GameView(int width, int height, int tileSize) {
     graphics.setFont(font);
     BufferedImage img = data.imgMap().get("ICON_ACTION");
     graphics.drawImage(img, render.transform() , null);
-    graphics.setColor(data.hero().getEnergy_point() > 1 ? Color.YELLOW : Color.RED);
-	  graphics.drawString(data.hero().getEnergy_point() + " AP", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
+    graphics.setColor(data.hero().getEnergyPoint() > 1 ? Color.YELLOW : Color.RED);
+	  graphics.drawString(data.hero().getEnergyPoint() + " AP", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
   private void drawHeroUnlock(Graphics2D graphics, GameData data) {
@@ -531,7 +535,7 @@ public record GameView(int width, int height, int tileSize) {
 	  graphics.setColor(Color.GRAY);
     graphics.fill(new Rectangle2D.Double(width / 2 - textWidth / 2, (int) (height * 0.03)  , textWidth, size * 0.25));
     graphics.setColor(Color.CYAN);
-    graphics.fill(new Rectangle2D.Double(width / 2 - textWidth / 2, (int) (height * 0.03)  , textWidth * data.hero().getXp() / data.hero().MAX_XP(), size * 0.25));
+    graphics.fill(new Rectangle2D.Double(width / 2 - textWidth / 2, (int) (height * 0.03)  , textWidth * data.hero().getXp() / data.hero().maxXP(), size * 0.25));
   }
   
   private void drawFloorLevel(Graphics2D graphics, GameData data) {
@@ -661,6 +665,7 @@ public record GameView(int width, int height, int tileSize) {
 			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
 			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
 			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.2); 
 			default ->{}
 	  }
 	}

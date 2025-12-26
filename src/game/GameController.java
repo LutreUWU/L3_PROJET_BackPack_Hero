@@ -17,9 +17,15 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import game.data.GameDataShop;
 import loader.FontLoader;
+import model.Curse;
 import model.Item;
 import model.XY;
+import model.item.common.Arrow;
 import model.item.common.Gold;
+import model.item.epic.Bow;
+import model.item.legendary.Axe;
+import model.item.rare.PoisonArrow;
+import model.item.superrare.Bomb;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -208,9 +214,20 @@ public class GameController {
 	 * @param mouseY coordY of the mouse.
 	 */
 	private static void newDragItem(GameData data, Item item, int mouseX, int mouseY) {
-		data.setDragItem(item);
-		GameDataClick.setOldPosition(mouseX, mouseY);
-		GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
+		if (data.bag().bagItemLst().contains(item)) {
+			switch(item) {
+			case Curse _ -> {}
+			default -> {
+				data.setDragItem(item);
+				GameDataClick.setOldPosition(mouseX, mouseY);
+				GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
+			}
+			}
+		} else {
+			data.setDragItem(item);
+			GameDataClick.setOldPosition(mouseX, mouseY);
+			GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
+		}
 	}
 	
 	/**
@@ -283,7 +300,10 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				GameDataClick.addDragItem(new Gold(50));
+				GameDataClick.addDragItem(new Curse());
+				// GameDataClick.addDragItem(new Bow());
+				GameDataClick.addDragItem(new Axe());
+				GameDataClick.addDragItem(new PoisonArrow());
 			}
 		}
 		case Key.I -> {

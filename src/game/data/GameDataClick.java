@@ -3,6 +3,7 @@ package game.data;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import com.github.forax.zen.ScreenInfo;
 
@@ -10,6 +11,7 @@ import game.GameData;
 import loader.MathLoader;
 import model.Backpack;
 import model.BoundingBox;
+import model.Curse;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
@@ -179,12 +181,19 @@ public class GameDataClick {
   	// For each item inside the bag 
   	var res = bagClick(x,y);
   	if (res != null) {
-  		if ((item = backpack.getItem(res.x(), res.y())) == null) {
+  		item = backpack.getItem(res.x(), res.y());
+  		if (item == null) {
   	    return null;
   		}
-  		data.bag().removeItemFromBackpack(item);
-  		addDragItemFromBag(item, res.x(), res.y());
-  		return item;
+  		switch(item) {
+  		case Curse _ -> {return null;}
+  		default -> {
+  			data.bag().removeItemFromBackpack(item);
+    		addDragItemFromBag(item, res.x(), res.y());
+    		return item;
+  		}
+  		}
+  		
   	}
   	return null;
   }
@@ -424,7 +433,11 @@ public class GameDataClick {
 		if (x >= NW.x() && x <= SE.x()) {
 			if (y >= NW.y() && y <= SE.y()) {
 				data.setBin(false);
-				removeItemFromDrag(data.dragItem());
+				var item = data.dragItem();
+				switch(item) {
+				case Curse _ -> {}
+				default -> {removeItemFromDrag(data.dragItem());}
+				}
 				return;
 			}
 		}
@@ -527,6 +540,7 @@ public class GameDataClick {
   public static ClickResult click(int x, int y) {
   	// Here we add other click info
   	Item item = itemClick(x, y);
+  	
     if (item != null) {
         return new ClickResult(ClickType.ITEM, item);
     }
@@ -534,9 +548,11 @@ public class GameDataClick {
     if (bag != null) {
         return new ClickResult(ClickType.BAG, bag);
     }
-    XY mapPos = floorClick(x, y);
-    if (mapPos != null) {
-        return new ClickResult(ClickType.MAP, mapPos);
+    if (!data.mapOrBag()) {
+    	XY mapPos = floorClick(x, y);
+      if (mapPos != null) {
+          return new ClickResult(ClickType.MAP, mapPos);
+      }
     }
     int mapOrBag = mapOrBagClick(x, y);
     if (mapOrBag != 0) {

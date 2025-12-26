@@ -26,8 +26,7 @@ public class ItemRepository {
     
     // Trier du moins rare au plus rare
     public static void createItemRepository() {
-  	  registerWeapon(new Gold(10)); // Common 
-  	  registerWeapon(new Arrow()); // Common 
+  	  registerWeapon(new Arrow()); // Common
   	  registerWeapon(new Gant()); // Rare
   	  registerWeapon(new PoisonArrow()); // Rare 
   	  registerWeapon(new Massue()); // SuperRare

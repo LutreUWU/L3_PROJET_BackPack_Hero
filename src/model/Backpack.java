@@ -121,16 +121,29 @@ public class Backpack {
 	    for (var block : b) {
 	      int y = block.y();
 	      int x = block.x();
-	      if (y < 0 || y >= backpack.length || x < 0 || x >= backpack[0].length) {
+	      if (inBackpack(x, y)) {
 	        return false;
 	      }
-	      if (backpack[y][x] != -1) {
-	        return false;
+	      switch(item) {
+	      case Curse _ -> {
+	      	if (backpack[y][x] == -2 || backpack[y][x] == 13) {
+		        return false;
+		      }
 	      }
+	      default -> {
+	      	if (backpack[y][x] != -1) {
+		        return false;
+		      }
+	      }
+	      }
+	      
 	    }
     return true;
   }
-	  
+	
+  public boolean inBackpack(int x, int y) {
+  	return (y < 0 || y >= backpack.length || x < 0 || x >= backpack[0].length);
+  }
   /**
    * Add an item in the backpack of the game.
    * If item is null, it means that we just press the button for adding. 
@@ -142,13 +155,30 @@ public class Backpack {
     if (item == null) {
       return false;
     }
-    if (checkPlace(item)) {
-      var b = item.shape();
-      for (var block : b) {
-        backpack[block.y()][block.x()] = item.ID();
+    switch(item) {
+    case Curse _ -> {
+    	if (checkPlace(item)) {
+        var b = item.shape();
+        for (var block : b) {
+        	if (backpack[block.y()][block.x()] != -1) {
+        		removeItemFromBackpack(getItem(block.x(), block.y()));
+        	}
+          backpack[block.y()][block.x()] = item.ID();
+        }
+        bagItemLst.add(item);
+        return true;
       }
-      bagItemLst.add(item);
-      return true;
+    }
+    default -> {
+    	if (checkPlace(item)) {
+        var b = item.shape();
+        for (var block : b) {
+          backpack[block.y()][block.x()] = item.ID();
+        }
+        bagItemLst.add(item);
+        return true;
+      }
+    }
     }
     return false;
   }

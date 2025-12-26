@@ -1,6 +1,7 @@
 package model.item.rare;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -68,6 +69,14 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
       GameDataHero.sub("energy", 1);
       enemy.subHP(6);
       enemy.addEffect(effect, 3);
+      // Sub durability to the bow
+      var bow = data.bag().bagItemLst().stream()
+																				.filter(item -> item.ID() == 10)
+																				.min(Comparator.comparingInt(Item::durability))
+																				.orElseThrow();
+      																						
+      data.bag().removeItemFromBackpack(bow);
+      if (bow.durability() - bow.AP() > 0) data.bag().addItemToBackpack(bow.subDurability(bow.AP()));
       return subDurability(1);
   	}
   	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");

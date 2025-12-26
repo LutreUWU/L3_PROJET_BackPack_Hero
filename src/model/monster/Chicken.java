@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
+import model.Curse;
 import model.Effect;
 
 /**
@@ -17,13 +19,13 @@ public class Chicken implements Enemy{
 	 * - HP :				 	When it reach 0, the enemy die
 	 * - Shield : 		Can mitigate damage received
 	 * - xp :					XP he drops when he die
-	 * - lst_attack : List of all attack the enemy has 
+	 * - lstAttack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
 	private int HP = 20;
 	private int shield = 0;
 	private final int xp = 4;
-	private final List<String> lst_attack = List.of("Morsure", "Protection");
+	private final List<String> lstAttack = List.of("Morsure", "Protection");
 	private final Map<Effect, Integer> effects = new HashMap<>();
 	private String action;
 	// For graphism
@@ -65,7 +67,7 @@ public class Chicken implements Enemy{
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
-		action = lst_attack.get(randomNumbers.nextInt(2));
+		action = lstAttack.get(randomNumbers.nextInt(2));
 		return action;
 	}
 	

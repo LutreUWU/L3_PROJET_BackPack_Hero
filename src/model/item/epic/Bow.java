@@ -14,15 +14,15 @@ import model.monster.Enemy;
 
 public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
 	public Bow() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.EPIC, 10, 15, 10, 0);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.EPIC, 10, 15, 10, 1);
   }
 
 	public Bow(XY[] shape, Direction direction, int durability) {
-    this(shape, direction, Rarity.EPIC, 10, 15, durability, 0);
+    this(shape, direction, Rarity.EPIC, 10, 15, durability, 1);
   }
 	
 	public Bow(XY coord, Direction direction, int durability) {
-    this(initShape(coord, direction), direction, Rarity.EPIC, 10, 15, durability, 0);
+    this(initShape(coord, direction), direction, Rarity.EPIC, 10, 15, durability, 1);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {

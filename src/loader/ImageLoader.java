@@ -59,6 +59,7 @@ public class ImageLoader {
 	  case "bow"   -> 10;
 	  case "poisonArrow" -> 11;
 	  case "bomb" -> 12;
+	  case "curse" -> 13;
 		default -> throw new IllegalArgumentException("Unexpected value: " + name);
 		};
 	}

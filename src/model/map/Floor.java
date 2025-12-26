@@ -115,9 +115,9 @@ public class Floor {
 		grid[list.get(1).y()][list.get(1).x()] = new Treasure(floor); // Create treasure
 		grid[list.get(2).y()][list.get(2).x()] = new Treasure(floor); // Create treasure
 		grid[list.get(3).y()][list.get(3).x()] = new Exit(floor); // Create exit
-		grid[list.get(4).y()][list.get(4).x()] = new Shop(floor); // Create Enemy
-		grid[list.get(5).y()][list.get(5).x()] = new Shop(floor); // Create Enemy
-		grid[list.get(6).y()][list.get(6).x()] = new Shop(floor); // Create Enemy
+		grid[list.get(4).y()][list.get(4).x()] = new EnemyRoom(); // Create Enemy
+		grid[list.get(5).y()][list.get(5).x()] = new EnemyRoom(); // Create Enemy
+		grid[list.get(6).y()][list.get(6).x()] = new EnemyRoom(); // Create Enemy
 		grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
 		grid[list.get(8).y()][list.get(8).x()] = new Start(); // Create start
 		grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the					// hero has a key)
@@ -237,8 +237,10 @@ public class Floor {
 			for (var acc : grid[first.y()][first.x()].getAccessible()) {
 				if (!visited.contains(acc) && (heroAccessible.contains(acc) || heroVisited.contains(acc))) {
 					parents.put(acc, first);
-					queue.add(acc);
 					visited.add(acc);
+					if (!heroAccessible.contains(acc)) {
+						queue.add(acc);
+					}
 					if (acc.equals(end)) {
 						var enfant = acc;
 						while(!enfant.equals(start)) {

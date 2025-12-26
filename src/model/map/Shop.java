@@ -15,6 +15,7 @@ import model.item.common.Gold;
 import model.item.common.Sword;
 
 public final class Shop implements Room {
+	final private int SHOP_SIZE = 5;
   private int floor;
   final private List<XY> accessible = new ArrayList<>();
   final private Map<Item, Integer> currentShop = new LinkedHashMap<>(); // Item : Price
@@ -34,15 +35,14 @@ public final class Shop implements Room {
   private void createShop() {
   	int i = 0;
   	boolean alreadyThere = false;
-		currentShop.put(new Gold(10), 10);
-		while (currentShop.size() != 4) {
+		while (currentShop.size() != SHOP_SIZE) {
 			var item = RandomItem.generate(floor);
 			for (var itemBag : currentShop.keySet()) {
 				if (itemBag.ID() == item.ID()) {
 					alreadyThere = true;
 				}
 			}
-			// Créer une méthode pour calculer le prix en fonction du score et la rareté de l'item
+			
 			if (!alreadyThere) currentShop.put(item, item.score()); 
 			alreadyThere = false;
 		}
@@ -73,7 +73,6 @@ public final class Shop implements Room {
   private String setLog(Item item) {
   	return switch(item) {
   	case Sword _ -> "T'es sah à acheter ça ?";
-  	case Gold _ -> "Depuis quand je vends de l'argent contre de l'argent ?";
 		default ->  "Très bon achat mon frère";
   	};
   }

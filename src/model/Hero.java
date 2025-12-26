@@ -6,22 +6,23 @@ import model.item.common.Gold;
 
 public class Hero {
   // Statistics of the hero
-	private int max_HP = 40;
+	private int maxHP = 40;
 	private int HP = 40;
-	private int current_protection = 0; // damage countered
-	private int current_armor = 0; // as a percentage (between 0 and 100%)
-	private int energy_point = 3;
-	private int mana_point = 0;
+	private int currentProtection = 0; // damage countered
+	private int currentArmor = 0; // as a percentage (between 0 and 100%)
+	private int energyPoint = 3;
+	private int manaPoint = 0;
+	private int curseRefuse = 0;
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;
 	
 	// For graphic interface
-	private int size_x = 150;
-	private int size_y = (int) (size_x * 1.2);
+	private int sizeX = 150;
+	private int sizeY = (int) (sizeX * 1.2);
 	
 	
-	public int MAX_XP() {
+	public int maxXP() {
 		return 10 + (level - 1) * 2;
 	}
 	
@@ -40,14 +41,15 @@ public class Hero {
 		 * @param value : how many points to add
 		 */
 		switch(string.toLowerCase()) {
-			case "max_hp" -> max_HP += value;
+			case "maxHP" -> maxHP += value;
 			case "hp" -> {HP += value;
-										if (HP > max_HP) HP = max_HP;}
-			case "protection" -> current_protection += value;
-			case "armor" -> current_armor += value;
-			case "energy" -> energy_point += value;
-			case "mana" -> mana_point += value;
-			case "xp" -> {xp += value; while (xp >= MAX_XP()) {xp -= MAX_XP(); level++;}}
+										if (HP > maxHP) HP = maxHP;}
+			case "protection" -> currentProtection += value;
+			case "armor" -> currentArmor += value;
+			case "energy" -> energyPoint += value;
+			case "mana" -> manaPoint += value;
+			case "xp" -> {xp += value; while (xp >= maxXP()) {xp -= maxXP(); level++;}}
+			case "curse" -> curseRefuse += value;
 		}
 	}
 	
@@ -58,13 +60,16 @@ public class Hero {
 		 * @param value : how many points to substract
 		 */
 		switch(string.toLowerCase()) {
-			case "max_hp" -> max_HP -= value;
+			case "maxhp" -> {maxHP -= value;
+												if (HP > maxHP) HP = maxHP;
+												if (currentProtection > maxHP) currentProtection = maxHP;
+			}
 			case "hp" -> {HP -= value;
 										if (HP <= 0) IO.println("Faudra qu'on s'occupe de la mort\n");}
-			case "protection" -> current_protection -= value;
-			case "armor" -> current_armor -= value;
-			case "energy" -> energy_point -= value;
-			case "mana" -> mana_point -= value;
+			case "protection" -> currentProtection -= value;
+			case "armor" -> currentArmor -= value;
+			case "energy" -> energyPoint -= value;
+			case "mana" -> manaPoint -= value;
 		}
 	}
 	
@@ -73,36 +78,38 @@ public class Hero {
 		 * Function to reset for some attribtues
 		 * @param string : What we want to reset
 		 */
-		current_protection = 0;
-		current_armor = 0;
+		currentProtection = 0;
+		currentArmor = 0;
 		
 	}
 	
-	
-	
 	// Getter
-	public int getMax_HP() {
-		return max_HP;
+	public int getCurseRefuse() {
+		return curseRefuse;
+	}
+	
+	public int getMaxHP() {
+		return maxHP;
 	}
 
 	public int getHP() {
 		return HP;
 	}
 
-	public int getCurrent_protection() {
-		return current_protection;
+	public int getCurrentProtection() {
+		return currentProtection;
 	}
 
-	public int getCurrent_armor() {
-		return current_armor;
+	public int getCurrentArmor() {
+		return currentArmor;
 	}
 
-	public int getEnergy_point() {
-		return energy_point;
+	public int getEnergyPoint() {
+		return energyPoint;
 	}
 
-	public int getMana_point() {
-		return mana_point;
+	public int getManaPoint() {
+		return manaPoint;
 	}
 
 	public int getXp() {
@@ -110,11 +117,11 @@ public class Hero {
 	}
 	
 	public int getSizeX() {
-		return size_x;
+		return sizeX;
 	}
 	
 	public int getSizeY() {
-		return size_y;
+		return sizeY;
 	}
 
 	public int getLevel() {

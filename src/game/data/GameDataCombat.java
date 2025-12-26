@@ -101,15 +101,15 @@ public class GameDataCombat {
 			data.bag().removeItemFromBackpack(item);
 			var newItem = item.use(target, lstEnemy, data);
 			if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
-			if(data.hero().getEnergy_point() <= 0) {
+			if(data.hero().getEnergyPoint() <= 0) {
 				applyEffects();
 			}
 			killMonster(data);
-			if(data.hero().getEnergy_point() <= 0) {
+			if(data.hero().getEnergyPoint() <= 0) {
 				enemyAction(data.hero());
 			}
 			if (lstEnemy.isEmpty()) {
-				GameDataHero.add("energy", (3 - data.hero().getEnergy_point()));
+				GameDataHero.add("energy", (3 - data.hero().getEnergyPoint()));
 				GameDataHero.add("xp", totalExp);
 				for (int i = 0; i < data.hero().getLevel() - levelBeforeCombat; i++) {
 					Random r = new Random();
@@ -185,7 +185,7 @@ public class GameDataCombat {
 			// TO DO 
 		}
 		GameDataHero.reset();
-		GameDataHero.add("energy", 3 - hero.getEnergy_point());
+		GameDataHero.add("energy", 3 - hero.getEnergyPoint());
 	}
 	
 	/**

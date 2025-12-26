@@ -30,10 +30,11 @@ public class LinkedEvent {
 		case "lockedDoor" -> createEventForLockedRoom(floor);
 		case "healerRoom" -> createEventForHealerRoom(floor);
 		case "treasure" -> createEventForTreasure(floor);
+		case "curse" -> createEventForCurse();
 		}
 		initialRoot = root;
 	}
-
+	
 	/**
 	 * create event the a room
 	 * 
@@ -49,6 +50,17 @@ public class LinkedEvent {
 		}
 		}
 		;
+	}
+	
+	private void createEventForCurse() {
+		root = new NodeEvent(null, "Souhaitez vous mettre la malédiction dans le sac ?");
+
+		var choiceOne = createNodeWithConsequence("Oui !", 0, 1, "curseInBag",
+				"Reste à le placer dedans");
+		root.setChoice1(choiceOne);
+
+		var choiceTwo = createNodeWithConsequence("Non !", 0, 1, "curseNotInBag", "Ca marche ! Tu as perdu un peu de vie !");
+		root.setChoice2(choiceTwo);
 	}
 
 	/**
