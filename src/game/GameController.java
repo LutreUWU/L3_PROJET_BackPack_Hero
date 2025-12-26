@@ -35,17 +35,6 @@ import model.monster.Soldat;
  * The SimpleGameController class deals with the main game loop, including
  * retrieving raw user actions, sending them for analysis to the GameView and
  * GameData, and dealing with time events.
- * 
- * GUIDE :
- * 
- * Key.A to create an Item in the bag (It's just for testing, it'll be useless
- * for the end) - Key.(ZQSD) to move the item in the grid - Key.R to rotate the
- * item clockwise - Key.ESCAPE (esc) to confirm and add the item in the backpack
- * 
- * Key.I to initiate a combat - Using an item cost 1 AP, when it reach 0, enemy
- * play. - Click on a item to use it
- * 
- * TO DO : - LA MAP ZEBI
  */
 public class GameController {
 	/**
@@ -62,80 +51,51 @@ public class GameController {
 	 */
 	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
 		Event event = context.pollOrWaitEvent(10);
-		if (event != null)
+		if (event != null) {
 			switch (event) {
-			case PointerEvent pointerEvent -> {
-				// If we click down on the screen
-				if (pointerEvent.action() == PointerEvent.Action.POINTER_DOWN) {
-					checkPointerDown(data, pointerEvent.location());
-				}
-
-				if (pointerEvent.action() == PointerEvent.Action.POINTER_MOVE) {
-					if (data.dragItem() != null) {
-						GameDataClick.moveDragItem(data.dragItem(), pointerEvent.location().x(), pointerEvent.location().y());
-						GameDataClick.setOldPosition(pointerEvent.location().x(), pointerEvent.location().y());
-						GameDataClick.binHover(pointerEvent.location().x(), pointerEvent.location().y());
-					}
-				}
-				if (data.dragItem() != null && pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-					int x = pointerEvent.location().x();
-					int y = pointerEvent.location().y();
-					GameDataClick.clickUp(x, y);
-					data.setDragItem(null);
-				}
-				GameView.draw(context, data, view);
-				data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
-			}
-			default -> {
-			}
-			}
-		// If event button is pressed
-
-		if (event != null)
-			switch (event) {
-			case KeyboardEvent key -> {
-				if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
-					switch (key.key()) {
-					case Key.A -> {
-						if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-							GameDataClick.addDragItem(new Gold(50));
-						}
-					}
-					case Key.I -> {
-						if (GameDataCombat.combat() == false) {
-							GameDataCombat.startCombat(new ArrayList<>(List.of(new Soldat(), new Robot())), data);
-						}
-					}
-
-					case Key.R -> {
-						if (data.dragItem() != null) {
-							GameDataClick.removeItemFromDrag(data.dragItem());
-							data.setDragItem(GameData.rotateItem(data.dragItem()));			
-							GameDataClick.addDragItem(data.dragItem());
-							GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
-						}
-					}
-					// Leave the game
-					case Key.E -> {
-						return false;
-					}
-					default -> {}
-					}
+				// Mouse event
+				case PointerEvent pointerEvent -> {
+					checkPointerEvent(data, pointerEvent);
 					GameView.draw(context, data, view);
 				}
+				// Keyboard event
+				case KeyboardEvent key -> {
+					if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
+						if (!checkKeyEvent(data, key.key())) {
+							return false;
+						};
+						GameView.draw(context, data, view);
+					}
+				}
+				default -> {}
 			}
-			default -> {
-			}
-			}
+		}
 		return true;
 	}
 
 	/**
+	 * Method dealing with all events about the mouse in game.
+	 * It checks and apply all event, when we pressed, moved, released the mouse.
+	 * 
+	 * @param data					{@code GameData} of the game.
+	 * @param pointerEvent	{@code pointerEvent} to know which type of mouse event it is.
+	 */
+	private static void checkPointerEvent(GameData data, PointerEvent pointerEvent) {
+		switch(pointerEvent.action()) {
+			case POINTER_DOWN -> checkPointerDown(data, pointerEvent.location());
+			case POINTER_MOVE -> checkPointerMove(data, pointerEvent.location());
+			case POINTER_UP -> checkPointerUp(data, pointerEvent.location());
+			default ->{}
+		}
+		data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
+	}
+	
+	/**
 	 * Check where the mouse is when we click down,
 	 * and update the game in consequence.
 	 * 
-	 * @param data					{@code GameData} of the game.
-	 * @param mouse					{@code Location} containing the coordinate of the mouse.
+	 * @param data		{@code GameData} of the game.
+	 * @param mouse		{@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerDown(GameData data, Location mouse) {
 		var res = GameDataClick.click(mouse.x(), mouse.y());
@@ -150,6 +110,12 @@ public class GameController {
 		}
 	}
 	
+	/**
+	 * On va vraiment faire une méthode pour chaque salle ????
+	 * 
+	 * @param data		{@code GameData} of the game.
+	 * @param coord		{@code XY} containing the coordinate of the cell we clicks on the map.
+	 */
 	private static void applyMap(GameData data, XY coord) {
 		if (coord != null) {
 			if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
@@ -207,9 +173,18 @@ public class GameController {
 				default -> {}
 				}
 			}
-		}
-		
+		}	
 	}
+	
+	/**
+	 * Methods dealing with event in dungeon.
+	 * All events in game has two choices (1 or 2) and a "end choice" (3) to end the event.
+	 * 
+	 * @param data	{@code GameData} of the game.
+	 * @param int	  1 is choice1
+	 * 							2 is choice2
+	 * 							3 is end button event
+	 */
 	private static void applyEvent(GameData data, int choice) {
 		if (choice == 1) {
 			data.event().choose1(data);
@@ -223,24 +198,117 @@ public class GameController {
 		}
 	}
 	
+	/**
+	 * Method adding a new item in the list of draggable item.
+	 * Since the item can be everywhere in the screen, we need the mouse coordinate
+	 * 
+	 * @param data	 {@code GameData} of the game.
+	 * @param item   {@code Item} we wants to add.
+	 * @param mouseX coordX of the mouse.
+	 * @param mouseY coordY of the mouse.
+	 */
 	private static void newDragItem(GameData data, Item item, int mouseX, int mouseY) {
 		data.setDragItem(item);
 		GameDataClick.setOldPosition(mouseX, mouseY);
 		GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
 	}
 	
+	/**
+	 * Method that permits to switch between the bag and the map in game.
+	 * 
+	 * @param data	 {@code GameData} of the game.
+	 */
 	private static void swapMapOrBag(GameData data) {
 		if (!data.getShop() && !GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
 			data.swapMapOrBag();
 		}
 	}
 	
+	/**
+	 * Method that treats all event when clicking in the bag.
+	 * Treating when using an item in combat.
+	 * Treating when unlocking a box in the bag.
+	 * 
+	 * @param data	 {@code GameData} of the game.
+	 * @param coord	 {@code XY} of the grid we click
+	 */
 	private static void actionBag(GameData data, XY coord) {
 		if (data.mapOrBag() && GameDataCombat.combat()) {
 			GameDataCombat.heroAction(data, coord);
 		}
 		data.bag().unlockCaseBackpack(coord);
 	}
+	
+	/**
+	 * Check and trigger all events when we're moving the mouse
+	 * 
+	 * @param data	{@code GameData} of the game.
+	 * @param mouse	{@code Location} containing the coordinate of the mouse.
+	 */
+	private static void checkPointerMove(GameData data, Location mouse) {
+		if (data.dragItem() != null) {
+			GameDataClick.moveDragItem(data.dragItem(), mouse.x(), mouse.y());
+			GameDataClick.setOldPosition(mouse.x(), mouse.y());
+			GameDataClick.binHover(mouse.x(), mouse.y());
+		}
+	}
+	
+	/**
+	 * Check and trigger all event when we're releasing the mouse
+	 *
+	 * @param data	{@code GameData} of the game.
+	 * @param mouse	{@code Location} containing the coordinate of the mouse.
+	 */
+	private static void checkPointerUp(GameData data, Location mouse) {
+		if(data.dragItem() != null) {
+			int x = mouse.x();
+			int y = mouse.y();
+			GameDataClick.clickUp(x, y);
+			data.setDragItem(null);
+		}
+	}
+	
+	/**
+	 * Methods dealing with all event regarding the keyboard.
+	 * We use the keyboard when rotating an item and if we wants to leave the game.
+	 * 
+	 * @param data	{@code GameData} of the game.
+	 * @param mouse	{@code Key} containing which key we pressed
+	 * 
+	 * @return false if we pressed E for leaving
+	 * 				 true otherwise
+	 */
+	private static boolean checkKeyEvent(GameData data, Key key) {
+		switch (key) {
+		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
+		case Key.A -> {
+			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
+				GameDataClick.addDragItem(new Gold(50));
+			}
+		}
+		case Key.I -> {
+			if (GameDataCombat.combat() == false) {
+				GameDataCombat.startCombat(new ArrayList<>(List.of(new Soldat(), new Robot())), data);
+			}
+		}
+		///////////////////////////////////////////////////////////////
+		case Key.R -> {
+			if (data.dragItem() != null) {
+				GameDataClick.removeItemFromDrag(data.dragItem());
+				data.setDragItem(GameData.rotateItem(data.dragItem()));			
+				GameDataClick.addDragItem(data.dragItem());
+				GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
+			}
+		}
+		// Leave the game
+		case Key.E -> {
+			return false;
+		}
+		default -> {}
+		}
+		return true;
+	}
+	
 	/**
 	 * Sets up the game, then launches the game loop.
 	 * 
