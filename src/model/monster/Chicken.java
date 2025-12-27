@@ -22,6 +22,7 @@ public class Chicken implements Enemy{
 	 * - lstAttack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	private int maxHP = 20;
 	private int HP = 20;
 	private int shield = 0;
 	private final int xp = 4;
@@ -143,6 +144,11 @@ public class Chicken implements Enemy{
 	@Override
 	public double getSizeY() {
 		return sizeY;
+	}
+	
+	@Override
+	public int getMaxHP() {
+		return maxHP;
 	}
 	
 	@Override

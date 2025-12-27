@@ -83,14 +83,26 @@ public class GameDataCombat {
 	 * @param heroSizeY		sizeY of the Hero
 	 */
 	private static void getEnemyBox(ArrayList<Enemy> lstEnemy, ScreenInfo screenInfo, int heroSizeX, int heroSizeY) {
+		double gap = 1.3;
 		for (int i = 0; i < lstEnemy.size(); i++) {
 			var enemy = lstEnemy.get(i);
 			double sizeX = heroSizeX * enemy.getSizeX();
 	  	double sizeY = heroSizeY * enemy.getSizeY();
-	  	double northWestX =  screenInfo.width() * 0.80 - heroSizeX + (i - (lstEnemy.size() - 1) / 2.0) * heroSizeX ;
-	  	double northWestY =  screenInfo.height() * (0.5 - (0.1 * (i%2))) + (heroSizeY - sizeY);
+	  	double offsetOdd = heroSizeX * gap * (i + 1 / 2);
+	  	double offsetEven = heroSizeX * gap * i / 2;
+	  	double northWestX = (i % 2 == 1) ? screenInfo.width() * 0.70 - offsetOdd - lstEnemy.get(i).getSizeX() 
+	  																	 : screenInfo.width() * 0.70 + offsetEven + lstEnemy.get(i).getSizeX();
+	  	boolean isTopRow;
+	    if (i == 0) {
+	        isTopRow = true; 
+	    } else if ((i-1) % 4 < 2) {
+	        isTopRow = false; 
+	    } else {
+	        isTopRow = true; 
+	    }	  	
+	    double northWestY =  screenInfo.height() * 0.4 + (isTopRow ? 0 : heroSizeY / 2 + heroSizeY - sizeY);
 	  	var NW = new XY((int) northWestX, (int) northWestY);
-	  	var SE = new XY(NW.x() + (int) sizeX,NW.y() + (int) sizeY);
+	  	var SE = new XY(NW.x() + (int) sizeX, NW.y() + (int) sizeY);
 	  	enemyBox.put(enemy, new BoundingBox(NW, SE));
 		}
 	}

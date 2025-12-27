@@ -28,6 +28,7 @@ import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
 import model.monster.Chicken;
+import model.monster.Gnome;
 import model.monster.Robot;
 import model.monster.Soldat;
 
@@ -303,7 +304,7 @@ public class GameController {
 		}
 		case Key.I -> {
 			if (GameDataCombat.combat() == false) {
-				GameDataCombat.startCombat(new ArrayList<>(List.of(new Soldat(), new Robot())), data);
+				GameDataCombat.startCombat(new ArrayList<>(List.of(new Soldat(), new Robot(), new Gnome())), data);
 			}
 		}
 		///////////////////////////////////////////////////////////////

@@ -75,4 +75,5 @@ public interface Enemy {
 	 */
 	void action();
 	
+	int getMaxHP();
 }

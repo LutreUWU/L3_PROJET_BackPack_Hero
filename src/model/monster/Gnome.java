@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Effect;
 
@@ -19,6 +20,7 @@ public class Gnome implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	private int maxHP = 15;
 	private int HP = 15;
 	private int shield = 0;
 	private final int xp = 4;
@@ -75,10 +77,14 @@ public class Gnome implements Enemy{
 	@Override
 	public void action() {
 		switch(action) {
-			case "Slash" -> GameDataHero.sub("HP", 5);
+			case "Slash" ->{
+				GameDataHero.sub("HP", 5);
+				GameDataCombat.addLog("Le gnome slash le héro (-5PV)");
+			}
 			case "Abattage" -> {
 				GameDataHero.sub("HP", 10);
 				this.subHP(3);
+				GameDataCombat.addLog("Le gnome perd 3PV, mais slash fort le héro (-10PV)");
 				}
 		}
 		preAction();
@@ -138,6 +144,11 @@ public class Gnome implements Enemy{
 	@Override
 	public double getSizeY() {
 		return sizeY;
+	}
+	
+	@Override
+	public int getMaxHP() {
+		return maxHP;
 	}
 	
 	@Override

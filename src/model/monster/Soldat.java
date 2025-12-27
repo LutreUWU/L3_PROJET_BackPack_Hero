@@ -20,6 +20,7 @@ public class Soldat implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	private int maxHP = 25;
 	private int HP = 25;
 	private int shield = 0;
 	private final int xp = 6;
@@ -143,6 +144,11 @@ public class Soldat implements Enemy{
 	@Override
 	public double getSizeY() {
 		return sizeY;
+	}
+	
+	@Override
+	public int getMaxHP() {
+		return maxHP;
 	}
 	
 	@Override

@@ -79,10 +79,10 @@ public record GameView(int width, int height, int tileSize) {
    * @param data			GameData containing the game data. 
 	 */
 	private void drawBG(Graphics2D graphics, GameData data) {
-		graphics.setColor(Color.gray);
-		graphics.fillRect(0, 0, width, height);
-//		BufferedImage img = data.imgMap().get("BG1");
-//		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
+//		graphics.setColor(Color.gray);
+//		graphics.fillRect(0, 0, width, height);
+		BufferedImage img = data.imgMap().get("BG1");
+		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
 	}
 	
 	/**
@@ -779,8 +779,9 @@ public record GameView(int width, int height, int tileSize) {
   	var boundingBox = GameDataCombat.getEnemyBox().get(enemy);
   	int sizeX = boundingBox.southEast().x() - boundingBox.northWest().x();
   	int sizeY = boundingBox.southEast().y() - boundingBox.northWest().y();
+  	drawEnemyArc(graphics, (int) boundingBox.northWest().x(), (int) (boundingBox.southEast().y()), sizeX, sizeY, enemy);
 		drawElement(graphics, data.imgMap().get(enemy.getImg()), boundingBox.northWest().x(), boundingBox.northWest().y(), sizeX, sizeY, Direction.UP);
-		drawEnemyInfo(graphics, enemy, (int) boundingBox.northWest().x(), (int) (boundingBox.southEast().y()));
+		drawEnemyInfo(graphics, enemy, boundingBox, sizeX, sizeY);
   }
   
   private void drawLog(Graphics2D graphics, GameData data, List<String> log) {
@@ -794,7 +795,7 @@ public record GameView(int width, int height, int tileSize) {
     	var text = iterator.next();
     	int textWidth = fm.stringWidth(text);
     	double gap = fm.getAscent() * 1.5;
-  	  graphics.drawString(text, width / 2 - textWidth / 2,	(int) (gap * i++ + height * 0.8));
+  	  graphics.drawString(text, width / 2 - textWidth / 2,	(int) (gap * i++ + height * 0.55));
     }
   }
   
@@ -810,19 +811,60 @@ public record GameView(int width, int height, int tileSize) {
    * @param x				 Coordinate x where we wants to draw.
    * @param y				 Coordinate y where we wants to draw.
    */
-  private void drawEnemyInfo(Graphics2D graphics, Enemy enemy, int x, int y) {
-  	int size = FontLoader.getSpan();
-    Font font = new Font("Arial", Font.PLAIN, size);
-    graphics.setColor(GameDataCombat.getTarget() == enemy ? Color.RED : Color.WHITE);
-		graphics.setFont(font);
-	  graphics.drawString("PV : " + enemy.getHP(), x,	y + size);
-	  graphics.drawString("SHIELD : " + String.valueOf(enemy.getShield()), x,	y + size*2);
-	  graphics.drawString("ACTION : " + String.valueOf(enemy.getAction()), x,	y + size * 3);
+  private void drawEnemyInfo(Graphics2D graphics, Enemy enemy, BoundingBox boundingBox, int width, int height) {
+  	int size = FontLoader.getH1();
+  	drawEnemyPV(graphics, boundingBox.northWest().x(), boundingBox.southEast().y(), width, height, enemy, size);
+  	drawEnemyShield(graphics, boundingBox.southEast().x(), boundingBox.southEast().y(), width, height, enemy, size);
+
 	  var i = 0;
 	  for (var effect : enemy.getEffects().keySet()) {
 	  	i++;
-	  	graphics.drawString(effect + " : " + enemy.getEffects().get(effect), x,	y + size * (3 + i));
+//	  	graphics.drawString(effect + " : " + enemy.getEffects().get(effect), size * (3 + i));
 	  }
+  }
+  
+  private void drawEnemyPV(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy, int size) {
+  	// Text shadow
+  	Font font = new Font("Mikodacs", Font.PLAIN, size + 4);
+ 		graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    graphics.setColor(Color.BLACK);
+ 	  graphics.drawString(Integer.toString(enemy.getHP()), (int) (x - fm.stringWidth(Integer.toString(enemy.getHP()))/ 2 + 1),	(int) (y - height/4 + 4));
+    // PV
+ 	  font = new Font("Mikodacs", Font.PLAIN, size);
+ 		graphics.setFont(font);
+    fm = graphics.getFontMetrics();
+ 	  graphics.setColor(GameDataCombat.getTarget() == enemy ? Color.RED : Color.WHITE);
+ 	  graphics.drawString(Integer.toString(enemy.getHP()), (int) (x - fm.stringWidth(Integer.toString(enemy.getHP()))/ 2),	(int) (y - height/4));
+  }
+  
+  private void drawEnemyShield(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy, int size) {
+  	// Text shadow
+  	Font font = new Font("Mikodacs", Font.PLAIN, size + 4);
+ 		graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    graphics.setColor(Color.BLACK);
+ 	  graphics.drawString(Integer.toString(enemy.getShield()), (int) (x - fm.stringWidth(Integer.toString(enemy.getShield()))/ 2 - 1),	(int) (y - height/4 + 4));
+    // PV
+ 	  font = new Font("Mikodacs", Font.PLAIN, size);
+ 		graphics.setFont(font);
+    fm = graphics.getFontMetrics();
+ 	  graphics.setColor(Color.BLUE);
+ 	  graphics.drawString(Integer.toString(enemy.getShield()), (int) (x - fm.stringWidth(Integer.toString(enemy.getShield()))/ 2 - 1),	(int) (y - height/4));
+  }
+  
+  private void drawEnemyArc(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy) {  
+  	graphics.setStroke(new BasicStroke(38));
+  	graphics.setColor(Color.BLACK);
+  	graphics.drawArc(x, (int) (y - (height / 2* 1.5)/2), width, height / 2, 0, -180);
+  	graphics.setStroke(new BasicStroke(30));
+  	graphics.setColor(Color.GRAY);
+  	graphics.drawArc(x, (int) (y - (height / 2* 1.5)/2), width, height / 2, 0, -180);
+    graphics.setColor(Color.RED);
+  	double percent = (double)enemy.getHP() / (double) enemy.getMaxHP(); 
+  	int arcAngle = (int) (180 * percent);
+  	graphics.drawArc(x, (int) (y - (height / 2* 1.5)/2), width, height / 2, 0, -arcAngle);
+  	graphics.setStroke(new BasicStroke(1));
   }
   
   /**
