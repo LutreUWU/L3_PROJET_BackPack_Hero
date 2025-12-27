@@ -317,11 +317,17 @@ public class GameDataClick {
    */
   public static void moveDragItem(Item item, int x, int y) {
   	Objects.requireNonNull(item);
+  	BoundingBox bb = dragItemMap.get(item);
   	int addX = x - oldPosition.x();
   	int addY = y - oldPosition.y();
-  	var newNorthWest = new XY(dragItemMap.get(item).northWest().x() + addX, dragItemMap.get(item).northWest().y() + addY);
-  	var newSouthEast = new XY(dragItemMap.get(item).southEast().x() + addX, dragItemMap.get(item).southEast().y() + addY);
-  	dragItemMap.put(item, new BoundingBox(newNorthWest, newSouthEast));
+  	var nw = bb.northWest();
+  	var se = bb.southEast();
+  	dragItemMap.put(item,
+  	    new BoundingBox(
+  	        new XY(nw.x() + addX, nw.y() + addY),
+  	        new XY(se.x() + addX, se.y() + addY)
+  	    )
+  	);
   }
   
   /**
@@ -536,7 +542,7 @@ public class GameDataClick {
    * @param y Coordinate Y of the mouse
    */
   public static void sellButtonHover(int x, int y) {
-		if(data.dragItem() != null) {
+		if(data.getShop() && data.dragItem() != null) {
 			var boundingBox = MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").box();
 			var NW = boundingBox.northWest();
 			var SE = boundingBox.southEast();
@@ -565,6 +571,7 @@ public class GameDataClick {
 					data.getShopLst().setSellItem(data.dragItem());
 					removeItemFromDrag(data.dragItem());
 					addDragItem(new Gold(data.dragItem().score() / 2));
+					data.setDragItem(null);
 				}
 			}
 		}

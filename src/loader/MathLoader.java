@@ -95,22 +95,16 @@ public class MathLoader {
 	
 // ================== BG ======================
 	private static void getBGValue() {
-		for (int i = 1; i < 7; i ++) {
+		for (int i = 1; i < 8; i ++) {
 			getBGimgValue("BG" + i);
 		}
 	}
 	
 	private static void getBGimgValue(String BG_name) {
 		BufferedImage img = data.imgMap().get(BG_name);
-		var width = img.getWidth();
-		var height = img.getHeight();
-		double scale = width / screenWidth;
-    double scaledX = width * scale;
-    double scaledY = height * scale;
-    double offsetX = (screenWidth  - scaledX) / 2.0;
-    double offsetY = (screenHeight - scaledY) / 2.0;
+		double width = img.getWidth();
+		double scale =  (double) (screenWidth) / width;
     var transform = new AffineTransform();
-		transform.translate(offsetX, offsetY);
     transform.scale(scale, scale);
 		XY NW = new XY(0, 0);
 		XY SE = new XY(screenWidth, screenHeight);

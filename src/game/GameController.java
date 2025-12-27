@@ -259,7 +259,9 @@ public class GameController {
 	 */
 	private static void checkPointerMove(GameData data, Location mouse) {
 		if (data.dragItem() != null) {
-			GameDataClick.sellButtonHover(mouse.x(), mouse.y());
+			if (data.getShop()) {
+				GameDataClick.sellButtonHover(mouse.x(), mouse.y());
+			}
 			GameDataClick.moveDragItem(data.dragItem(), mouse.x(), mouse.y());
 			GameDataClick.setOldPosition(mouse.x(), mouse.y());
 			GameDataClick.binHover(mouse.x(), mouse.y());
