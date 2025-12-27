@@ -37,7 +37,7 @@ public class GameDataCombat {
   private static ArrayList<Enemy> lstEnemy;
   private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
   private static ArrayList<String> log = new ArrayList<>();
-  private static int totalExp;
+  private static int totalExp = 0;
   private static int levelBeforeCombat;
   
 	/**
@@ -54,13 +54,13 @@ public class GameDataCombat {
 		Objects.requireNonNull(data);
 		GameDataClick.resetDragItemLst();
 		lstEnemy = monsters;
-		totalExp = 0;
 		levelBeforeCombat = data.hero().getLevel();
 		getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
 		lstEnemy.forEach(monster -> monster.preAction());
 		setTarget(lstEnemy.get(0));
 		log = new ArrayList<>();
 		log.add("Le combat démarre !");
+		useAllPassive(data);
 		combat = true;
 	}
 	
@@ -68,7 +68,6 @@ public class GameDataCombat {
 		ListIterator<Item> it = data.bag().bagItemLst().listIterator();
 		while (it.hasNext()) {
 			var item = it.next();
-			
 			var newItem = item.usePassive(target, lstEnemy, data);
 			it.set(newItem);
 		}
@@ -109,31 +108,55 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		var item = data.bag().getItem(coord.x(), coord.y());
 		if (item != null) {
-			data.bag().removeItemFromBackpack(item);
-			var newItem = item.use(target, lstEnemy, data);
-			if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
-			if(data.hero().getEnergyPoint() <= 0) {
-				applyEffects();
+			if (item.AP() > data.hero().getEnergyPoint()) {
+				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
+				return;
 			}
-			killMonster(data);
+      GameDataHero.sub("energy", item.AP());
+			useItemOnEnemies(data, item);
 			if(data.hero().getEnergyPoint() <= 0) {
 				enemyAction(data.hero());
 			}
 			if (lstEnemy.isEmpty()) {
-				GameDataHero.add("energy", (3 - data.hero().getEnergyPoint()));
-				GameDataHero.add("xp", totalExp);
-				for (int i = 0; i < data.hero().getLevel() - levelBeforeCombat; i++) {
-					Random r = new Random();
-					data.bag().addCaseUnlock(3 + r.nextInt(1));
-				}
-				var itemGain = RandomItem.generate(data.floor());
-				GameDataClick.addDragItem(itemGain);
-				combat = false;
-			
+				endCombat(data);
 			}
 		}
 	}
 	
+	/**
+	 * Use the item against enemies.
+	 * 
+	 * @param data {@code GameData} of the game
+	 * @param item {@code Item} we wants to use
+	 */
+	private static void useItemOnEnemies(GameData data, Item item) {
+		data.bag().removeItemFromBackpack(item);
+		var newItem = item.use(target, lstEnemy, data);
+		if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
+		if(data.hero().getEnergyPoint() <= 0) {
+			applyEffects();
+		}
+		killMonster(data);
+	}
+
+	/**
+	 * This method is called when there's no enemy left.
+	 * It will reset AP, give the exp, give the weapon and end the combat.
+	 * 
+	 * @param data {@code GameData} of the game.
+	 */
+	private static void endCombat(GameData data) {
+		GameDataHero.add("energy", (3 - data.hero().getEnergyPoint()));
+		GameDataHero.add("xp", totalExp);
+		for (int i = 0; i < data.hero().getLevel() - levelBeforeCombat; i++) {
+			Random r = new Random();
+			data.bag().addCaseUnlock(3 + r.nextInt(1));
+		}
+		var itemGain = RandomItem.generate(data.floor());
+		GameDataClick.addDragItem(itemGain);
+		combat = false;
+	}
+
 	/**
 	 * Check the list of monster, and kill him if he has below 0 PV.
 	 * Add the exp, update the bounding box and swap the target if necessary.
@@ -168,6 +191,7 @@ public class GameDataCombat {
 		applyEffects();
 		killMonster(data);
 		enemyAction(data.hero());
+		useAllPassive(data);
 	}
 	
 	/**

@@ -3,7 +3,6 @@ package game;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;
@@ -20,14 +19,7 @@ import loader.FontLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.common.Arrow;
-import model.item.common.Gold;
-import model.item.epic.Bow;
-import model.item.epic.DespairShield;
-import model.item.epic.Shield;
-import model.item.legendary.Axe;
-import model.item.rare.PoisonArrow;
-import model.item.superrare.Bomb;
+import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -266,6 +258,7 @@ public class GameController {
 	 */
 	private static void checkPointerMove(GameData data, Location mouse) {
 		if (data.dragItem() != null) {
+			GameDataClick.sellButtonHover(mouse.x(), mouse.y());
 			GameDataClick.moveDragItem(data.dragItem(), mouse.x(), mouse.y());
 			GameDataClick.setOldPosition(mouse.x(), mouse.y());
 			GameDataClick.binHover(mouse.x(), mouse.y());
@@ -302,10 +295,10 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				// GameDataClick.addDragItem(new Curse());
-				// GameDataClick.addDragItem(new Bow());
-				GameDataClick.addDragItem(new Shield());
-				GameDataClick.addDragItem(new DespairShield());
+				 GameDataClick.addDragItem(new Curse());
+				 GameDataClick.addDragItem(new Mimicry());
+//				GameDataClick.addDragItem(new Shield());
+//				GameDataClick.addDragItem(new DespairShield());
 			}
 		}
 		case Key.I -> {

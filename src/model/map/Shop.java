@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import game.data.GameDataClick;
 import model.Backpack;
@@ -70,6 +71,19 @@ public final class Shop implements Room {
     }
   }
   
+  public void setSellItemPrice(Item item) {
+  	Objects.requireNonNull(item);
+  	logShop = switch(item) {
+					  	case Gold _ -> "Tu me vends de l'or contre de l'or ?";
+					  	default -> "Je te rachète " + item.toString() + " pour " + item.score() / 2 + " gold";
+					  	};		
+  }
+  
+  public void setSellItem(Item item) {
+  	Objects.requireNonNull(item);
+  	logShop = "Transaction effectuée pour " + item.toString();
+  }
+  
   private String setLog(Item item) {
   	return switch(item) {
   	case Sword _ -> "T'es sah à acheter ça ?";
@@ -94,7 +108,6 @@ public final class Shop implements Room {
     copy.putAll(map);
     map.clear();
     map.putAll(copy);
-
   }
   
   public void leftShiftShop() {

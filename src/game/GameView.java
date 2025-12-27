@@ -79,8 +79,10 @@ public record GameView(int width, int height, int tileSize) {
    * @param data			GameData containing the game data. 
 	 */
 	private void drawBG(Graphics2D graphics, GameData data) {
-		BufferedImage img = data.imgMap().get("BG1");
-		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
+		graphics.setColor(Color.gray);
+		graphics.fillRect(0, 0, width, height);
+//		BufferedImage img = data.imgMap().get("BG1");
+//		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
 	}
 	
 	/**
@@ -321,7 +323,7 @@ public record GameView(int width, int height, int tileSize) {
 	    graphics.setFont(font);
 	    FontMetrics fm = graphics.getFontMetrics();
 	    graphics.setColor(Color.WHITE);
-		  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 20);
+		  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 25);
 		  graphics.setColor(Color.GREEN);
 		  drawTextInfo(graphics, "AP : " + item.AP(), NW.x(), NW.y() + height / 3, 20);
 		  drawTextInfo(graphics, "Durability : " + item.durability(), NW.x(), NW.y() + height / 3 + (int) (fm.getAscent() * 1.5), 20);
@@ -1032,10 +1034,8 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private void drawSellArticle(Graphics2D graphics, GameData data) {
-    var bubbleBox = MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").box();
-    var width = bubbleBox.southEast().x() - bubbleBox.northWest().x();
-    var height = bubbleBox.southEast().y() - bubbleBox.northWest().y();
-    graphics.drawRect(bubbleBox.northWest().x(), bubbleBox.northWest().y(), width, height);
+    var img = data.imgMap().get("ICON_SELL_BUTTON");
+    graphics.drawImage(img, MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").transform(), null);
   }
   
   private void drawArticle(Graphics2D graphics, GameData data) {

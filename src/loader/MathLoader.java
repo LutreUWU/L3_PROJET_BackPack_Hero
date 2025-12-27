@@ -355,8 +355,16 @@ public class MathLoader {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.81;
 		double posY = shopBoundingBox.northWest().y() + shopHeight * 0.1;
+		var img = data.imgMap().get("ICON_SELL_BUTTON");
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scaleX = (shopWidth * 0.1) / width;
+		var scaleY = (shopHeight * 0.30) / height;
+		AffineTransform transform = new AffineTransform();
+	  transform.translate(posX, posY);
+	  transform.scale(scaleX, scaleY);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + shopWidth * 0.1), (int) (posY + shopHeight * 0.30)));
-	  renderDataGame.put("SHOP_SELL_ARTICLE", new RenderData(null, boundingBox));
+	  renderDataGame.put("SHOP_SELL_ARTICLE", new RenderData(transform, boundingBox));
 	}
 	
 	private static void getArticleShopValue() {

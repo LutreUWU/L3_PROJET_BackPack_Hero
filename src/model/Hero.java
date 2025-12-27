@@ -54,20 +54,18 @@ public class Hero {
 			case "curse" -> curseRefuse += value;
 		}
 	}
-	
+	/**
+	 * Function to substract for all attribtues
+	 * @param string : What we want to substract
+	 * @param value : how many points to substract
+	 */
 	public void sub(String string, int value) {
-		/**
-		 * Function to substract for all attribtues
-		 * @param string : What we want to substract
-		 * @param value : how many points to substract
-		 */
 		switch(string.toLowerCase()) {
 			case "maxhp" -> {maxHP -= value;
 												if (HP > maxHP) HP = maxHP;
 												if (currentProtection > maxHP) currentProtection = maxHP;
 			}
-			case "hp" -> {HP -= value;
-										if (HP <= 0) IO.println("Faudra qu'on s'occupe de la mort\n");}
+			case "hp" -> checkProtection(value);
 			case "protection" -> currentProtection -= value;
 			case "armor" -> currentArmor -= value;
 			case "energy" -> energyPoint -= value;
@@ -75,6 +73,22 @@ public class Hero {
 		}
 	}
 	
+	private void checkProtection(int value) {
+		int remainingDamage = value;
+    if (currentProtection > 0) {
+        int absorbed = Math.min(currentProtection, remainingDamage);
+        currentProtection -= absorbed;
+        remainingDamage -= absorbed;
+    }
+    if (remainingDamage > 0) {
+        HP -= remainingDamage;
+        if (HP <= 0) {
+            HP = 0;
+            IO.println("Faudra qu'on s'occupe de la mort\n");
+        }
+    }
+	}
+
 	public void reset() {
 		/**
 		 * Function to reset for some attribtues

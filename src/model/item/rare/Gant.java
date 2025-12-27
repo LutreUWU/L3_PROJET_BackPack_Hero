@@ -81,7 +81,6 @@ public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int s
     GameDataCombat.addLog("Le héro porte de super gant ! Il gagne 10 PV");
     GameDataHero.sub("energy", 1);
     GameDataHero.add("hp", 10);
-    enemy.subHP(30);
     return subDurability(1);
   }
   

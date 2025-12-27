@@ -528,6 +528,47 @@ public class GameDataClick {
 		}
   }
   
+  /**
+   * Check if when moving the mouse, we're above the sell button in shop.
+   * This method is not triggered if we're not in the shop.
+   * 
+   * @param x Coordinate X of the mouse
+   * @param y Coordinate Y of the mouse
+   */
+  public static void sellButtonHover(int x, int y) {
+		if(data.dragItem() != null) {
+			var boundingBox = MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").box();
+			var NW = boundingBox.northWest();
+			var SE = boundingBox.southEast();
+			if (x >= NW.x() && x <= SE.x()) {
+				if (y >= NW.y() && y <= SE.y()) {
+					data.getShopLst().setSellItemPrice(data.dragItem());
+				}
+			}
+		}
+	}
+
+  /**
+   * Check if when releasing the mouse, we're above the sell button in shop.
+   * This method is not triggered if we're not in the shop.
+   * 
+   * @param x Coordinate X of the mouse
+   * @param y Coordinate Y of the mouse
+   */
+  private static void sellButtonClick(int x, int y) {
+		if(data.dragItem() != null) {
+			var boundingBox = MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").box();
+			var NW = boundingBox.northWest();
+			var SE = boundingBox.southEast();
+			if (x >= NW.x() && x <= SE.x()) {
+				if (y >= NW.y() && y <= SE.y()) {
+					data.getShopLst().setSellItem(data.dragItem());
+					removeItemFromDrag(data.dragItem());
+					addDragItem(new Gold(data.dragItem().score() / 2));
+				}
+			}
+		}
+	}
   
   /**
    * Main function treating the click and returning information about what we clicks.
@@ -540,7 +581,6 @@ public class GameDataClick {
   public static ClickResult click(int x, int y) {
   	// Here we add other click info
   	Item item = itemClick(x, y);
-  	
     if (item != null) {
         return new ClickResult(ClickType.ITEM, item);
     }
@@ -570,14 +610,14 @@ public class GameDataClick {
     if (data.getShop()) {
     	if (!data.getShopLst().getCurrentShop().isEmpty()) {
     		arrowButtonClick(x, y);
-      	buyButtonClick(x, y);
+    		buyButtonClick(x, y);
     	}
     	exitButtonClick(x, y);
     }
     return new ClickResult(ClickType.NOTHING, null);
   }
-  
-  /**
+
+	/**
    * Check where the mouse is when we release the mouse.
    * We call this method when releasing an item above the bin button for exemple.
    * 
@@ -617,6 +657,9 @@ public class GameDataClick {
   	}
   	if (!GameDataCombat.combat()) {
   		binClick(x, y);
+  	}
+  	if (data.getShop()) {
+  		sellButtonClick(x, y);
   	}
   }
   
