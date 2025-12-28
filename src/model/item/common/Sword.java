@@ -80,7 +80,6 @@ public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée");
-    GameDataHero.sub("energy", 1);
     enemy.subHP(3);
     return subDurability(1);
   }

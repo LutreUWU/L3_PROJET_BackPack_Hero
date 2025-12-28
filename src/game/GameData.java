@@ -58,13 +58,6 @@ public class GameData {
    */
   private LinkedEvent event;
   private XY mouseCoord;
-  /**
-   * Map used for drawing an image <br>
-   * The keys are the name of the image and the value his {@code BufferedImage}
-   * 
-   */
-  private final Map<String, BufferedImage> imgMap;
-  private final Map<Integer, BufferedImage> imgMapByID;
   
   /**
    * Sortest Path
@@ -82,9 +75,6 @@ public class GameData {
 	  ItemRepository.createItemRepository();
 	  map = new Floor(floor);
 	  screenInfo = screenInfo_;
-	  imgMap = ImageLoader.loadAllImage();
-	  imgMapByID = ImageLoader.loadAllImageByID();
-	  new MathLoader(this);
     new GameDataHero(hero);
     new GameDataClick(this);
 	}
@@ -214,17 +204,7 @@ public class GameData {
   public ScreenInfo screenInfo() {
     return screenInfo;
   }
-  
-  
-  public Map<String, BufferedImage> imgMap(){
-  	return imgMap;
-  }
-  
-  public Map<Integer, BufferedImage> imgMapByID(){
-  	return imgMapByID;
-  }
-
-
+ 
 	public XY getMouseCoord() {
 		return mouseCoord;
 	}

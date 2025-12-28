@@ -16,10 +16,13 @@ import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import game.data.GameDataShop;
 import loader.FontLoader;
+import loader.ImageLoader;
+import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.mythic.Mimicry;
+import model.item.epic.Bow;
+import model.item.rare.PoisonArrow;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -298,10 +301,10 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				 GameDataClick.addDragItem(new Curse());
-				 GameDataClick.addDragItem(new Mimicry());
-//				GameDataClick.addDragItem(new Shield());
-//				GameDataClick.addDragItem(new DespairShield());
+//				 GameDataClick.addDragItem(new Curse());
+//				 GameDataClick.addDragItem(new Mimicry());
+				GameDataClick.addDragItem(new PoisonArrow());
+				GameDataClick.addDragItem(new Bow());
 			}
 		}
 		case Key.I -> {
@@ -335,8 +338,10 @@ public class GameController {
 	public static void memoryGame(ApplicationContext context) {
 		var screenInfo = context.getScreenInfo();
 		var data = new GameData(screenInfo);
+		var imageLoader = new ImageLoader();
 		FontLoader.load_font(screenInfo);
-		var view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize());
+		new MathLoader(data, imageLoader);
+		var view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize(), imageLoader);
 		GameView.draw(context, data, view);
 		while (true) {
 			if (!gameLoop(context, data, view)) {

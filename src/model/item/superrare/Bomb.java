@@ -75,7 +75,6 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 		var bonus = Synergy.getBonusDmg();
 		GameDataCombat.addLog("EXPLOSION ! Chaque ennemi perd 6 PV");
 		if (bonus != 0) GameDataCombat.addLog("SYNERGIE ! Chaque ennemi perd " + bonus + " PV supplémentaire(s)");
-		data.hero().sub("energy", 2);
 		for (var target : lstEnemy) {
 			target.subHP(6 + bonus);
 		}

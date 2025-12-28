@@ -19,10 +19,12 @@ import com.github.forax.zen.ApplicationContext;
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import loader.FontLoader;
+import loader.ImageLoader;
 import loader.MathLoader;
 import model.BoundingBox;
 import model.Curse;
 import model.Direction;
+import model.Effect;
 import model.Item;
 import model.XY;
 import model.item.common.Arrow;
@@ -59,7 +61,7 @@ import model.monster.Enemy;
   * @param tileSize Size of a grid in the bag
   *
   */
-public record GameView(int width, int height, int tileSize) {	
+public record GameView(int width, int height, int tileSize, ImageLoader imgLoader) {	
   /**
    * Create a new GameView
    * 
@@ -68,8 +70,8 @@ public record GameView(int width, int height, int tileSize) {
    * @param grid_size Size of a grid in the bag
    * @return SimpleGameView
    */
-  public static GameView initGameGraphics(int width, int height, int grid_size) {
-  	return new GameView(width, height, grid_size);
+  public static GameView initGameGraphics(int width, int height, int grid_size, ImageLoader imgLoader) {
+  	return new GameView(width, height, grid_size, imgLoader);
   }
   
   /**
@@ -81,7 +83,7 @@ public record GameView(int width, int height, int tileSize) {
 	private void drawBG(Graphics2D graphics, GameData data) {
 //		graphics.setColor(Color.gray);
 //		graphics.fillRect(0, 0, width, height);
-		BufferedImage img = data.imgMap().get("BG1");
+		BufferedImage img = imgLoader.bgImages().get("BG1");
 		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
 	}
 	
@@ -208,7 +210,7 @@ public record GameView(int width, int height, int tileSize) {
   private void drawGrid(Graphics2D graphics, GameData data) {
     int size = data.bag().getGridSize();
 		int [][] grid = data.bag().grid();
-		BufferedImage imgBackpack = data.imgMap().get("BG_BACKPACK");
+		BufferedImage imgBackpack = imgLoader.bgImages().get("BG_BACKPACK");
 		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box(); 
 		graphics.drawImage(imgBackpack, MathLoader.getMapEvent().get("BG_BACKPACK").transform(), null);
 		for (int i = 0; i < 5; i++) {
@@ -216,11 +218,11 @@ public record GameView(int width, int height, int tileSize) {
 	    	final int fi = i;
 	    	final int fj = j;				  
 		  	if (grid[fi][fj] >= -1) {
-		  		graphics.drawImage(data.imgMap().get("BG_BAG_UNLOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
+		  		graphics.drawImage(imgLoader.bgImages().get("BG_BAG_UNLOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
 		  		
 		  	}
 		  	if (grid[fi][fj] == -2) {
-		  		graphics.drawImage(data.imgMap().get("BG_BAG_LOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
+		  		graphics.drawImage(imgLoader.bgImages().get("BG_BAG_LOCK"), boundingBox.northWest().x() + (size * fj), boundingBox.northWest().y() + (size * fi), size, size, null);
 		  	}
 			}
     }
@@ -238,20 +240,20 @@ public record GameView(int width, int height, int tileSize) {
 		for (var item : itemLst) {
 			XY coordinate = item.shape()[0];
 		  switch (item.ID()) {
-			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75);
+			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75);
 			  case 2 -> drawItemGold(graphics, data, coordinate, item);
-				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
-				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
-				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
-				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
-				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75); 
-				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), data.imgMapByID().get(item.ID()), 0.20, 0.5); 
-				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
-				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25);
-				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
-				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
-				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.2); 
-				case 14 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
+				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25); 
+				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
+				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
+				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75); 
+				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.20, 0.5); 
+				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25);
+				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
+				case 14 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 				default ->{}
 		  }
 		}
@@ -260,9 +262,9 @@ public record GameView(int width, int height, int tileSize) {
   private void drawItemGold(Graphics2D graphics, GameData data, XY coordinate, Item item) {
   	var itemGold = (Gold) item;
   	switch (getSizeGold(itemGold.value())) {
-  	case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold3"));
-  	case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold2"));
-  	default -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), data.imgMap().get("gold1"));
+  	case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.bgImages().get("gold3"));
+  	case 2 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.bgImages().get("gold2"));
+  	default -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.bgImages().get("gold1"));
   	}
   }
   
@@ -307,7 +309,7 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private void drawItemInfo(Graphics2D graphics, GameData data) {
-  	BufferedImage imgItemInfo = data.imgMap().get("BG_INFO_ITEM");
+  	BufferedImage imgItemInfo = imgLoader.bgImages().get("BG_INFO_ITEM");
   	BoundingBox itemInfoBoundingBox = MathLoader.getMapEvent().get("BG_INFO_ITEM").box();
   	XY NW = itemInfoBoundingBox.northWest();
   	XY SE = itemInfoBoundingBox.southEast();
@@ -417,7 +419,7 @@ public record GameView(int width, int height, int tileSize) {
   	double size_x = data.hero().getSizeX();
   	double size_y = data.hero().getSizeY();
   	if (!data.getShop()) {
-  		BufferedImage img = data.imgMap().get("Roland");
+  		BufferedImage img = imgLoader.bgImages().get("Roland");
   		drawElement(graphics, img, width * 0.20, height * 0.50, size_x, size_y, Direction.UP);
   	}
 		drawHeroStats(graphics, data, (int) (width * 0.20 + size_x/2),  (int) (height * 0.50 + size_y));
@@ -449,7 +451,7 @@ public record GameView(int width, int height, int tileSize) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("ICON_HEALTH");
+    BufferedImage img = imgLoader.bgImages().get("ICON_HEALTH");
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.GRAY);
     graphics.fill(new Rectangle2D.Double(logoWidth, logoHeight / 2 - size / 2 , width * 0.20, size));
@@ -467,7 +469,7 @@ public record GameView(int width, int height, int tileSize) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("ICON_SHIELD");
+    BufferedImage img = imgLoader.bgImages().get("ICON_SHIELD");
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.GRAY);
     graphics.fill(new Rectangle2D.Double(logoWidth, render.box().northWest().y() + logoHeight / 2 - size / 2, width * 0.20, size));
@@ -485,7 +487,7 @@ public record GameView(int width, int height, int tileSize) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("ICON_MANA");
+    BufferedImage img = imgLoader.bgImages().get("ICON_MANA");
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.CYAN);
 	  graphics.drawString(data.hero().getManaPoint() + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
@@ -498,7 +500,7 @@ public record GameView(int width, int height, int tileSize) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("ICON_ACTION");
+    BufferedImage img = imgLoader.bgImages().get("ICON_ACTION");
     graphics.drawImage(img, render.transform() , null);
     graphics.setColor(data.hero().getEnergyPoint() > 1 ? Color.YELLOW : Color.RED);
 	  graphics.drawString(data.hero().getEnergyPoint() + " AP", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
@@ -511,7 +513,7 @@ public record GameView(int width, int height, int tileSize) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("ICON_UNLOCK");
+    BufferedImage img = imgLoader.bgImages().get("ICON_UNLOCK");
     graphics.drawImage(img, render.transform() , null);
     graphics.setColor(data.bag().getCaseUnlock() > 0 ? Color.GREEN : Color.RED);
 	  graphics.drawString(data.bag().getCaseUnlock() + " CASE DEBLOQUABLE", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
@@ -524,7 +526,7 @@ public record GameView(int width, int height, int tileSize) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
-    BufferedImage img = data.imgMap().get("gold1");
+    BufferedImage img = imgLoader.bgImages().get("gold1");
     graphics.drawImage(img, render.transform() , null);
     graphics.setColor(data.bag().getGoldInBag() > 0 ? Color.GREEN : Color.RED);
 	  graphics.drawString(data.bag().getGoldInBag() + " gold", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
@@ -574,7 +576,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param data			GameData containing the game data. 
    */
   private void drawMap(Graphics2D graphics, GameData data) {
-  	BufferedImage imgMap = data.imgMap().get("BG_MAP");
+  	BufferedImage imgMap = imgLoader.bgImages().get("BG_MAP");
   	var leftGrid = MathLoader.getMapEvent().get("BG_MAP").box();
   	var gap = tileSize * 0.1;
   	graphics.drawImage(imgMap, MathLoader.getMapEvent().get("BG_MAP").transform(), null);
@@ -586,23 +588,22 @@ public record GameView(int width, int height, int tileSize) {
 		  	int newX = (int) (gap * fj) + leftGrid.northWest().x() + (tileSize * fj);
 		  	int newY = (int) (gap * fi) + leftGrid.northWest().y() + (tileSize * fi);
 		  	if (data.map().getHeroVisible().contains(coordXY)) {
-		  		graphics.drawImage(data.imgMap().get("BG_MAP_TILE"), newX, newY, tileSize, tileSize, null);
+		  		graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE"), newX, newY, tileSize, tileSize, null);
 			    if (data.map().getHeroAccessible().contains(coordXY)) {
-			    	graphics.drawImage(data.imgMap().get("BG_MAP_TILE_ACCES"), newX, newY, tileSize, tileSize, null);
+			    	graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE_ACCES"), newX, newY, tileSize, tileSize, null);
 			    }
 			  	switch(data.map().getGrid()[fi][fj]) {
-			  		case Shop _ -> graphics.drawImage(data.imgMap().get("ICON_SHOP"), newX, newY, tileSize, tileSize, null);
-			  		case EnemyRoom _ -> graphics.drawImage(data.imgMap().get("ICON_COMBAT"), newX, newY, tileSize, tileSize, null);
-			  		case EventRoom _ -> graphics.drawImage(data.imgMap().get("ICON_EVENT"), newX, newY, tileSize, tileSize, null);
-			  		case Healer _ -> graphics.drawImage(data.imgMap().get("ICON_HEAL"), newX, newY, tileSize, tileSize, null);
-			  		case Start _ -> graphics.drawImage(data.imgMap().get("ICON_START"), newX, newY, tileSize, tileSize, null);
-			  		case Exit _ -> graphics.drawImage(data.imgMap().get("ICON_EXIT"), newX, newY, tileSize, tileSize, null);
-			  		case LockedDoor _ -> graphics.drawImage(data.imgMap().get("ICON_LOCK_DOOR"), newX, newY, tileSize, tileSize, null);
-			  		case Treasure _ -> graphics.drawImage(data.imgMap().get("ICON_TREASURE"), newX, newY, tileSize, tileSize, null);
+			  		case Shop _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_SHOP"), newX, newY, tileSize, tileSize, null);
+			  		case EnemyRoom _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_COMBAT"), newX, newY, tileSize, tileSize, null);
+			  		case EventRoom _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_EVENT"), newX, newY, tileSize, tileSize, null);
+			  		case Healer _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_HEAL"), newX, newY, tileSize, tileSize, null);
+			  		case Start _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_START"), newX, newY, tileSize, tileSize, null);
+			  		case Exit _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_EXIT"), newX, newY, tileSize, tileSize, null);
+			  		case LockedDoor _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_LOCK_DOOR"), newX, newY, tileSize, tileSize, null);
+			  		case Treasure _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_TREASURE"), newX, newY, tileSize, tileSize, null);
 			  		default ->  {}
 			  	}
-		  	} else graphics.drawImage(data.imgMap().get("BG_MAP_SHADOW"), newX - (int) gap, newY - (int) gap, tileSize + (int) gap*2, tileSize + (int) gap*2, null);
-
+		  	} else graphics.drawImage(imgLoader.bgImages().get("BG_MAP_SHADOW"), newX - (int) gap, newY - (int) gap, tileSize + (int) gap*2, tileSize + (int) gap*2, null);
       }
 		}
 		
@@ -633,7 +634,7 @@ public record GameView(int width, int height, int tileSize) {
   	
 		graphics.setColor(Color.WHITE);
 		var coord = data.map().getHeroPos();
-		graphics.drawImage(data.imgMap().get("ICON_HERO"), (int) (gap * coord.x()) + leftGrid.northWest().x() + (coord.x() * tileSize), (int) (gap * coord.y()) + leftGrid.northWest().y() + (coord.y() * tileSize), tileSize, tileSize, null);
+		graphics.drawImage(imgLoader.bgImages().get("ICON_HERO"), (int) (gap * coord.x()) + leftGrid.northWest().x() + (coord.x() * tileSize), (int) (gap * coord.y()) + leftGrid.northWest().y() + (coord.y() * tileSize), tileSize, tileSize, null);
 		///////////////////////////////////
   }
 
@@ -659,20 +660,20 @@ public record GameView(int width, int height, int tileSize) {
    */
   private void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
 	  switch (item.ID()) {
-		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75); 
+		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75); 
 		  case 2 -> drawDragGold(graphics, data, item, box);
-			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
-			case 4 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
-			case 5 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
-			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), data.imgMapByID().get(item.ID())); 
-			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.75); 
-			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), data.imgMapByID().get(item.ID()), 0.20, 0.5); 
-			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
-			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.25, 0.25); 
-			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
-			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
-			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), data.imgMapByID().get(item.ID()), 0.5, 0.2); 
-			case 14 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMapByID().get(item.ID()));
+			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
+			case 4 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25); 
+			case 5 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
+			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
+			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75); 
+			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.20, 0.5); 
+			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25); 
+			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
+			case 14 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 			default ->{}
 	  }
 	}
@@ -686,9 +687,9 @@ public record GameView(int width, int height, int tileSize) {
   private void drawDragGold(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
   	var itemGold = (Gold) item;
   	switch (getSizeGold(itemGold.value())) {
-  	case 3 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold3"));
-  	case 2 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold2")); 
-  	default -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), data.imgMap().get("gold1"));
+  	case 3 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.bgImages().get("gold3"));
+  	case 2 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.bgImages().get("gold2")); 
+  	default -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.bgImages().get("gold1"));
   	}
   }
   
@@ -763,7 +764,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param lstEnemy List of all enemy we fight
    */
   private void updateCombat(Graphics2D graphics, GameData data,  ArrayList<Enemy> lstEnemy) {
-  	drawEndTurnButton(graphics,  data.imgMap().get("BG_ENDTURN"));
+  	drawEndTurnButton(graphics,  imgLoader.bgImages().get("BG_ENDTURN"));
   	lstEnemy.forEach(enemy -> drawEnemy(graphics, data, enemy));
   	drawLog(graphics, data, GameDataCombat.getLog());
   }
@@ -780,22 +781,21 @@ public record GameView(int width, int height, int tileSize) {
   	int sizeX = boundingBox.southEast().x() - boundingBox.northWest().x();
   	int sizeY = boundingBox.southEast().y() - boundingBox.northWest().y();
   	drawEnemyArc(graphics, (int) boundingBox.northWest().x(), (int) (boundingBox.southEast().y()), sizeX, sizeY, enemy);
-		drawElement(graphics, data.imgMap().get(enemy.getImg()), boundingBox.northWest().x(), boundingBox.northWest().y(), sizeX, sizeY, Direction.UP);
+		drawElement(graphics, imgLoader.bgImages().get(enemy.getImg()), boundingBox.northWest().x(), boundingBox.northWest().y(), sizeX, sizeY, Direction.UP);
 		drawEnemyInfo(graphics, enemy, boundingBox, sizeX, sizeY);
   }
   
   private void drawLog(Graphics2D graphics, GameData data, List<String> log) {
   	int i = 0;
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
-    graphics.setColor(Color.WHITE);
     graphics.setFont(font);
+    graphics.setColor(Color.WHITE);
     FontMetrics fm = graphics.getFontMetrics();
-    var iterator = log.iterator();
+  	double gap = fm.getAscent() * 1.5;
+    var iterator = log.reversed().iterator();
     while (iterator.hasNext()) {
     	var text = iterator.next();
-    	int textWidth = fm.stringWidth(text);
-    	double gap = fm.getAscent() * 1.5;
-  	  graphics.drawString(text, width / 2 - textWidth / 2,	(int) (gap * i++ + height * 0.55));
+  	  graphics.drawString("-> " + text, (int) gap ,	(int) (height - gap - gap * i++));
     }
   }
   
@@ -815,15 +815,62 @@ public record GameView(int width, int height, int tileSize) {
   	int size = FontLoader.getH1();
   	drawEnemyPV(graphics, boundingBox.northWest().x(), boundingBox.southEast().y(), width, height, enemy, size);
   	drawEnemyShield(graphics, boundingBox.southEast().x(), boundingBox.southEast().y(), width, height, enemy, size);
-
-	  var i = 0;
-	  for (var effect : enemy.getEffects().keySet()) {
-	  	i++;
-//	  	graphics.drawString(effect + " : " + enemy.getEffects().get(effect), size * (3 + i));
-	  }
+  	drawEnemyAction(graphics, boundingBox, enemy);
+		drawEnemyEffect(graphics, enemy, boundingBox);
   }
   
-  private void drawEnemyPV(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy, int size) {
+  private void drawEnemyEffect(Graphics2D graphics, Enemy enemy, BoundingBox boundingBox) {
+		var width = boundingBox.southEast().x() - boundingBox.northWest().x();
+		var centerX = boundingBox.northWest().x() + width / 2;
+		int size = (int) (height * 0.04);
+		int gap = (int) (size * 0.1);
+  	var i = 0;
+  	for (var effect : enemy.getEffects().keySet()) {
+	    int offset = (i + 1) / 2;
+	    int dir = (i % 2 == 0) ? 1 : -1;
+	    int pos = offset * dir;
+	    int x = centerX + pos * (size + gap);
+	    drawEnemyEffectImageAndValue(graphics, enemy, effect, x, (int) (boundingBox.southEast().y() * 1.08), size);
+	    i++;
+  	}
+	}
+
+	private void drawEnemyEffectImageAndValue(Graphics2D graphics, Enemy enemy, Effect effect, int x, int y, int size) {
+		var img = imgLoader.bgImages().get("ICON_POISON");
+		drawElement(graphics, img, x, y, size, size, Direction.UP); 
+		var charNumber = Integer.toString(enemy.getEffects().get(effect));
+		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+    FontMetrics fm = graphics.getFontMetrics();
+ 		graphics.setFont(font);
+ 		graphics.setColor(Color.BLACK);
+    graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, (int) (y + size * 1.05));
+ 		graphics.setColor(Color.WHITE);
+    graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, y + size);
+
+	}
+
+	private void drawEnemyAction(Graphics2D graphics, BoundingBox boundingBox, Enemy enemy) {
+		var width = boundingBox.southEast().x() - boundingBox.northWest().x();
+		Font font = new Font("Mikodacs", Font.ITALIC, FontLoader.getH3());
+    FontMetrics fm = graphics.getFontMetrics();
+ 		graphics.setFont(font);
+		var centerX = boundingBox.northWest().x() + width / 2;
+		var centerY = boundingBox.northWest().y() - fm.getAscent() / 2;
+		graphics.setColor(Color.BLACK);
+  	drawText(graphics, "Action : " + enemy.getAction(), centerX, (int) (centerY * 1.01), 20);	
+ 		graphics.setColor(Color.LIGHT_GRAY);
+  	drawText(graphics, "Action : " + enemy.getAction(), centerX, centerY, 20);	
+  	font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH2());
+    fm = graphics.getFontMetrics();
+    graphics.setFont(font);
+		graphics.setColor(Color.BLACK);
+    centerY = boundingBox.northWest().y() - fm.getAscent() * 3;
+  	drawText(graphics, enemy.toString(), centerX, (int) (centerY * 1.01), 20);	
+ 		graphics.setColor(GameDataCombat.getTarget() == enemy ? Color.RED : Color.WHITE);
+  	drawText(graphics, enemy.toString(), centerX, centerY, 20);	
+	}
+
+	private void drawEnemyPV(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy, int size) {
   	// Text shadow
   	Font font = new Font("Mikodacs", Font.PLAIN, size + 4);
  		graphics.setFont(font);
@@ -834,7 +881,7 @@ public record GameView(int width, int height, int tileSize) {
  	  font = new Font("Mikodacs", Font.PLAIN, size);
  		graphics.setFont(font);
     fm = graphics.getFontMetrics();
- 	  graphics.setColor(GameDataCombat.getTarget() == enemy ? Color.RED : Color.WHITE);
+ 	  graphics.setColor(Color.WHITE);
  	  graphics.drawString(Integer.toString(enemy.getHP()), (int) (x - fm.stringWidth(Integer.toString(enemy.getHP()))/ 2),	(int) (y - height/4));
   }
   
@@ -886,7 +933,7 @@ public record GameView(int width, int height, int tileSize) {
    * @param data		 {@code GameData} containing all informations about the game
    */
   private void drawBgEvent(Graphics2D graphics, GameData data) {
-  	BufferedImage img = data.imgMap().get("BG_EVENT");
+  	BufferedImage img = imgLoader.bgImages().get("BG_EVENT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_EVENT").transform(), null);
   }
   
@@ -916,8 +963,8 @@ public record GameView(int width, int height, int tileSize) {
    * @param data		 {@code GameData} containing all informations about the game
    */
   private void drawChoiceEvent(Graphics2D graphics, GameData data) {
-  	var img1 = data.imgMap().get("BG_CHOICE1");
-  	var img2 = data.imgMap().get("BG_CHOICE2");
+  	var img1 = imgLoader.bgImages().get("BG_CHOICE1");
+  	var img2 = imgLoader.bgImages().get("BG_CHOICE2");
   	var event1 = MathLoader.getMapEvent().get("BG_CHOICE1");
   	var event2 = MathLoader.getMapEvent().get("BG_CHOICE2");
   	int width = event1.box().southEast().x() - event1.box().northWest().x();
@@ -925,7 +972,7 @@ public record GameView(int width, int height, int tileSize) {
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
   	if (data.event().getRoot().getChoice2() == null){
-  		var img3 = data.imgMap().get("BG_CHOICE_END");
+  		var img3 = imgLoader.bgImages().get("BG_CHOICE_END");
   		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
   		graphics.drawImage(img3, event3.transform(), null);
 		  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
@@ -1020,16 +1067,16 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private void drawBinButton(Graphics2D graphics, GameData data) {
-  	BufferedImage img = data.imgMap().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");
+  	BufferedImage img = imgLoader.bgImages().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_BIN_CLOSE").transform(), null);
   }
   
   private void drawShop(Graphics2D graphics, GameData data) {
-  	BufferedImage img = data.imgMap().get("BG_SHOP");
+  	BufferedImage img = imgLoader.bgImages().get("BG_SHOP");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_SHOP").transform(), null);
-    img = data.imgMap().get("RolandBody");
+    img = imgLoader.bgImages().get("RolandBody");
     graphics.drawImage(img, MathLoader.getMapEvent().get("RolandBody").transform(), null);
-    img = data.imgMap().get("ICON_EXIT_SHOP");
+    img = imgLoader.bgImages().get("ICON_EXIT_SHOP");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
     drawTextBubble(graphics, data);
     if (data.getShopLst().getCurrentShop().isEmpty()) {
@@ -1055,7 +1102,7 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private void drawNoItemShop(Graphics2D graphics, GameData data) {
-  	var img = data.imgMap().get("ICON_SOLDOUT");
+  	var img = imgLoader.bgImages().get("ICON_SOLDOUT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SOLDOUT").transform(), null);
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setFont(font);
@@ -1067,16 +1114,16 @@ public record GameView(int width, int height, int tileSize) {
   }
   
   private void drawButtonShop(Graphics2D graphics, GameData data) {
-  	var img = data.imgMap().get("ICON_SHOP_LEFT");
+  	var img = imgLoader.bgImages().get("ICON_SHOP_LEFT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_LEFT").transform(), null);
-    img = data.imgMap().get("ICON_SHOP_RIGHT");
+    img = imgLoader.bgImages().get("ICON_SHOP_RIGHT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_RIGHT").transform(), null);
-    img = data.imgMap().get("ICON_SHOP_BUY");
+    img = imgLoader.bgImages().get("ICON_SHOP_BUY");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_BUY").transform(), null);
   }
   
   private void drawSellArticle(Graphics2D graphics, GameData data) {
-    var img = data.imgMap().get("ICON_SELL_BUTTON");
+    var img = imgLoader.bgImages().get("ICON_SELL_BUTTON");
     graphics.drawImage(img, MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").transform(), null);
   }
   
@@ -1086,10 +1133,10 @@ public record GameView(int width, int height, int tileSize) {
   	Item item = entry.getKey();
   	int price = entry.getValue();
     var imageBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_IMAGE_HOLDER").box();
-		if (data.imgMapByID().get(item.ID()) == null) {
+		if (imgLoader.itemImagesByID().get(item.ID()) == null) {
 			throw new IllegalArgumentException("Can't fint img : " + item.toString());
 		}
-    drawItemShopImage(graphics, data, data.imgMapByID().get(item.ID()), imageBubbleBox);
+    drawItemShopImage(graphics, data, imgLoader.itemImagesByID().get(item.ID()), imageBubbleBox);
     var titleBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
     drawItemShopName(graphics, item, titleBubbleBox);
     drawItemShopInfo(graphics, item, price, data.getShopLst().getCurrentShop().size());    

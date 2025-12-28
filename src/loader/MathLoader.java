@@ -16,12 +16,14 @@ public class MathLoader {
 	private static int screenWidth;
 	private static int screenHeight;
 	private static GameData data;
-	
+	private static ImageLoader imgLoader;
+
 	
 	private static LinkedHashMap<String, RenderData> renderDataGame = new LinkedHashMap<>();
 	
-	public MathLoader(GameData dataGame) {
+	public MathLoader(GameData dataGame, ImageLoader imageLoader) {
 		data = dataGame;
+		imgLoader = imageLoader;
 		screenWidth = data.screenInfo().width();
 		screenHeight = data.screenInfo().height();
 		getBGValue();
@@ -39,7 +41,7 @@ public class MathLoader {
 	private static void getIconHeroValue() {
   	double sizeY =  screenHeight * 0.04;
   	// ICON HEALTH
-		BufferedImage img = data.imgMap().get("ICON_HEALTH");
+		BufferedImage img = imgLoader.bgImages().get("ICON_HEALTH");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		double scale = sizeY / height;
@@ -49,7 +51,7 @@ public class MathLoader {
 		XY SE = new XY((int) (width * scale), (int) (height * scale));
 		renderDataGame.put("ICON_HEALTH", new RenderData(transform, new BoundingBox(NW, SE)));
 		// ICON SHIELD
-		img = data.imgMap().get("ICON_SHIELD");
+		img = imgLoader.bgImages().get("ICON_SHIELD");
 		transform = new AffineTransform();
     transform.translate(0, height * scale);
     transform.scale(scale, scale);
@@ -57,7 +59,7 @@ public class MathLoader {
 		SE = new XY((int) (width * scale), (int) (height * scale * 2));
 		renderDataGame.put("ICON_SHIELD", new RenderData(transform, new BoundingBox(NW, SE)));
 		// ICON MANA
-		img = data.imgMap().get("ICON_MANA");
+		img = imgLoader.bgImages().get("ICON_MANA");
 		transform = new AffineTransform();
     transform.translate(0, height * scale * 2);
     transform.scale(scale, scale);
@@ -65,7 +67,7 @@ public class MathLoader {
 		SE = new XY((int) (width * scale), (int) (height * scale * 3));
 		renderDataGame.put("ICON_MANA", new RenderData(transform, new BoundingBox(NW, SE)));
 		// ICON ACTION
-		img = data.imgMap().get("ICON_ACTION");
+		img = imgLoader.bgImages().get("ICON_ACTION");
 		transform = new AffineTransform();
     transform.translate(0, height * scale * 3);
     transform.scale(scale, scale);
@@ -73,7 +75,7 @@ public class MathLoader {
 		SE = new XY((int) (width * scale), (int) (height * scale * 4));
 		renderDataGame.put("ICON_ACTION", new RenderData(transform, new BoundingBox(NW, SE)));
 		// ICON UNLOCK
-		img = data.imgMap().get("ICON_UNLOCK");
+		img = imgLoader.bgImages().get("ICON_UNLOCK");
 		transform = new AffineTransform();
     transform.translate(0, height * scale * 4);
     transform.scale(scale, scale);
@@ -81,7 +83,7 @@ public class MathLoader {
 		SE = new XY((int) (width * scale), (int) (height * scale * 5));
 		renderDataGame.put("ICON_UNLOCK", new RenderData(transform, new BoundingBox(NW, SE)));
 		// ICON GOLD
-		img = data.imgMap().get("gold");
+		img = imgLoader.bgImages().get("gold");
 		transform = new AffineTransform();
     transform.translate(0, height * scale * 5);
     transform.scale(scale, scale);
@@ -101,7 +103,7 @@ public class MathLoader {
 	}
 	
 	private static void getBGimgValue(String BG_name) {
-		BufferedImage img = data.imgMap().get(BG_name);
+		BufferedImage img = imgLoader.bgImages().get(BG_name);
 		double width = img.getWidth();
 		double scale =  (double) (screenWidth) / width;
     var transform = new AffineTransform();
@@ -120,7 +122,7 @@ public class MathLoader {
 		var dimY = size * 7.0;
 		XY NW = new XY((int) (screenWidth / 2 - 3.5 * size), (int) (screenHeight * 0.02 + size * 0.8));
 		XY SE = new XY((int) (screenWidth / 2 + 3.5 * size), (int) (screenHeight * 0.02 + size * 7.0));
-		BufferedImage img = data.imgMap().get("BG_BACKPACK");
+		BufferedImage img = imgLoader.bgImages().get("BG_BACKPACK");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		var scaleX = dimX / width;
@@ -140,7 +142,7 @@ public class MathLoader {
 		var dimY = size * 5.0;
 		var NW = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size, renderDataGame.get("BG_BACKPACK").box().northWest().y());
 		var SE = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size + (int) dimX, renderDataGame.get("BG_BACKPACK").box().southEast().y() );
-		BufferedImage img = data.imgMap().get("BG_INFO_ITEM");
+		BufferedImage img = imgLoader.bgImages().get("BG_INFO_ITEM");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		var scaleX = dimX / width;
@@ -163,7 +165,7 @@ public class MathLoader {
 		var dimY = size * 6.0 + 4 * gap;
 		XY NW = new XY((int) ((screenWidth / 2) - 5.5 * size - 5*gap), (int) ((screenHeight * 0.04 + size / 2.0)));
 		XY SE = new XY((int) ((screenWidth / 2) + 5.5 * size + 5*gap), (int) ((screenHeight * 0.04 + size / 2.0) + 5.0 * size + 4*gap));
-		BufferedImage img = data.imgMap().get("BG_MAP");
+		BufferedImage img = imgLoader.bgImages().get("BG_MAP");
 		var width = img.getWidth();
 		var height = img.getHeight();
 		var scaleX = dimX / width;
@@ -194,7 +196,7 @@ public class MathLoader {
 	}
 	
 	private static void getEventBackgroundValue() {
-		BufferedImage img = data.imgMap().get("BG_EVENT");
+		BufferedImage img = imgLoader.bgImages().get("BG_EVENT");
     int imgW = img.getWidth();
     int imgH = img.getHeight();
     double scaleX = 0.80 * screenWidth / imgW;
@@ -211,7 +213,7 @@ public class MathLoader {
 	
 	private static void getEventChoiceValue() {
 		// Choice 1
-		var img = data.imgMap().get("BG_CHOICE1");
+		var img = imgLoader.bgImages().get("BG_CHOICE1");
 		int width = img.getWidth(), height = img.getHeight();;
 		var scale = (screenWidth * 0.20) / width;
 	  AffineTransform transform1 = new AffineTransform();
@@ -222,7 +224,7 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
 	  renderDataGame.put("BG_CHOICE1", new RenderData(transform1, boundingBox));
 	  // Choice 2
-	  img = data.imgMap().get("BG_CHOICE2");
+	  img = imgLoader.bgImages().get("BG_CHOICE2");
 	  AffineTransform transform2 = new AffineTransform();
 	  posX = screenWidth * (0.5 + 0.23) - (width * scale);
 	  transform2.translate(posX, posY);
@@ -232,7 +234,7 @@ public class MathLoader {
 	}
 	
 	private static void getEventChoiceEndValue() {
-		var img = data.imgMap().get("BG_CHOICE_END");
+		var img = imgLoader.bgImages().get("BG_CHOICE_END");
 		int width = img.getWidth(), height = img.getHeight();;
 		var scale = (screenWidth * 0.20) / width;
 	  AffineTransform transform = new AffineTransform();
@@ -249,7 +251,7 @@ public class MathLoader {
 	
 //================= ENDTURN =====================
 	private static void getEndTurnValue() {
-		var img = data.imgMap().get("BG_ENDTURN");	
+		var img = imgLoader.bgImages().get("BG_ENDTURN");	
 		int width = img.getWidth();
 		int height = img.getHeight();
 		var scale = (screenWidth * 0.10) / width;
@@ -266,7 +268,7 @@ public class MathLoader {
 	
 //================= BIN =====================
 	private static void getBinValue() {
-		var img = data.imgMap().get("BG_BIN_CLOSE");	
+		var img = imgLoader.bgImages().get("BG_BIN_CLOSE");	
 		int width = img.getWidth();
 		int height = img.getHeight();
 		var scale = (screenWidth * 0.10) / width;
@@ -277,14 +279,14 @@ public class MathLoader {
 	  transform.scale(scale, scale);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
 	  renderDataGame.put("BG_BIN_CLOSE", new RenderData(transform, boundingBox));
-		img = data.imgMap().get("BG_BIN_OPEN");	
+		img = imgLoader.bgImages().get("BG_BIN_OPEN");	
 	  renderDataGame.put("BG_BIN_OPEN", new RenderData(transform, boundingBox));
 	}	
 // ===================
 	
 //================= Shop =====================
 	private static void getShopValue() {
-		var img = data.imgMap().get("BG_SHOP");	
+		var img = imgLoader.bgImages().get("BG_SHOP");	
 		int width = img.getWidth();
 		int height = img.getHeight();
 		double scale = getBGshopValue();
@@ -303,7 +305,7 @@ public class MathLoader {
 	}	
 	
 	private static double getBGshopValue() {
-		var img = data.imgMap().get("BG_SHOP");	
+		var img = imgLoader.bgImages().get("BG_SHOP");	
 		int width = img.getWidth();
 		int height = img.getHeight();
 		var scale = (screenHeight * 0.60) / height;
@@ -318,7 +320,7 @@ public class MathLoader {
 	}
 	
 	private static void getCharacterValue(double shopWidth, double shopHeight) {
-		var img = data.imgMap().get("RolandBody");
+		var img = imgLoader.bgImages().get("RolandBody");
 		int width = img.getWidth();
 		int height = img.getHeight();
 		AffineTransform transform = new AffineTransform();
@@ -349,7 +351,7 @@ public class MathLoader {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.81;
 		double posY = shopBoundingBox.northWest().y() + shopHeight * 0.1;
-		var img = data.imgMap().get("ICON_SELL_BUTTON");
+		var img = imgLoader.bgImages().get("ICON_SELL_BUTTON");
 		int width = img.getWidth();
 		int height = img.getHeight();
 		var scaleX = (shopWidth * 0.1) / width;
@@ -393,7 +395,7 @@ public class MathLoader {
 	
 	private static void getExitShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
-		var img = data.imgMap().get("ICON_EXIT_SHOP");
+		var img = imgLoader.bgImages().get("ICON_EXIT_SHOP");
 		int width = img.getWidth();
 		int height = img.getHeight();
 		var scale = (screenHeight * 0.10) / height;
@@ -408,7 +410,7 @@ public class MathLoader {
 	
 	private static void getButtonShopValue(double articleWidth, double articleHeight) {
 		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
-		var img = data.imgMap().get("ICON_SHOP_LEFT");
+		var img = imgLoader.bgImages().get("ICON_SHOP_LEFT");
 		var scale = (articleHeight * 0.20) / img.getHeight();
 	  double posX = articleBoundingBox.northWest().x() + articleWidth * 0.05;
 	  double posY = articleBoundingBox.northWest().y() + articleHeight * 0.75;
@@ -417,7 +419,7 @@ public class MathLoader {
 	  transform.scale(scale, scale);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scale), (int) (posY + img.getHeight() * scale)));
 	  renderDataGame.put("ICON_SHOP_LEFT", new RenderData(transform, boundingBox));
-	  img = data.imgMap().get("ICON_SHOP_RIGHT");
+	  img = imgLoader.bgImages().get("ICON_SHOP_RIGHT");
 	  posX = articleBoundingBox.southEast().x() - img.getWidth() * scale - articleWidth * 0.05;
 	  transform = new AffineTransform();
 	  transform.translate(posX, posY);
@@ -428,9 +430,9 @@ public class MathLoader {
 	
 	private static void getBuyButtonShopValue(double articleWidth, double articleHeight) {
 		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
-		var img = data.imgMap().get("ICON_SHOP_BUY");
+		var img = imgLoader.bgImages().get("ICON_SHOP_BUY");
 		var scaleY = (articleHeight * 0.20) / img.getHeight();
-		var imgButton = data.imgMap().get("ICON_SHOP_LEFT");
+		var imgButton = imgLoader.bgImages().get("ICON_SHOP_LEFT");
 		var widthButton = imgButton.getWidth() * (articleHeight * 0.20) / imgButton.getHeight();
 		var scaleX = (articleWidth - articleWidth * 0.15 - widthButton * 2) / img.getWidth();
 	  double posX = articleBoundingBox.northWest().x() + articleWidth * 0.5 - img.getWidth() * scaleX / 2;
@@ -443,7 +445,7 @@ public class MathLoader {
 	}
 	
 	private static void getSoldOutShopValue(double articleWidth, double articleHeight) {
-		var img = data.imgMap().get("ICON_SOLDOUT");
+		var img = imgLoader.bgImages().get("ICON_SOLDOUT");
 		var shopBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
 		int width = img.getWidth();
 		int height = img.getHeight();

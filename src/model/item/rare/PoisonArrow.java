@@ -72,7 +72,6 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
   		GameDataCombat.addLog("Vous tirez sur l'ennemi (-6HP) ! Et vous l'empoisonnez !");
-      GameDataHero.sub("energy", 1);
       enemy.subHP(6);
       enemy.addEffect(effect, 3);
       // Sub durability to the bow

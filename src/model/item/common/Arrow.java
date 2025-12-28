@@ -74,7 +74,6 @@ public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
   		GameDataCombat.addLog("Vous tirez sur l'ennemi (-8HP) !");
-      GameDataHero.sub("energy", 1);
       enemy.subHP(8);
       // Sub durability to the bow
       var bow = data.bag().bagItemLst().stream()

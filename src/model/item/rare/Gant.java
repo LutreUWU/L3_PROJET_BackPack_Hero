@@ -79,7 +79,6 @@ public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int s
   @Override
   public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro porte de super gant ! Il gagne 10 PV");
-    GameDataHero.sub("energy", 1);
     GameDataHero.add("hp", 10);
     return subDurability(1);
   }

@@ -80,7 +80,6 @@ public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
     @Override
     public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro EXPLOSE " + enemy + " avec SA GROSSE HACHE (-10PV)");
-      GameDataHero.sub("energy", 1);
       enemy.subHP(10);
       return subDurability(1);
     }

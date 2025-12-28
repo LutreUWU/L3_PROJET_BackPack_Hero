@@ -100,7 +100,7 @@ public class GameDataCombat {
 	    } else {
 	        isTopRow = true; 
 	    }	  	
-	    double northWestY =  screenInfo.height() * 0.4 + (isTopRow ? 0 : heroSizeY / 2 + heroSizeY - sizeY);
+	    double northWestY =  screenInfo.height() * 0.5 + (isTopRow ? 0 : heroSizeY / 2 + heroSizeY - sizeY);
 	  	var NW = new XY((int) northWestX, (int) northWestY);
 	  	var SE = new XY(NW.x() + (int) sizeX, NW.y() + (int) sizeY);
 	  	enemyBox.put(enemy, new BoundingBox(NW, SE));
@@ -120,17 +120,20 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		var item = data.bag().getItem(coord.x(), coord.y());
 		if (item != null) {
+			IO.println(item.AP());
+			IO.println(data.hero().getEnergyPoint());
 			if (item.AP() > data.hero().getEnergyPoint()) {
 				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
-				return;
 			}
-      GameDataHero.sub("energy", item.AP());
-			useItemOnEnemies(data, item);
-			if(data.hero().getEnergyPoint() <= 0) {
-				enemyAction(data.hero());
-			}
-			if (lstEnemy.isEmpty()) {
-				endCombat(data);
+			else {
+				GameDataHero.sub("energy", item.AP());
+				useItemOnEnemies(data, item);
+				if(data.hero().getEnergyPoint() <= 0) {
+					enemyAction(data.hero());
+				}
+				if (lstEnemy.isEmpty()) {
+					endCombat(data);
+				}
 			}
 		}
 	}

@@ -80,7 +80,6 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     @Override
     public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
-      GameDataHero.sub("energy", 1);
       enemy.subHP(5);
       return subDurability(1);
     }
