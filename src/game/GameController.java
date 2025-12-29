@@ -31,7 +31,6 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
-import model.monster.Chicken;
 import model.monster.Gnome;
 import model.monster.Robot;
 import model.monster.Soldat;
@@ -302,8 +301,8 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-//				 GameDataClick.addDragItem(new Curse());
-//				 GameDataClick.addDragItem(new Mimicry());
+				 GameDataClick.addDragItem(new PoisonArrow());
+				 GameDataClick.addDragItem(new Bow());
 				GameDataClick.addDragItem(new FireBall());
 			}
 		}

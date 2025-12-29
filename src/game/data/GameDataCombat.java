@@ -120,18 +120,13 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		var item = data.bag().getItem(coord.x(), coord.y());
 		if (item != null) {
-			IO.println(item.AP());
-			IO.println(data.hero().getEnergyPoint());
 			if (item.AP() > data.hero().getEnergyPoint()) {
 				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
 			}
 			else {
 				useItemOnEnemies(data, item);
 				if(data.hero().getEnergyPoint() <= 0) {
-					enemyAction(data.hero());
-				}
-				if (lstEnemy.isEmpty()) {
-					endCombat(data);
+					endTour(data);
 				}
 			}
 		}
@@ -147,10 +142,6 @@ public class GameDataCombat {
 		data.bag().removeItemFromBackpack(item);
 		var newItem = item.use(target, lstEnemy, data);
 		if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
-		if(data.hero().getEnergyPoint() <= 0) {
-			applyEffects();
-		}
-		killMonster(data);
 	}
 
 	/**
@@ -206,6 +197,9 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		applyEffects();
 		killMonster(data);
+		if (lstEnemy.isEmpty()) {
+			endCombat(data);
+		}
 		enemyAction(data.hero());
 		useAllPassive(data);
 	}

@@ -841,7 +841,11 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	}
 
 	private void drawEnemyEffectImageAndValue(Graphics2D graphics, Enemy enemy, Effect effect, int x, int y, int size) {
-		var img = imgLoader.bgImages().get("ICON_POISON");
+		var img = switch(effect) {
+		case POISON -> imgLoader.bgImages().get("ICON_POISON");
+		case FIRE -> imgLoader.bgImages().get("ICON_BURN");
+		default -> throw new IllegalArgumentException("This is not an effect : " + effect);
+		};
 		drawElement(graphics, img, x, y, size, size, Direction.UP); 
 		var charNumber = Integer.toString(enemy.getEffects().get(effect));
 		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());

@@ -14,7 +14,6 @@ import model.monster.Soldat;
 
 
 public class EnemyRepository {
-
     // Stocke les ennemies
     private static List<Enemy> enemyLst = new ArrayList<>();
 
