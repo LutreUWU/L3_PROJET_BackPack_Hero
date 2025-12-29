@@ -1,6 +1,7 @@
 package model.item.epic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -73,13 +74,13 @@ public record Bow(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
   }
 
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Bow(shape, direction, durability);
   }
 
   
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Cliquez sur les flèches pour tirer !");
     return new Bow(shape, direction, durability);
   }

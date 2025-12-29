@@ -34,7 +34,7 @@ public class GameDataCombat {
 	 */
 	private static boolean combat = false;
 	private static Enemy target;
-  private static ArrayList<Enemy> lstEnemy;
+  private static List<Enemy> lstEnemy;
   private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
   private static ArrayList<String> log = new ArrayList<>();
   private static int totalExp = 0;
@@ -46,7 +46,7 @@ public class GameDataCombat {
 	 * @param monster The data of the monster we fight
 	 * @param data		The data of the game
 	 */
-	public static void startCombat(ArrayList<Enemy> monsters, GameData data) {
+	public static void startCombat(List<Enemy> monsters, GameData data) {
 		if (combat) {
 			return;
 		}
@@ -82,7 +82,7 @@ public class GameDataCombat {
 	 * @param heroSizeX		sizeX of the Hero
 	 * @param heroSizeY		sizeY of the Hero
 	 */
-	private static void getEnemyBox(ArrayList<Enemy> lstEnemy, ScreenInfo screenInfo, int heroSizeX, int heroSizeY) {
+	private static void getEnemyBox(List<Enemy> lstEnemy, ScreenInfo screenInfo, int heroSizeX, int heroSizeY) {
 		double gap = 1.3;
 		for (int i = 0; i < lstEnemy.size(); i++) {
 			var enemy = lstEnemy.get(i);
@@ -126,7 +126,6 @@ public class GameDataCombat {
 				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
 			}
 			else {
-				GameDataHero.sub("energy", item.AP());
 				useItemOnEnemies(data, item);
 				if(data.hero().getEnergyPoint() <= 0) {
 					enemyAction(data.hero());
@@ -179,6 +178,8 @@ public class GameDataCombat {
 	 * @param data {@code data} of the game
 	 */
 	private static void killMonster(GameData data) {
+		
+		
 		Iterator<Enemy> it = lstEnemy.iterator();
 		while (it.hasNext()) {
 	    Enemy enemy = it.next();
@@ -254,7 +255,7 @@ public class GameDataCombat {
 		return target;
 	}
 	
-	public static ArrayList<Enemy> getLstEnemy(){
+	public static List<Enemy> getLstEnemy(){
 		return lstEnemy;
 	}
 	

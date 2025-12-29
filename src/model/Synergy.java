@@ -61,6 +61,8 @@ public class Synergy {
 	}
 	
 	public static int getBonusDmg() {
-		return bonusDmg;
+		var tmpBonus = bonusDmg;
+		bonusDmg = 0;
+		return tmpBonus;
 	}
 }

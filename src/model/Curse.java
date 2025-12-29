@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -71,12 +72,12 @@ public record Curse(XY[] shape, Direction direction, Rarity rarity, int ID, int 
     }
     
     @Override
-    public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     	return new Curse(shape, direction, durability);
     }
 
     @Override
-    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("MUAAAHAAAHAAA ! J'espère que tu as aimé la malédiction !");
       return subDurability(1);
     }

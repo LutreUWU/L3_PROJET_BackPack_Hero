@@ -1,6 +1,7 @@
 package model.item.common;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -68,13 +69,13 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
     }
     
     @Override
-    public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     	return new KeyDoor(shape, direction);
     }
 
 
     @Override
-    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     	GameDataCombat.addLog("Garde ta clef précieusement au lieu de jouer avec !");
       return new KeyDoor(shape, direction);
     }

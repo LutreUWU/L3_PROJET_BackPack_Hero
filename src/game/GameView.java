@@ -36,6 +36,7 @@ import model.item.epic.DespairShield;
 import model.item.epic.Shield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
+import model.item.rare.FireBall;
 import model.item.rare.Gant;
 import model.item.rare.PoisonArrow;
 import model.item.superrare.Bomb;
@@ -254,6 +255,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
 				case 14 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+				case 15 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 				default ->{}
 		  }
 		}
@@ -284,6 +286,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Bomb _ -> "Bombe volée à Mario";
 	  	case Curse _ -> "Malédiction que t'a jeté un ennemi";
 	  	case Shield _ -> "(EFFET PASSIF) Bouclier de Captain pas America";
+	  	case FireBall _ -> "Ca chauffe !!";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -304,6 +307,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Bomb _ -> "Inflige -6PV à tous les ennemies + 1PV par bombe qui l'entoure";
 	  	case Curse _ -> "Utilise la malédiction pour t'en débarasser";
 	  	case Shield _ -> "Te donne 3 shield par tour si tu l'as placé à la prmeière ligne, 1 sinon";
+	  	case FireBall _ -> "Inflige -6PV à l'ennemi et enflamme l'ennemi";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -674,6 +678,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
 			case 14 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+			case 15 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 			default ->{}
 	  }
 	}
@@ -761,11 +766,11 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    * 
    * @param context		{@code ApplicationContext} of the game.
    * @param data			GameData containing the game data. 
-   * @param lstEnemy List of all enemy we fight
+   * @param list List of all enemy we fight
    */
-  private void updateCombat(Graphics2D graphics, GameData data,  ArrayList<Enemy> lstEnemy) {
+  private void updateCombat(Graphics2D graphics, GameData data,  List<Enemy> list) {
   	drawEndTurnButton(graphics,  imgLoader.bgImages().get("BG_ENDTURN"));
-  	lstEnemy.forEach(enemy -> drawEnemy(graphics, data, enemy));
+  	list.forEach(enemy -> drawEnemy(graphics, data, enemy));
   	drawLog(graphics, data, GameDataCombat.getLog());
   }
   

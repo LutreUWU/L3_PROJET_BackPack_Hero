@@ -69,8 +69,7 @@ public class LinkedEvent {
 	 * @param current floor
 	 */
 	private void createEventForExitRoom(int floor) {
-		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
-		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour " + question);
+		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour monter à l'étage ?");
 		
 		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(new Soldat())), "Bon courage !");
 		root.setChoice1(choiceOne);

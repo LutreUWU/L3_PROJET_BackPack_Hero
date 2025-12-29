@@ -11,9 +11,8 @@ public class RandomItem {
 	public static Item generate(int floor) {
 		var allItem = ItemRepository.getItemrankLst();
 		var sizeList = allItem.size();
-		var sixth = (int) (sizeList / 6);
 		Random rand = new Random();
-		int randomIndexWithGauss = (int) rand.nextGaussian(sixth * floor * 2, 1);
+		int randomIndexWithGauss = (int) rand.nextGaussian(floor, 1);
 		if (randomIndexWithGauss < 0)
 			randomIndexWithGauss = 0;
 		if (randomIndexWithGauss >= sizeList - 1)

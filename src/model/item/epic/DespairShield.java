@@ -1,6 +1,7 @@
 package model.item.epic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -73,16 +74,17 @@ public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int 
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new DespairShield(shape, direction, durability);
   }
 
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro gagne 10 Shield, mais en échange de 3PV ...");
     enemy.subHP(3);
     data.hero().add("protection", 10);
+    data.hero().sub("energy", AP);
     return subDurability(1);
   }
   

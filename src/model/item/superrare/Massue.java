@@ -1,6 +1,7 @@
 package model.item.superrare;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -72,15 +73,16 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     }
     
     @Override
-    public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     	return new Massue(shape, direction, durability);
     }
 
 
     @Override
-    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
       enemy.subHP(5);
+      data.hero().sub("energy", AP);
       return subDurability(1);
     }
     

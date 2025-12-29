@@ -1,6 +1,7 @@
 package model.item.mythic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -72,16 +73,17 @@ public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, in
     }
     
     @Override
-    public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     	return new Mimicry(shape, direction, durability);
     }
 
 
     @Override
-    public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+    public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro FOUDROIE " + enemy + " (-30PV), mais en échange de 5PV");
       GameDataHero.sub("hp", 5);
       enemy.subHP(30);
+      data.hero().sub("energy", AP);
       return subDurability(1);
     }
     

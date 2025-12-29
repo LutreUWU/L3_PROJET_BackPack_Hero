@@ -10,8 +10,10 @@ import model.item.common.Arrow;
 import model.item.common.Gold;
 import model.item.epic.Bow;
 import model.item.epic.DespairShield;
+import model.item.epic.Shield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
+import model.item.rare.FireBall;
 import model.item.rare.Gant;
 import model.item.rare.PoisonArrow;
 import model.item.superrare.Bomb;
@@ -28,10 +30,12 @@ public class ItemRepository {
     public static void createItemRepository() {
   	  registerWeapon(new Arrow()); // Common
   	  registerWeapon(new Gant()); // Rare
-  	  registerWeapon(new PoisonArrow()); // Rare 
+  	  registerWeapon(new PoisonArrow()); // Rare
+  	  registerWeapon(new FireBall()); // Rare 
   	  registerWeapon(new Massue()); // SuperRare
   	  registerWeapon(new Bomb()); // SuperRare
   	  registerWeapon(new DespairShield()); // Epic
+  	  registerWeapon(new Shield()); // Epic
   	  registerWeapon(new Bow()); // Epic
   	  registerWeapon(new Axe()); // Legendary
   	  registerWeapon(new Mimicry()); // Mythics
@@ -59,7 +63,7 @@ public class ItemRepository {
     }
     
     public static List<Item> getItemrankLst() {
-			return itemRankLst;
+			return List.copyOf(itemRankLst);
 		}
 
 }

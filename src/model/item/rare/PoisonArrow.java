@@ -2,6 +2,7 @@ package model.item.rare;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -64,12 +65,12 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new PoisonArrow(shape, direction, durability, effect);
   }
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
   		GameDataCombat.addLog("Vous tirez sur l'ennemi (-6HP) ! Et vous l'empoisonnez !");
       enemy.subHP(6);
@@ -82,6 +83,7 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
       																						
       data.bag().removeItemFromBackpack(bow);
       if (bow.durability() - bow.AP() > 0) data.bag().addItemToBackpack(bow.subDurability(bow.AP()));
+      data.hero().sub("energy", AP);
       return subDurability(1);
   	}
   	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");

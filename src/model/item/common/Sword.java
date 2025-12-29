@@ -1,6 +1,7 @@
 package model.item.common;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -72,15 +73,16 @@ public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Sword(shape, direction, durability);
   }
 
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée");
     enemy.subHP(3);
+    data.hero().sub("energy", AP);
     return subDurability(1);
   }
   

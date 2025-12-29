@@ -49,6 +49,15 @@ public final class Treasure implements Room {
 	public List<XY> getAccessible() {
 		return accessible;
 	}
+	
+	/**
+	 * Adds rooms that is accessible from the others
+	 * @param coord
+	 */
+	@Override
+	public void addAccessible(XY coord){
+		accessible.add(coord);
+	}
 
 	/**
 	 * Getter for rewardList

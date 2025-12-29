@@ -2,6 +2,7 @@ package model.item.common;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import game.GameData;
@@ -65,13 +66,13 @@ public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Arrow(shape, direction, durability);
   }
 
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
   		GameDataCombat.addLog("Vous tirez sur l'ennemi (-8HP) !");
       enemy.subHP(8);
@@ -83,6 +84,7 @@ public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int 
       																						
       data.bag().removeItemFromBackpack(bow);
       if (bow.durability() - bow.AP() > 0) data.bag().addItemToBackpack(bow.subDurability(bow.AP()));
+      data.hero().sub("energy", AP);
       return subDurability(1);
   	}
   	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");

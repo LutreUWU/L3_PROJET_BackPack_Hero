@@ -1,6 +1,7 @@
 package model.item.superrare;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -65,12 +66,12 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 	}
 	
 	@Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Bomb(shape, direction, durability);
   }
 
 	@Override
-	public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+	public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
 		Synergy.checkSynergie(data, this);
 		var bonus = Synergy.getBonusDmg();
 		GameDataCombat.addLog("EXPLOSION ! Chaque ennemi perd 6 PV");
@@ -78,6 +79,7 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 		for (var target : lstEnemy) {
 			target.subHP(6 + bonus);
 		}
+		data.hero().sub("energy", AP);
 		return subDurability(1);
 	}
 

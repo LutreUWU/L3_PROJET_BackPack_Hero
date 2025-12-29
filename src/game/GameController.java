@@ -22,6 +22,7 @@ import model.Curse;
 import model.Item;
 import model.XY;
 import model.item.epic.Bow;
+import model.item.rare.FireBall;
 import model.item.rare.PoisonArrow;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
@@ -128,12 +129,12 @@ public class GameController {
 				data.map().setHeroPos(coord);
 				var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
 				switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
-				case EnemyRoom room -> {
-					if (!room.getAlreadyVisited()) {
+				case EnemyRoom enemyRoom -> {
+					if (!enemyRoom.getAlreadyVisited()) {
 						data.swapMapOrBag();
-						GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken(), new Chicken())), data);
+						GameDataCombat.startCombat(enemyRoom.getLstEnemy(), data);
 						data.map().updateMap(coord);
-						room.nowVisited();
+						enemyRoom.nowVisited();
 					}
 				}
 				case EventRoom eventRoom -> {
@@ -303,8 +304,7 @@ public class GameController {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 //				 GameDataClick.addDragItem(new Curse());
 //				 GameDataClick.addDragItem(new Mimicry());
-				GameDataClick.addDragItem(new PoisonArrow());
-				GameDataClick.addDragItem(new Bow());
+				GameDataClick.addDragItem(new FireBall());
 			}
 		}
 		case Key.I -> {

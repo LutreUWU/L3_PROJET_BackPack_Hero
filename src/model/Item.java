@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import model.monster.Enemy;
@@ -17,7 +18,7 @@ public interface Item {
     Item subDurability(int nb);
     int ID();
     Item setXY(XY coord);
-    Item use(Enemy enemy, ArrayList<Enemy> lstenemy, GameData data);
-    Item usePassive(Enemy enemy, ArrayList<Enemy> lstenemy, GameData data);
+    Item use(Enemy enemy, List<Enemy> lstenemy, GameData data);
+    Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data);
     Item rotateXY();
 }

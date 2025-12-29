@@ -1,6 +1,7 @@
 package model.item.common;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -65,12 +66,12 @@ public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int s
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Curse(shape, direction, value);
   }
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	GameDataCombat.addLog("Tu comptes lui jeter des pièces dessus ????");
   	return new Gold(shape, direction, value);
   }

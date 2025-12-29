@@ -2,6 +2,7 @@ package model.item.epic;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 import game.GameData;
@@ -65,15 +66,16 @@ public record Shield(XY[] shape, Direction direction, Rarity rarity, int ID, int
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	Synergy.checkSynergie(data, this);
   	data.hero().add("protection", 1 + Synergy.getBonusDmg());
   	return subDurability(1);
   }
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	GameDataCombat.addLog("Cet objet est seulement passif ! On ne peut pas l'utiliser !");
+  	data.hero().sub("energy", AP);
   	return new Shield(shape, direction, durability);
   }
   

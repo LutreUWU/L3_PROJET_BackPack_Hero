@@ -11,6 +11,7 @@ import game.data.GameDataHero;
 import loader.ImageLoader;
 import loader.MathLoader;
 import model.Backpack;
+import model.EnemyRepository;
 import model.Hero;
 import model.Item;
 import model.ItemRepository;
@@ -73,6 +74,7 @@ public class GameData {
 	  hero = new Hero(); 
 	  floor = 1;
 	  ItemRepository.createItemRepository();
+	  EnemyRepository.createEnemyRepository();
 	  map = new Floor(floor);
 	  screenInfo = screenInfo_;
     new GameDataHero(hero);

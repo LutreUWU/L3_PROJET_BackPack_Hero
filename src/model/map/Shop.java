@@ -128,6 +128,15 @@ public final class Shop implements Room {
 		return accessible;
 	}
 	
+	/**
+	 * Adds rooms that is accessible from the others
+	 * @param coord
+	 */
+	@Override
+	public void addAccessible(XY coord){
+		accessible.add(coord);
+	}
+	
 	public String getLogShop() {
 		return logShop;
 	}

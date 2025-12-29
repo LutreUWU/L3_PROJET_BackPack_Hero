@@ -1,6 +1,7 @@
 package model.item.rare;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
@@ -71,15 +72,16 @@ public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int s
   }
   
   @Override
-  public Item usePassive(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Gant(shape, direction, durability);
   }
 
 
   @Override
-  public Item use(Enemy enemy, ArrayList<Enemy> lstEnemy, GameData data) {
+  public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
     GameDataCombat.addLog("Le héro porte de super gant ! Il gagne 10 PV");
     GameDataHero.add("hp", 10);
+    data.hero().sub("energy", AP);
     return subDurability(1);
   }
   
