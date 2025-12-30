@@ -1,6 +1,5 @@
 package model.monster;
 
-import java.util.List;
 import java.util.Map;
 
 import model.Effect;
@@ -46,28 +45,6 @@ public interface Enemy {
 	 * @return String of the attack we choose
 	 */
 	String preAction();
-	
-	/**
-	 * Get the path to the enemy image
-	 * 
-	 * @return (String) path 
-	 */
-	String getImg();
-	
-	/**
-	 * Get the size of the enemy
-	 * 
-	 * @return (int) enemy
-	 */
-	double getSizeX();
-	double getSizeY();
-	/**
-	 * Get the XP drop by the enemy
-	 * 
-	 * @return (int) enemy
-	 */
-	int getXP();
-	
 	/**
 	 * Apply the action the enemy will do.
 	 * Since all enemy has different attacks, we do an interface
@@ -75,5 +52,5 @@ public interface Enemy {
 	 */
 	void action();
 	
-	int getMaxHP();
+	EnemyInfo getInfo();
 }

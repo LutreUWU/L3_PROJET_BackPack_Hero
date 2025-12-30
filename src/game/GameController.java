@@ -22,8 +22,7 @@ import model.Curse;
 import model.Item;
 import model.XY;
 import model.item.epic.Bow;
-import model.item.rare.FireBall;
-import model.item.rare.PoisonArrow;
+import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -248,8 +247,17 @@ public class GameController {
 	 * @param coord	 {@code XY} of the grid we click
 	 */
 	private static void actionBag(GameData data, XY coord) {
-		if (data.mapOrBag() && GameDataCombat.combat()) {
-			GameDataCombat.heroAction(data, coord);
+		if (GameDataCombat.combat()) {
+			var item = data.bag().getItem(coord.x(), coord.y());
+			if (item != null) {
+				if (GameDataCombat.getHoverItem() == null || item != GameDataCombat.getHoverItem()) {
+					GameDataCombat.setHoverItem(item);
+				}
+				else {
+					GameDataCombat.heroAction(data);
+					GameDataCombat.setHoverItem(null);
+				}
+			}
 		}
 		data.bag().unlockCaseBackpack(coord);
 	}
@@ -301,9 +309,8 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				 GameDataClick.addDragItem(new PoisonArrow());
 				 GameDataClick.addDragItem(new Bow());
-				GameDataClick.addDragItem(new FireBall());
+				 GameDataClick.addDragItem(new Mimicry());
 			}
 		}
 		case Key.I -> {

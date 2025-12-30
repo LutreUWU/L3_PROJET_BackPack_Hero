@@ -117,20 +117,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	}
 	
 	/**
-   * <p>
-   * Draw an image but with a specifity.<br>
+   * Draw an image but with a specifity.
    * Initially, the other method {@code drawElement} draw the element base of the center of the image.
-   * </p>
    * 
-   * <p>
-   * But since we're using .png image, it can happens that the center of the image is empty.<br>
+   * But since we're using .png image, it can happens that the center of the image is empty.
    * In consequence, we need to change the "center" of the image to draw properly the image.
-   * </p>
    * 
-   * <p>
-   * We're adding two new parameters marginX and marginY to help drawing this item.<br>
+   * We're adding two new parameters marginX and marginY to help drawing this item.
    * For example, if we wants the center to be at the left center of the image, marginX = 0 and marginY = 0.5 
-   * </p>
 	 * 
 	 * @param graphics	{@code Graphics2D} of the game
 	 * @param img				Image we wants to put
@@ -161,20 +155,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	}
 	
 	/**
-   * <p>
-   * Draw an item in the bag but with a specifity.<br>
+   * Draw an item in the bag but with a specifity.
    * Initially, the other method {@code drawElement} draw the element base of the center of the image.
-   * </p>
    * 
-   * <p>
-   * But since we're using .png image, it can happens that the center of the image is empty.<br>
+   * But since we're using .png image, it can happens that the center of the image is empty.
    * In consequence, we need to change the "center" of the image to draw properly the image.
-   * </p>
    * 
-   * <p>
-   * We're adding two new parameters marginX and marginY to help drawing this item.<br>
+   * We're adding two new parameters marginX and marginY to help drawing this item.
    * For example, if we wants the center to be at the left center of the image, marginX = 0 and marginY = 0.5 
-   * </p>
 	 * 
 	 * @param graphics	{@code Graphics2D} of the game
 	 * @param img				Image we wants to put
@@ -230,7 +218,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   }
   
   /**
-   * Check the id int the bag we wants to draw and calls the appropriate method.<br>
+   * Check the id int the bag we wants to draw and calls the appropriate method.
    * This method use a switch on the item id to know which item we wants to draw.
    * 
    * @param graphics {@Code Graphics2D} of the game
@@ -261,6 +249,16 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		}
   }
   
+  /**
+   * Draw gold item in bag.
+   * Since gold has a specifical visual depending of his amount, 
+   * we did a separated method for that.
+   * 
+   * @param graphics 		{@Code Graphics2D} of the game
+   * @param data	   		Data of the game
+   * @param coordinate	coordinate XY of where the gold is in the bag
+   * @param item				{@Code Item} containing the amount of gold
+   */
   private void drawItemGold(Graphics2D graphics, GameData data, XY coordinate, Item item) {
   	var itemGold = (Gold) item;
   	switch (getSizeGold(itemGold.value())) {
@@ -270,6 +268,13 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	}
   }
   
+  
+  /**
+   * Get the description of each item in the game.
+   * 
+   * @param item {@code Item} we wants to get the description
+   * @return String description of the item
+   */
   private String getDescriptionItem(Item item) {
   	return switch (item) {
 	  	case KeyDoor _ -> "J'ai retrouvé mes clés de maison"; 
@@ -291,6 +296,12 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	};
   }
   
+  /**
+   * Get the effect of each item in the game.
+   * 
+   * @param item {@code Item} we wants to get the effect
+   * @return String effect of the item
+   */
   private String getEffectItem(Item item) {
   	return switch (item) {
 	  	case KeyDoor _ -> "Déverouille une porte (1 fois)"; 
@@ -312,6 +323,12 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	};
   }
   
+  /**
+   * Display information about the item
+   * 
+   * @param graphics
+   * @param data
+   */
   private void drawItemInfo(Graphics2D graphics, GameData data) {
   	BufferedImage imgItemInfo = imgLoader.bgImages().get("BG_INFO_ITEM");
   	BoundingBox itemInfoBoundingBox = MathLoader.getMapEvent().get("BG_INFO_ITEM").box();
@@ -319,8 +336,13 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	XY SE = itemInfoBoundingBox.southEast();
 		graphics.drawImage(imgItemInfo, MathLoader.getMapEvent().get("BG_INFO_ITEM").transform(), null);
 		Item item = data.dragItem();
-		if (item == null && data.getShop() && !data.getShopLst().getCurrentShop().isEmpty()) {
-			item = data.getShopLst().getCurrentShop().keySet().iterator().next();
+		if (item == null) {
+			if (data.getShop() && !data.getShopLst().getCurrentShop().isEmpty()) {
+				item = data.getShopLst().getCurrentShop().keySet().iterator().next();
+			}
+		}
+		if (GameDataCombat.combat()) {
+			item = GameDataCombat.getHoverItem();
 		}
 		int height = SE.y() - NW.y();
 		if (item != null) {
@@ -771,22 +793,46 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   private void updateCombat(Graphics2D graphics, GameData data,  List<Enemy> list) {
   	drawEndTurnButton(graphics,  imgLoader.bgImages().get("BG_ENDTURN"));
   	list.forEach(enemy -> drawEnemy(graphics, data, enemy));
+  	if (GameDataCombat.getHoverItem() != null) {
+  		drawSelectedItem(graphics, GameDataCombat.getHoverItem());
+  	}
   	drawLog(graphics, data, GameDataCombat.getLog());
   }
   
   /**
+   * Show to the user, the item he selected.
+   * 
+   * @param graphics  {@code graphics} of the game.
+   * @param hoverItem {@code Item} selected.
+   */
+  private void drawSelectedItem(Graphics2D graphics, Item hoverItem) {
+  	String sentence = "Vous avez sélectionné " + hoverItem.toString();
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    int textWidth = fm.stringWidth(sentence);
+    int textHeight = fm.getAscent();
+    int y = MathLoader.getMapEvent().get("BG_BIN_OPEN").box().northWest().y();
+    graphics.setColor(Color.BLACK);
+	  graphics.drawString(sentence, width / 2 - textWidth / 2, y + (int) (textHeight*0.25));
+    graphics.setColor(Color.WHITE);
+	  graphics.drawString(sentence, width / 2 - textWidth / 2, y);
+	}
+
+	/**
    * Draws the enemy in the windows
    * 
-   * @param context {@code ApplicationContext} of the game.
-   * @param data    GameData containing the game data. 
-   * @param enemy 	Data of the enemy.
+   * @param graphics {@code graphics} of the game.
+   * @param data     GameData containing the game data. 
+   * @param enemy 	 Data of the enemy.
    */
   private void drawEnemy(Graphics2D graphics, GameData data, Enemy enemy) {
+  	var imgName = enemy.getInfo().img();
   	var boundingBox = GameDataCombat.getEnemyBox().get(enemy);
   	int sizeX = boundingBox.southEast().x() - boundingBox.northWest().x();
   	int sizeY = boundingBox.southEast().y() - boundingBox.northWest().y();
   	drawEnemyArc(graphics, (int) boundingBox.northWest().x(), (int) (boundingBox.southEast().y()), sizeX, sizeY, enemy);
-		drawElement(graphics, imgLoader.bgImages().get(enemy.getImg()), boundingBox.northWest().x(), boundingBox.northWest().y(), sizeX, sizeY, Direction.UP);
+		drawElement(graphics, imgLoader.bgImages().get(imgName), boundingBox.northWest().x(), boundingBox.northWest().y(), sizeX, sizeY, Direction.UP);
 		drawEnemyInfo(graphics, enemy, boundingBox, sizeX, sizeY);
   }
   
@@ -917,7 +963,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	graphics.setColor(Color.GRAY);
   	graphics.drawArc(x, (int) (y - (height / 2* 1.5)/2), width, height / 2, 0, -180);
     graphics.setColor(Color.RED);
-  	double percent = (double)enemy.getHP() / (double) enemy.getMaxHP(); 
+  	double percent = (double)enemy.getHP() / (double) enemy.getInfo().maxHP(); 
   	int arcAngle = (int) (180 * percent);
   	graphics.drawArc(x, (int) (y - (height / 2* 1.5)/2), width, height / 2, 0, -arcAngle);
   	graphics.setStroke(new BasicStroke(1));

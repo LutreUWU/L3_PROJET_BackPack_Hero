@@ -20,17 +20,12 @@ public class Soldat implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
-	private int maxHP = 25;
 	private int HP = 25;
 	private int shield = 0;
-	private final int xp = 6;
-	private List<String> lst_attack = List.of("Coup", "Bouclier");
 	private String action;
 	private final Map<Effect, Integer> effects = new HashMap<>();
-	// For graphism
-	private final String img = "soldat";
-	private final double sizeX = 1;
-	private final double sizeY = 1;
+	private static final EnemyInfo info = new EnemyInfo(25, 6, List.of("Coup", "Bouclier"), 1, 1, "soldat");
+
 
 	/**
 	 * Add an effect to the enemy
@@ -66,7 +61,7 @@ public class Soldat implements Enemy{
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
-		action = lst_attack.get(randomNumbers.nextInt(2));
+		action = info.attacks().get(randomNumbers.nextInt(2));
 		return action;
 	}
 	
@@ -127,28 +122,8 @@ public class Soldat implements Enemy{
 	}
 	
 	@Override
-	public int getXP() {
-		return xp;
-	}
-	
-	@Override
-	public String getImg() {
-		return img;
-	}
-	
-	@Override
-	public double getSizeX() {
-		return sizeX;
-	}
-	
-	@Override
-	public double getSizeY() {
-		return sizeY;
-	}
-	
-	@Override
-	public int getMaxHP() {
-		return maxHP;
+	public EnemyInfo getInfo() {
+		return info;
 	}
 	
 	@Override

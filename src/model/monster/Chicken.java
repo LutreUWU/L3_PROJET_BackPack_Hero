@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
-import model.Curse;
 import model.Effect;
 
 /**
@@ -18,21 +16,13 @@ public class Chicken implements Enemy{
 	/**
 	 * - HP :				 	When it reach 0, the enemy die
 	 * - Shield : 		Can mitigate damage received
-	 * - xp :					XP he drops when he die
-	 * - lstAttack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
-	private int maxHP = 20;
 	private int HP = 20;
 	private int shield = 0;
-	private final int xp = 4;
-	private final List<String> lstAttack = List.of("Morsure", "Protection");
 	private final Map<Effect, Integer> effects = new HashMap<>();
 	private String action;
-	// For graphism
-	private final String img = "chicken";
-	private final double sizeX = 0.8;
-	private final double sizeY = 0.4;
+	private static final EnemyInfo info = new EnemyInfo(20, 4, List.of("Morsure", "Protection"), 0.8, 0.4, "chicken");
 	
 	/**
 	 * Add an effect to the enemy
@@ -43,7 +33,6 @@ public class Chicken implements Enemy{
 	public void addEffect(Effect effect, int value) {
 		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
 	}
-	
 	
 	/**
 	 * Update all effects and remove them if necessary
@@ -68,7 +57,7 @@ public class Chicken implements Enemy{
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
-		action = lstAttack.get(randomNumbers.nextInt(2));
+		action = info.attacks().get(randomNumbers.nextInt(2));
 		return action;
 	}
 	
@@ -127,28 +116,8 @@ public class Chicken implements Enemy{
 	}
 	
 	@Override
-	public int getXP() {
-		return xp;
-	}
-	
-	@Override
-	public String getImg() {
-		return img;
-	}
-	
-	@Override
-	public double getSizeX() {
-		return sizeX;
-	}
-	
-	@Override
-	public double getSizeY() {
-		return sizeY;
-	}
-	
-	@Override
-	public int getMaxHP() {
-		return maxHP;
+	public EnemyInfo getInfo() {
+		return info;
 	}
 	
 	@Override

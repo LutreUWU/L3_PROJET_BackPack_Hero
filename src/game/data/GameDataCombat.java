@@ -33,6 +33,7 @@ public class GameDataCombat {
 	 * - lst_enemy : List of all enemy we're fighting
 	 */
 	private static boolean combat = false;
+	private static Item hoverItem = null;
 	private static Enemy target;
   private static List<Enemy> lstEnemy;
   private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
@@ -86,12 +87,12 @@ public class GameDataCombat {
 		double gap = 1.3;
 		for (int i = 0; i < lstEnemy.size(); i++) {
 			var enemy = lstEnemy.get(i);
-			double sizeX = heroSizeX * enemy.getSizeX();
-	  	double sizeY = heroSizeY * enemy.getSizeY();
+			double sizeX = heroSizeX * enemy.getInfo().sizeX();
+	  	double sizeY = heroSizeY * enemy.getInfo().sizeY();
 	  	double offsetOdd = heroSizeX * gap * (i + 1 / 2);
 	  	double offsetEven = heroSizeX * gap * i / 2;
-	  	double northWestX = (i % 2 == 1) ? screenInfo.width() * 0.70 - offsetOdd - lstEnemy.get(i).getSizeX() 
-	  																	 : screenInfo.width() * 0.70 + offsetEven + lstEnemy.get(i).getSizeX();
+	  	double northWestX = (i % 2 == 1) ? screenInfo.width() * 0.70 - offsetOdd - enemy.getInfo().sizeX() 
+	  																	 : screenInfo.width() * 0.70 + offsetEven + enemy.getInfo().sizeY();
 	  	boolean isTopRow;
 	    if (i == 0) {
 	        isTopRow = true; 
@@ -114,17 +115,17 @@ public class GameDataCombat {
 	 * @param data		The data of the game.
 	 * @param object	The ID of the item we click in the backpack.
 	 */
-	public static void heroAction(GameData data, XY coord) {
+	public static void heroAction(GameData data) {
 		Objects.requireNonNull(data);
-		Objects.requireNonNull(coord);
 		log = new ArrayList<>();
-		var item = data.bag().getItem(coord.x(), coord.y());
+		var item = hoverItem;
 		if (item != null) {
 			if (item.AP() > data.hero().getEnergyPoint()) {
 				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
 			}
 			else {
 				useItemOnEnemies(data, item);
+				killMonster(data);
 				if(data.hero().getEnergyPoint() <= 0) {
 					endTour(data);
 				}
@@ -169,13 +170,11 @@ public class GameDataCombat {
 	 * @param data {@code data} of the game
 	 */
 	private static void killMonster(GameData data) {
-		
-		
 		Iterator<Enemy> it = lstEnemy.iterator();
 		while (it.hasNext()) {
 	    Enemy enemy = it.next();
 			if(enemy.getHP() <= 0) {
-				totalExp += enemy.getXP();
+				totalExp += enemy.getInfo().xp();
 				it.remove();
 				enemyBox.remove(enemy);
 				if (target == enemy && !lstEnemy.isEmpty()) {
@@ -242,6 +241,7 @@ public class GameDataCombat {
 	}
 	
 	public static void setTarget(Enemy enemy) {
+		Objects.requireNonNull(enemy);
 		target = enemy;
 	}
 	
@@ -264,5 +264,13 @@ public class GameDataCombat {
 	
 	public static List<String> getLog() {
 		return List.copyOf(log);
+	}
+	
+	public static void setHoverItem(Item item) {
+		hoverItem = item;
+	}
+	
+	public static Item getHoverItem() {
+		return hoverItem;
 	}
 }

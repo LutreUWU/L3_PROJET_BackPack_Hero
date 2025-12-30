@@ -1,15 +1,12 @@
 package game;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 import com.github.forax.zen.ScreenInfo;
 
 import game.data.GameDataClick;
 import game.data.GameDataHero;
-import loader.ImageLoader;
-import loader.MathLoader;
 import model.Backpack;
 import model.EnemyRepository;
 import model.Hero;
@@ -26,50 +23,33 @@ import model.map.eventManager.LinkedEvent;
  * 
  */
 public class GameData {
-  /**
-   * - User's backpack information
-   * - Map of the game
-   * - User's hero information
-   * - Floor number
-   * - Width and height of the screen
-   */
   private static Backpack backpack;
   private static Floor map;
   private static Hero hero;
   private static int floor;
   private static ScreenInfo screenInfo;
-  /**
-   * To know if we're adding an item.
-   * null if we're not adding.
-   */
+
   private Item dragItem = null; 
   private boolean onBin = false;
-  /**
-   * To know if we display map or bag
-   * 
-   * - false : map
-   * - true : bag
-   */
+
   private boolean mapOrBag = true;
   private boolean shop = false;
   private Shop shopLst;
-  /**
-   * To know if we're wurrently in a event or no
-   * 
-   */
+
   private LinkedEvent event;
   private XY mouseCoord;
-  
   /**
    * Sortest Path
    */
   private List<XY> shortestPath = new ArrayList<>();
+  
   /**
    * Initialize data of the game 
    * 
    * @param gridSize size of the grid in the backpack
    */
   public GameData(ScreenInfo screenInfo_) {
+  	Objects.requireNonNull(screenInfo_);
 	  backpack = new Backpack(screenInfo_.height());
 	  hero = new Hero(); 
 	  floor = 1;
@@ -99,10 +79,12 @@ public class GameData {
   }
   
   public void setShortestPath(List<XY> shortestPath2) {
+  	Objects.requireNonNull(shortestPath2);
   	shortestPath = shortestPath2;
   }
   
   public static Item rotateItem(Item item) {
+  	Objects.requireNonNull(item);
   	return item.rotateXY();
   }
   // ============

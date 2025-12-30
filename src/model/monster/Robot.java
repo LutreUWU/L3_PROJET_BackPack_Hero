@@ -20,17 +20,12 @@ public class Robot implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
-	private int maxHP = 50;
 	private int HP = 50;
 	private int shield = 0;
-	private final int xp = 20;
-	private final List<String> lst_attack = List.of("Hoo...", "HOHOHOH", "HEHEHEH");
 	private String action;
 	private final Map<Effect, Integer> effects = new HashMap<>();
-	// For graphism
-	private final String img = "robot";
-	private final double sizeY = 1.2;
-	private final double sizeX = 1.2;
+	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Hoo...", "HOHOHOH", "HEHEHEH"), 1.2, 1.2, "robot");
+
 	
 	
 	/**
@@ -67,7 +62,7 @@ public class Robot implements Enemy{
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
-		action = lst_attack.get(randomNumbers.nextInt(2));
+		action = info.attacks().get(randomNumbers.nextInt(2));
 		return action;
 	}
 	
@@ -130,28 +125,8 @@ public class Robot implements Enemy{
 	}
 	
 	@Override
-	public int getXP() {
-		return xp;
-	}
-	
-	@Override
-	public String getImg() {
-		return img;
-	}
-	
-	@Override
-	public double getSizeX() {
-		return sizeX;
-	}
-	
-	@Override
-	public double getSizeY() {
-		return sizeY;
-	}
-	
-	@Override
-	public int getMaxHP() {
-		return maxHP;
+	public EnemyInfo getInfo() {
+		return info;
 	}
 	
 	@Override

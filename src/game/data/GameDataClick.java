@@ -298,6 +298,8 @@ public class GameDataClick {
    * Add an item from the bag in the list of items draggable.
    * 
    * @param item item we wants to move
+   * @param x		 position X in the bag before dragging it.
+   * @param y 	 position Y in the bag before dragging it.
    */
   public static void addDragItemFromBag(Item item, int x, int y) {
   	Objects.requireNonNull(item);
