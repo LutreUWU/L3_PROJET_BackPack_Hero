@@ -20,13 +20,19 @@ public class Robot implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	final private int maxHP = 50;
 	private int HP = 50;
 	private int shield = 0;
 	private String action;
 	private final Map<Effect, Integer> effects = new HashMap<>();
 	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Hoo...", "HOHOHOH", "HEHEHEH"), 1.2, 1.2, "robot");
 
-	
+	@Override
+	public void resetStats() {
+		HP = maxHP;
+		shield = 0;
+		effects.clear();
+	}
 	
 	/**
 	 * Add an effect to the enemy

@@ -20,13 +20,20 @@ public class Soldat implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	final private int maxHP = 25;
 	private int HP = 25;
 	private int shield = 0;
 	private String action;
 	private final Map<Effect, Integer> effects = new HashMap<>();
 	private static final EnemyInfo info = new EnemyInfo(25, 6, List.of("Coup", "Bouclier"), 1, 1, "soldat");
 
-
+	@Override
+	public void resetStats() {
+		HP = maxHP;
+		shield = 0;
+		effects.clear();
+	}
+	
 	/**
 	 * Add an effect to the enemy
 	 * @param effect (Enum of all item)

@@ -18,11 +18,19 @@ public class Chicken implements Enemy{
 	 * - Shield : 		Can mitigate damage received
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	final private int maxHP = 20;
 	private int HP = 20;
 	private int shield = 0;
 	private final Map<Effect, Integer> effects = new HashMap<>();
 	private String action;
 	private static final EnemyInfo info = new EnemyInfo(20, 4, List.of("Morsure", "Protection"), 0.8, 0.4, "chicken");
+	
+	@Override
+	public void resetStats() {
+		HP = maxHP;
+		shield = 0;
+		effects.clear();
+	}
 	
 	/**
 	 * Add an effect to the enemy

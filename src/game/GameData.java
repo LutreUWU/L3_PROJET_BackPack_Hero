@@ -140,6 +140,7 @@ public class GameData {
    */
   public void newFloor() {
   	floor++;
+  	shortestPath = null;
     map = new Floor(floor);
   }
   

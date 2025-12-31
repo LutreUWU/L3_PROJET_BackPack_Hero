@@ -21,8 +21,12 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
+import model.item.common.Arrow;
+import model.item.common.KeyDoor;
 import model.item.epic.Bow;
 import model.item.mythic.Mimicry;
+import model.item.rare.FireBall;
+import model.item.rare.PoisonArrow;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -309,8 +313,12 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
+				 GameDataClick.addDragItem(new FireBall());
 				 GameDataClick.addDragItem(new Bow());
-				 GameDataClick.addDragItem(new Mimicry());
+				 GameDataClick.addDragItem(new Bow());
+				 GameDataClick.addDragItem(new Arrow());
+				 GameDataClick.addDragItem(new PoisonArrow());
+				 GameDataClick.addDragItem(new KeyDoor());
 			}
 		}
 		case Key.I -> {

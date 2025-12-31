@@ -1,8 +1,10 @@
 package model.map;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import model.EnemyRepository;
 import model.XY;
@@ -19,15 +21,28 @@ public final class EnemyRoom implements Room {
 		createEnemyLst(floor);
 	}
 	
+	private int chooseNbEnemy(List<Enemy> allEnemy, int floor, Random random) {
+		var enemyStrength = (int) random.nextGaussian(floor, 1);
+		if (enemyStrength >= allEnemy.size()) enemyStrength = allEnemy.size() -1;
+		if (enemyStrength < 0) enemyStrength = 0;
+		return enemyStrength;
+	}
+	
 	private void createEnemyLst(int floor) {
+		Set<Enemy> differentEnemy = new HashSet<>();
 		var allEnemy = EnemyRepository.getEnemyRankLst();
 		var random = new Random();
 		var nbEnemy = (int) random.nextGaussian(floor, 0.5);
-		var enemyStrength = (int) random.nextGaussian(floor, 1);
 		if (nbEnemy < 1) nbEnemy = 1;
 		if (nbEnemy > 3) nbEnemy = 3;
-		for (int i = 0; i < nbEnemy; i++) {
-			enemyLst.add(allEnemy.get(nbEnemy));
+		while (differentEnemy.size() != nbEnemy) {
+			var enemyNb = chooseNbEnemy(allEnemy, floor, random);
+			var enemy = allEnemy.get(enemyNb);
+			if (!differentEnemy.contains(enemy)) {
+				enemyLst.add(enemy);
+				differentEnemy.add(enemy);
+			}
+			
 		}
 	}
 	

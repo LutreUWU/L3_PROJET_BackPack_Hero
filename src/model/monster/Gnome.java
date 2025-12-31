@@ -20,12 +20,19 @@ public class Gnome implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
+	final private int maxHP = 15;
 	private int HP = 15;
 	private int shield = 0;
 	private String action;
 	private final Map<Effect, Integer> effects = new HashMap<>();
 	private static final EnemyInfo info = new EnemyInfo(15, 4, List.of("Slash", "Abattage"), 1, 0.8, "gnome");
 
+	@Override
+	public void resetStats() {
+		HP = maxHP;
+		shield = 0;
+		effects.clear();
+	}
 
 	/**
 	 * Add an effect to the enemy

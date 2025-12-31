@@ -55,6 +55,7 @@ public class GameDataCombat {
 		Objects.requireNonNull(data);
 		GameDataClick.resetDragItemLst();
 		lstEnemy = monsters;
+		lstEnemy.forEach(monster -> monster.resetStats());
 		levelBeforeCombat = data.hero().getLevel();
 		getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
 		lstEnemy.forEach(monster -> monster.preAction());
