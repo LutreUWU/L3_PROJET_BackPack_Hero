@@ -50,6 +50,11 @@ public record Gant(XY[] shape, Direction direction, Rarity rarity, int ID, int s
   }
   
   @Override
+  public boolean isConductive() {
+  	return true;
+  }
+  
+  @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new Gant(shape, direction, durability + nb); 

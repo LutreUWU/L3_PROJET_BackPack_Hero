@@ -52,6 +52,11 @@ public record DespairShield(XY[] shape, Direction direction, Rarity rarity, int 
   }
   
   @Override
+  public boolean isConductive() {
+  	return true;
+  }
+  
+  @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new DespairShield(shape, direction, durability + nb); 

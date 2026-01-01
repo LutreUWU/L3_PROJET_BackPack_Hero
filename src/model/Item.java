@@ -21,4 +21,5 @@ public interface Item {
     Item use(Enemy enemy, List<Enemy> lstenemy, GameData data);
     Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data);
     Item rotateXY();
+    boolean isConductive();
 }

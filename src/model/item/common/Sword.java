@@ -57,6 +57,11 @@ public record Sword(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   }
   
   @Override
+  public boolean isConductive() {
+  	return true;
+  }
+  
+  @Override
   public Item subDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new Sword(shape, direction, durability - nb); 

@@ -15,6 +15,7 @@ import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
 import model.item.rare.FireBall;
 import model.item.rare.Gant;
+import model.item.rare.ManaStone;
 import model.item.rare.PoisonArrow;
 import model.item.superrare.Bomb;
 import model.item.superrare.Massue;
@@ -31,7 +32,8 @@ public class ItemRepository {
   	  registerWeapon(new Arrow()); // Common
   	  registerWeapon(new Gant()); // Rare
   	  registerWeapon(new PoisonArrow()); // Rare
-  	  registerWeapon(new FireBall()); // Rare 
+  	  registerWeapon(new FireBall()); // Rare
+  	  registerWeapon(new ManaStone(2)); // Rare 
   	  registerWeapon(new Massue()); // SuperRare
   	  registerWeapon(new Bomb()); // SuperRare
   	  registerWeapon(new DespairShield()); // Epic

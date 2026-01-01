@@ -49,6 +49,11 @@ public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, in
     }
     
     @Override
+    public boolean isConductive() {
+    	return true;
+    }
+    
+    @Override
     public Item addDurability(int nb) {
     	return null; 
     }

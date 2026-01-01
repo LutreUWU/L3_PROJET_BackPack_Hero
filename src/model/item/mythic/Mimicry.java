@@ -51,6 +51,11 @@ public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, in
     }
     
     @Override
+    public boolean isConductive() {
+    	return true;
+    }
+    
+    @Override
     public Item addDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
     	return new Mimicry(shape, direction, durability + nb); 

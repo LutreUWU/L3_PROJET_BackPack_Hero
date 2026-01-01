@@ -51,6 +51,11 @@ public record Axe(XY[] shape, Direction direction, Rarity rarity, int ID, int sc
     }
     
     @Override
+    public boolean isConductive() {
+    	return true;
+    }
+    
+    @Override
     public Item addDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
     	return new Axe(shape, direction, durability + nb); 

@@ -50,6 +50,11 @@ public record Curse(XY[] shape, Direction direction, Rarity rarity, int ID, int 
     }
     
     @Override
+    public boolean isConductive() {
+    	return false;
+    }
+    
+    @Override
     public Item addDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
     	return new Curse(shape, direction, durability + nb); 

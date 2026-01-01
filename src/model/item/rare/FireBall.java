@@ -41,6 +41,11 @@ public record FireBall(XY[] shape, Direction direction, Rarity rarity, int ID, i
 	private static XY[] rotate90(XY[] shape, XY pivot) {
     return shape;
   }
+	
+	@Override
+  public boolean isConductive() {
+  	return false;
+  }
   
   @Override
   public Item addDurability(int nb) {

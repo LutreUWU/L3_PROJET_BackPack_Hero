@@ -66,10 +66,15 @@ public record Arrow(XY[] shape, Direction direction, Rarity rarity, int ID, int 
   }
   
   @Override
+  public boolean isConductive() {
+  	return false;
+  }
+  
+  @Override
   public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	return new Arrow(shape, direction, durability);
   }
-
+  
 
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {

@@ -51,6 +51,11 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     }
     
     @Override
+    public boolean isConductive() {
+    	return true;
+    }
+    
+    @Override
     public Item addDurability(int nb) {
     	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
     	return new Massue(shape, direction, durability + nb); 

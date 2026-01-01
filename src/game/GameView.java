@@ -9,9 +9,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.github.forax.zen.ApplicationContext;
@@ -38,6 +40,7 @@ import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
 import model.item.rare.FireBall;
 import model.item.rare.Gant;
+import model.item.rare.ManaStone;
 import model.item.rare.PoisonArrow;
 import model.item.superrare.Bomb;
 import model.item.superrare.Massue;
@@ -242,8 +245,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
-				case 14 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-				case 15 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+				case 14, 15, 16 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 				default ->{}
 		  }
 		}
@@ -292,6 +294,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Curse _ -> "Malédiction que t'a jeté un ennemi";
 	  	case Shield _ -> "(EFFET PASSIF) Bouclier de Captain pas America";
 	  	case FireBall _ -> "Ca chauffe !!";
+	  	case ManaStone m -> "Le mana se propage entre les éléments conduteurs (ceux avec du métal)";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -319,6 +322,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Curse _ -> "Utilise la malédiction pour t'en débarasser";
 	  	case Shield _ -> "Te donne 3 shield par tour si tu l'as placé à la prmeière ligne, 1 sinon";
 	  	case FireBall _ -> "Inflige -6PV à l'ennemi et enflamme l'ennemi";
+	  	case ManaStone m -> "Cette pierre contient " + m.value() + " mana !";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -412,6 +416,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 																	 coord.northWest().x() + (tileSize * pos.x()) + centerX,
 																	 coord.northWest().y() + (tileSize * pos.y()) - centerY, 
 																	 tileSize * width, tileSize * height, direction);
+		
 	}
 	
 	/**
@@ -699,8 +704,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
-			case 14 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-			case 15 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+			case 14, 15, 16 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
 			default ->{}
 	  }
 	}
@@ -1239,6 +1243,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     drawText(graphics, "Items restants : " + nbItem, centerX, centerY - fm.getAscent()/2, 20);
   }
   
+  private void drawMana(Graphics2D graphics, GameData data) {
+  	var lstMana = data.bag().getManaStone(data);
+  	if (!lstMana.isEmpty()) {
+  		var manaConductive = data.bag().getManaConnectedCoords(lstMana);
+  		///                   
+  	}
+  }
+  
   
   /**
    * Methods for drawing the game 
@@ -1250,6 +1262,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		drawBG(graphics, data);
 		if (data.mapOrBag()) {
 			drawGrid(graphics, data);
+			drawMana(graphics, data);
 			drawItemBag(graphics, data);
 			drawItemInfo(graphics, data);
 			drawBinButton(graphics, data);

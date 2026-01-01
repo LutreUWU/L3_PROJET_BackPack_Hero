@@ -13,7 +13,7 @@ import model.XY;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int value, int AP) implements Item{
+public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int value, int AP) implements Item {
 	
 	public Gold(int value) {
     this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 2, -1, value, 0);
@@ -40,7 +40,8 @@ public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int s
     return shape;
   }
   
-  public Gold changeGoldValue(int value2) {
+  public Gold addGoldValue(int value2) {
+  	if (value2 < 0) throw new IllegalArgumentException("! MUST BE A POSITIVE VALUE !");
   	int finalValue = value + value2;
   	return new Gold(shape, direction, finalValue);
   }
@@ -66,8 +67,13 @@ public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int s
   }
   
   @Override
+  public boolean isConductive() {
+  	return true;
+  }
+  
+  @Override
   public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-  	return new Curse(shape, direction, value);
+  	return new Gold(shape, direction, value);
   }
 
   @Override

@@ -648,7 +648,7 @@ public class GameDataClick {
 						case Gold goldDrag -> {
 							var goldCollide = (Gold) colideItem;
 							data.bag().removeItemFromBackpack(goldCollide);
-							goldCollide = goldCollide.changeGoldValue(goldDrag.value());
+							goldCollide = goldCollide.addGoldValue(goldDrag.value());
 							data.bag().addItemToBackpack(goldCollide);
 						}
 						default -> {

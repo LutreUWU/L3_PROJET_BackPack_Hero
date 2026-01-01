@@ -40,6 +40,11 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 	private static XY[] rotate90(XY[] shape, XY pivot) {
 		return shape;
 	}
+	
+	@Override
+  public boolean isConductive() {
+  	return true;
+  }
 
 	@Override
 	public Item addDurability(int nb) {
