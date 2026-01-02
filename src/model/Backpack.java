@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import game.GameData;
 import model.item.common.Gold;
+import model.item.rare.ManaStone;
 
 public class Backpack {
 	/**
@@ -60,6 +61,10 @@ public class Backpack {
 		return gridSize;
 	}
 
+	public int getManaInBag() {
+		return bagItemLst.stream().filter(item -> item instanceof ManaStone).mapToInt(item -> ((ManaStone) item).value()).sum();
+	}
+	
 	public int getGoldInBag() {
 		return bagItemLst.stream().filter(item -> item instanceof Gold).mapToInt(item -> ((Gold) item).value()).sum();
 	}
@@ -188,10 +193,10 @@ public class Backpack {
 		return arround;
 	}
 	
-	public List<Item> getManaStone(GameData data) {
-		return data.bag().bagItemLst.stream()
-																.filter(t -> t.ID() == 16)
-																.toList();
+	public List<Item> getManaStone() {
+		return bagItemLst.stream()
+														.filter(t -> t.ID() == 16)
+														.toList();
 	}
 
 	public Set<XY> getManaConnectedCoords(List<Item> manaStones) {
@@ -227,7 +232,6 @@ public class Backpack {
 			}
 			queue.remove(0);
 		}
-
 		return connected;
 	}
 

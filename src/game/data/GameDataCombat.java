@@ -184,6 +184,9 @@ public class GameDataCombat {
 				getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());	
 			}
 		}
+		if (lstEnemy.isEmpty()) {
+			endCombat(data);
+		}
 	}
 	
 	/**
@@ -197,9 +200,6 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		applyEffects();
 		killMonster(data);
-		if (lstEnemy.isEmpty()) {
-			endCombat(data);
-		}
 		enemyAction(data.hero());
 		useAllPassive(data);
 	}

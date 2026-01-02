@@ -9,11 +9,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.github.forax.zen.ApplicationContext;
@@ -218,9 +216,24 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		  	}
 			}
     }
+		drawManaGrid(graphics, data);
   }
   
   /**
+   * Draw all tiles where mana is fill inside.
+   * 
+   * @param graphics {@code Graphics2D} of the game
+   * @param data 		 {@code data} of the game
+   */
+  private void drawManaGrid(Graphics2D graphics, GameData data) {
+    int size = data.bag().getGridSize();
+		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box(); 
+		for (XY coord : data.bag().getManaConnectedCoords(data.bag().getManaStone())) {
+  		graphics.drawImage(imgLoader.bgImages().get("BG_BAG_MANA"), boundingBox.northWest().x() + (size * coord.x()), boundingBox.northWest().y() + (size * coord.y()), size, size, null);
+		}
+	}
+
+	/**
    * Check the id int the bag we wants to draw and calls the appropriate method.
    * This method use a switch on the item id to know which item we wants to draw.
    * 
@@ -294,7 +307,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Curse _ -> "Malédiction que t'a jeté un ennemi";
 	  	case Shield _ -> "(EFFET PASSIF) Bouclier de Captain pas America";
 	  	case FireBall _ -> "Ca chauffe !!";
-	  	case ManaStone m -> "Le mana se propage entre les éléments conduteurs (ceux avec du métal)";
+	  	case ManaStone _ -> "Le mana se propage entre les éléments conduteurs (ceux avec du métal)";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
   	};
   }
@@ -521,7 +534,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     BufferedImage img = imgLoader.bgImages().get("ICON_MANA");
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.CYAN);
-	  graphics.drawString(data.hero().getManaPoint() + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
+	  graphics.drawString(data.bag().getManaInBag() + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
   private void drawHeroAction(Graphics2D graphics, GameData data) {
@@ -1243,15 +1256,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     drawText(graphics, "Items restants : " + nbItem, centerX, centerY - fm.getAscent()/2, 20);
   }
   
-  private void drawMana(Graphics2D graphics, GameData data) {
-  	var lstMana = data.bag().getManaStone(data);
-  	if (!lstMana.isEmpty()) {
-  		var manaConductive = data.bag().getManaConnectedCoords(lstMana);
-  		///                   
-  	}
-  }
-  
-  
   /**
    * Methods for drawing the game 
    * 
@@ -1262,7 +1266,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		drawBG(graphics, data);
 		if (data.mapOrBag()) {
 			drawGrid(graphics, data);
-			drawMana(graphics, data);
 			drawItemBag(graphics, data);
 			drawItemInfo(graphics, data);
 			drawBinButton(graphics, data);
