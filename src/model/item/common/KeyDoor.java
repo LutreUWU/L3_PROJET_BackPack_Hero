@@ -10,20 +10,28 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.ItemStats;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record KeyDoor(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int AP) implements Item{
-		public KeyDoor() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 1, -1, 0);
+public record KeyDoor(XY[] shape, Direction direction, ItemStats info) implements Item{		
+	private static final Rarity RARITY_VALUE = Rarity.COMMON;
+	private static final int ID_VALUE = 1;
+	private static final int SCORE_VALUE = -1;
+	private static final int MANA_VALUE = 0;
+	private static final int AP_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+	
+	public KeyDoor() {
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS);
 	  }
 	
 		public KeyDoor(XY[] shape, Direction direction) {
-      this(shape, direction, Rarity.COMMON, 1, -1, 0);
+      this(shape, direction, ITEM_STATS);
     }
 		
 		public KeyDoor(XY coord, Direction direction) {
-      this(initShape(coord, direction), direction, Rarity.COMMON, 1, -1, 0);
+      this(initShape(coord, direction), direction, ITEM_STATS);
     }
 		
     private static XY[] initShape(XY coord, Direction direction) {

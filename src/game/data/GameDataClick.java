@@ -572,7 +572,7 @@ public class GameDataClick {
 				if (y >= NW.y() && y <= SE.y()) {
 					data.getShopLst().setSellItem(data.dragItem());
 					removeItemFromDrag(data.dragItem());
-					addDragItem(new Gold(data.dragItem().score() / 2));
+					addDragItem(new Gold(data.dragItem().info().score() / 2));
 					data.setDragItem(null);
 				}
 			}
@@ -643,7 +643,7 @@ public class GameDataClick {
 				var itemDrag = data.dragItem();
 				var colideItem = data.bag().getItem(coord.x(), coord.y());
 				if (item.canMerge()) {
-					if (colideItem != null && itemDrag.ID() == colideItem.ID()) {
+					if (colideItem != null && itemDrag.info().ID() == colideItem.info().ID()) {
 						switch(itemDrag) {
 						case Gold goldDrag -> {
 							var goldCollide = (Gold) colideItem;

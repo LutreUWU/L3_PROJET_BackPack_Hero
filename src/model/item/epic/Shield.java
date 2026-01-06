@@ -15,19 +15,29 @@ import model.Item;
 import model.Rarity;
 import model.Synergy;
 import model.XY;
+import model.item.ItemStats;
 import model.monster.Enemy;
 
-public record Shield(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
+public record Shield(XY[] shape, Direction direction, int durability, ItemStats info) implements Item{
+	private static final int DURABILITY = 10;
+	private static final Rarity RARITY_VALUE = Rarity.EPIC;
+	private static final int ID_VALUE = 14;
+	private static final int SCORE_VALUE = 30;
+	private static final int AP_VALUE = 1;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+	
+	
 	public Shield() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 14, 30, 10, 1);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, DURABILITY, ITEM_STATS);
   }
 	
 	public Shield(XY[] shape, Direction direction, int durability) {
-		this(shape, direction, Rarity.COMMON, 14, 30, durability, 1);
+		this(shape, direction, durability, ITEM_STATS);
 	}
 	
 	public Shield(XY coord, Direction direction, int durability) {
-    this(initShape(coord, direction), direction, Rarity.COMMON, 14, 30, durability, 1);
+    this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -80,7 +90,6 @@ public record Shield(XY[] shape, Direction direction, Rarity rarity, int ID, int
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	GameDataCombat.addLog("Cet objet est seulement passif ! On ne peut pas l'utiliser !");
-  	data.hero().sub("energy", AP);
   	return new Shield(shape, direction, durability);
   }
   

@@ -13,6 +13,7 @@ public class FontLoader {
 	private static int h1;
 	private static int h2;
 	private static int h3;
+	private static int h4;
 	private static int span;
 
 	private static BufferedImage load_font(String name) {
@@ -50,6 +51,7 @@ public class FontLoader {
 		h1 = (int) (screenInfo.width() * 0.025);
 		h2 = (int) (screenInfo.width() * 0.02);
 		h3 = (int) (screenInfo.width() * 0.013);
+		h4 = (int) (screenInfo.width() * 0.011);
 		span = (int) (screenInfo.width() * 0.008);
 	}
 	
@@ -63,6 +65,10 @@ public class FontLoader {
 	
 	public static int getH3() {
 		return h3;
+	}
+	
+	public static int getH4() {
+		return h4;
 	}
 	
 	public static int getSpan() {

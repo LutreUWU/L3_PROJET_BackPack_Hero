@@ -40,6 +40,7 @@ public class GameDataCombat {
   private static ArrayList<String> log = new ArrayList<>();
   private static int totalExp = 0;
   private static int levelBeforeCombat;
+  private static int nbMana;
   
 	/**
 	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
@@ -54,6 +55,7 @@ public class GameDataCombat {
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
 		GameDataClick.resetDragItemLst();
+		nbMana = data.bag().getManaInBag();
 		lstEnemy = monsters;
 		lstEnemy.forEach(monster -> monster.resetStats());
 		levelBeforeCombat = data.hero().getLevel();
@@ -121,8 +123,14 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		var item = hoverItem;
 		if (item != null) {
-			if (item.AP() > data.hero().getEnergyPoint()) {
+			if (item.info().AP() > data.hero().getEnergyPoint()) {
 				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
+			}
+			else if (item.info().mana() > nbMana) {
+				addLog("Vous n'avez pas assez de mana pour utiliser " + item.toString());
+			}
+			else if (!data.bag().itemConnectedToMana(item)) {
+				addLog(item.toString() + " n'est pas connecté à une source de mana");
 			}
 			else {
 				useItemOnEnemies(data, item);
@@ -142,6 +150,8 @@ public class GameDataCombat {
 	 */
 	private static void useItemOnEnemies(GameData data, Item item) {
 		data.bag().removeItemFromBackpack(item);
+		data.hero().sub("energy", item.info().AP());
+		nbMana -= item.info().mana();
 		var newItem = item.use(target, lstEnemy, data);
 		if (newItem.durability() != 0) data.bag().addItemToBackpack(newItem);
 	}
@@ -273,5 +283,9 @@ public class GameDataCombat {
 	
 	public static Item getHoverItem() {
 		return hoverItem;
+	}
+	
+	public static int getNbMana() {
+		return nbMana;
 	}
 }

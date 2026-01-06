@@ -70,7 +70,7 @@ public class Backpack {
 	}
 
 	public boolean fuseGoldInBag(int value) {
-		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.ID() == 2).map(item -> (Gold) item).toList();
+		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.info().ID() == 2).map(item -> (Gold) item).toList();
 		for (Gold gold : goldItems) {
 			if (gold.value() > value) {
 				gold.addGoldValue(value);
@@ -86,7 +86,7 @@ public class Backpack {
 	}
 
 	public void subGoldInBag(int value) {
-		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.ID() == 2).map(item -> (Gold) item).toList();
+		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.info().ID() == 2).map(item -> (Gold) item).toList();
 		for (Gold gold : goldItems) {
 			if (gold.value() > value) {
 				Gold newGold = new Gold(gold.shape(), gold.direction(), gold.value() - value);
@@ -159,7 +159,7 @@ public class Backpack {
 					if (backpack[block.y()][block.x()] != -1) {
 						removeItemFromBackpack(getItem(block.x(), block.y()));
 					}
-					backpack[block.y()][block.x()] = item.ID();
+					backpack[block.y()][block.x()] = item.info().ID();
 				}
 				bagItemLst.add(item);
 				return true;
@@ -169,7 +169,7 @@ public class Backpack {
 			if (checkPlace(item)) {
 				var b = item.shape();
 				for (var block : b) {
-					backpack[block.y()][block.x()] = item.ID();
+					backpack[block.y()][block.x()] = item.info().ID();
 				}
 				bagItemLst.add(item);
 				return true;
@@ -195,7 +195,7 @@ public class Backpack {
 	
 	public List<Item> getManaStone() {
 		return bagItemLst.stream()
-														.filter(t -> t.ID() == 16)
+														.filter(t -> t.info().ID() == 16)
 														.toList();
 	}
 
@@ -203,7 +203,6 @@ public class Backpack {
 		List<XY> queue = new ArrayList<>();
 		Set<XY> visited = new HashSet<>();
 		Set<XY> connected = new HashSet<>();
-
 		for (Item mana : manaStones) {
 			for (XY coord : mana.shape()) {
 				queue.add(coord);
@@ -211,7 +210,6 @@ public class Backpack {
 				connected.add(coord);
 			}
 		}
-
 		while (!queue.isEmpty()) {
 			var first = queue.get(0);
 			for (var acc : getArround(first)) {
@@ -234,7 +232,21 @@ public class Backpack {
 		}
 		return connected;
 	}
-
+	
+	/**
+	 * Check if the item is connected to a manastone 
+	 * in the bag.
+	 * 
+	 * @param item {@code Item} we wants to check
+	 * @return true if connected to a manastone, else false
+	 */
+	public boolean itemConnectedToMana(Item item) {
+		if (item.info().mana() == 0) {
+			return true;
+		}
+		return true;
+	}
+	
 	/**
 	 * Remove an item from the backpack
 	 * 

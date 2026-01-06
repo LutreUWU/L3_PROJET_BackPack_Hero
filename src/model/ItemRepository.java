@@ -46,11 +46,11 @@ public class ItemRepository {
     
     // Méthode pour enregistrer une arme
     private static void registerWeapon(Item item) {
-        itemRepositoryMap.put(item.ID(), item);
+        itemRepositoryMap.put(item.info().ID(), item);
     }
     
     private static int finalScore(Item item) {
-      return (item.rarity().ordinal() + 1) * item.score();
+      return (item.info().rarity().ordinal() + 1) * item.info().score();
     }
     
     private static void createRankingWeapon() {

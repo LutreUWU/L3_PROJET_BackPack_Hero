@@ -21,15 +21,8 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.common.Arrow;
-import model.item.common.KeyDoor;
-import model.item.epic.Bow;
-import model.item.legendary.Axe;
-import model.item.mythic.Mimicry;
-import model.item.rare.FireBall;
+import model.item.epic.EnchantedDiamondSword;
 import model.item.rare.ManaStone;
-import model.item.rare.PoisonArrow;
-import model.item.superrare.Bomb;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -317,10 +310,7 @@ public class GameController {
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 				 GameDataClick.addDragItem(new ManaStone(2));
-				 GameDataClick.addDragItem(new Axe());
-				 GameDataClick.addDragItem(new Bomb());
-				 GameDataClick.addDragItem(new Mimicry());
-				 GameDataClick.addDragItem(new Bow());
+				 GameDataClick.addDragItem(new EnchantedDiamondSword());
 			}
 		}
 		case Key.I -> {

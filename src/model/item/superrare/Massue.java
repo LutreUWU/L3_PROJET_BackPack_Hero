@@ -11,20 +11,30 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.ItemStats;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
-		public Massue() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.SUPERARE, 6, 10, 4, 1);
+public record Massue(XY[] shape, Direction direction, ItemStats info, int durability) implements Item{
+	private static final int DURABILITY = 4;
+	private static final Rarity RARITY_VALUE = Rarity.RARE;
+	private static final int ID_VALUE = 6;
+	private static final int SCORE_VALUE = 10;
+	private static final int AP_VALUE = 1;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+		
+	
+	public Massue() {
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, DURABILITY);
 	  }
 	
 		public Massue(XY[] shape, Direction direction, int durability) {
-      this(shape, direction, Rarity.SUPERARE, 6, 10, durability, 1);
+      this(shape, direction, ITEM_STATS, DURABILITY);
     }
 		
 		public Massue(XY coord, Direction direction, int durability) {
-      this(initShape(coord, direction), direction, Rarity.SUPERARE, 6, 10, durability, 1);
+      this(initShape(coord, direction), direction, ITEM_STATS, DURABILITY);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -87,7 +97,7 @@ public record Massue(XY[] shape, Direction direction, Rarity rarity, int ID, int
     public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
       enemy.subHP(5);
-      data.hero().sub("energy", AP);
+      data.hero().sub("energy", info.AP());
       return subDurability(1);
     }
     

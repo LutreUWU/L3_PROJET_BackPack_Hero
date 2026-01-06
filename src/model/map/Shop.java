@@ -39,12 +39,12 @@ public final class Shop implements Room {
 		while (currentShop.size() != SHOP_SIZE) {
 			var item = RandomItem.generate(floor);
 			for (var itemBag : currentShop.keySet()) {
-				if (itemBag.ID() == item.ID()) {
+				if (itemBag.info().ID() == item.info().ID()) {
 					alreadyThere = true;
 				}
 			}
 			
-			if (!alreadyThere) currentShop.put(item, item.score()); 
+			if (!alreadyThere) currentShop.put(item, item.info().score()); 
 			alreadyThere = false;
 		}
   }
@@ -75,7 +75,7 @@ public final class Shop implements Room {
   	Objects.requireNonNull(item);
   	logShop = switch(item) {
 					  	case Gold _ -> "Tu me vends de l'or contre de l'or ?";
-					  	default -> "Je te rachète " + item.toString() + " pour " + item.score() / 2 + " gold";
+					  	default -> "Je te rachète " + item.toString() + " pour " + item.info().score() / 2 + " gold";
 					  	};		
   }
   
@@ -86,7 +86,7 @@ public final class Shop implements Room {
   
   private String setLog(Item item) {
   	return switch(item) {
-  	case Sword _ -> "T'es sah à acheter ça ?";
+  	case Sword _ -> "T'achètes ça vraiment ?";
 		default ->  "Très bon achat mon frère";
   	};
   }

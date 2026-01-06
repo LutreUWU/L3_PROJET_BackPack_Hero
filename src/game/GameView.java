@@ -33,6 +33,7 @@ import model.item.common.KeyDoor;
 import model.item.common.Sword;
 import model.item.epic.Bow;
 import model.item.epic.DespairShield;
+import model.item.epic.EnchantedDiamondSword;
 import model.item.epic.Shield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
@@ -243,22 +244,24 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   private void drawItemBag(Graphics2D graphics, GameData data) {
 		var itemLst = data.bag().bagItemLst();
 		for (var item : itemLst) {
+			var id = item.info().ID();
 			XY coordinate = item.shape()[0];
-		  switch (item.ID()) {
-			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75);
+		  switch (id){
+			  case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75);
 			  case 2 -> drawItemGold(graphics, data, coordinate, item);
-				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
-				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25); 
-				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
-				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
-				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75); 
-				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.20, 0.5); 
-				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25);
-				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
-				case 14, 15, 16 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+				case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id)); 
+				case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.25); 
+				case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id)); 
+				case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id)); 
+				case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75); 
+				case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), imgLoader.itemImagesByID().get(id), 0.20, 0.5); 
+				case 9 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+				case 10 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.25);
+				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.2); 
+				case 14, 15, 16 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+				case 17 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.75); 
 				default ->{}
 		  }
 		}
@@ -308,7 +311,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Shield _ -> "(EFFET PASSIF) Bouclier de Captain pas America";
 	  	case FireBall _ -> "Ca chauffe !!";
 	  	case ManaStone _ -> "Le mana se propage entre les éléments conduteurs (ceux avec du métal)";
-	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
+	  	case EnchantedDiamondSword _ -> "Une épée DIVINE";
+	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.info().ID());
   	};
   }
   
@@ -336,7 +340,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case Shield _ -> "Te donne 3 shield par tour si tu l'as placé à la prmeière ligne, 1 sinon";
 	  	case FireBall _ -> "Inflige -6PV à l'ennemi et enflamme l'ennemi";
 	  	case ManaStone m -> "Cette pierre contient " + m.value() + " mana !";
-	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.ID());
+	  	case EnchantedDiamondSword _ -> "Inflige -8PV à l'ennemi (nécessite 1 point de Mana)";
+	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.info().ID());
   	};
   }
   
@@ -364,23 +369,24 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		int height = SE.y() - NW.y();
 		if (item != null) {
 	    drawTextInfoName(graphics, item, NW);
-	    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+	    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH4());
 	    graphics.setFont(font);
 	    FontMetrics fm = graphics.getFontMetrics();
 	    graphics.setColor(Color.WHITE);
 		  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 25);
 		  graphics.setColor(Color.GREEN);
-		  drawTextInfo(graphics, "AP : " + item.AP(), NW.x(), NW.y() + height / 3, 20);
-		  drawTextInfo(graphics, "Durability : " + item.durability(), NW.x(), NW.y() + height / 3 + (int) (fm.getAscent() * 1.5), 20);
+		  drawTextInfo(graphics, "AP : " + item.info().AP(), NW.x(), NW.y() + height / 4, 20);
+		  drawTextInfo(graphics, "MANA : " + item.info().mana(), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 1.5), 20);
+		  drawTextInfo(graphics, "Durability : " + item.durability(), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 3), 20);
 		  graphics.setColor(Color.WHITE);
-		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + height / 3 + (int) (fm.getAscent() * 4), 23);
+		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 5), 23);
 		}
   }
   
   private void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setFont(font);
-    graphics.setColor(switch(item.rarity()) {
+    graphics.setColor(switch(item.info().rarity()) {
 	    case COMMON -> Color.GRAY;
 	    case RARE -> Color.GREEN;
 	    case SUPERARE -> Color.BLUE;
@@ -534,7 +540,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     BufferedImage img = imgLoader.bgImages().get("ICON_MANA");
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.CYAN);
-	  graphics.drawString(data.bag().getManaInBag() + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
+	  graphics.drawString((GameDataCombat.combat() ? GameDataCombat.getNbMana()  : data.bag().getManaInBag()) + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
   private void drawHeroAction(Graphics2D graphics, GameData data) {
@@ -703,21 +709,23 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    * @param box		 	 The boundingbox (border) of the item.
    */
   private void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
-	  switch (item.ID()) {
-		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75); 
+  	var id = item.info().ID();
+  	switch (id) {
+		  case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75); 
 		  case 2 -> drawDragGold(graphics, data, item, box);
-			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
-			case 4 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25); 
-			case 5 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
-			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID())); 
-			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.75); 
-			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.20, 0.5); 
-			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.25, 0.25); 
-			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
-			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), imgLoader.itemImagesByID().get(item.ID()), 0.5, 0.2); 
-			case 14, 15, 16 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(item.ID()));
+			case 3 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id)); 
+			case 4 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.25); 
+			case 5 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id)); 
+			case 6 -> drawDragItem(graphics, box.northWest(), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id)); 
+			case 7 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75); 
+			case 8 -> drawDragSpecialItem(graphics, box.northWest(), 2, 3, item.direction(), imgLoader.itemImagesByID().get(id), 0.20, 0.5); 
+			case 9 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+			case 10 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.25); 
+			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.2); 
+			case 14, 15, 16 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+			case 17 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.75); 
 			default ->{}
 	  }
 	}
@@ -1205,10 +1213,10 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	Item item = entry.getKey();
   	int price = entry.getValue();
     var imageBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_IMAGE_HOLDER").box();
-		if (imgLoader.itemImagesByID().get(item.ID()) == null) {
+		if (imgLoader.itemImagesByID().get(item.info().ID()) == null) {
 			throw new IllegalArgumentException("Can't fint img : " + item.toString());
 		}
-    drawItemShopImage(graphics, data, imgLoader.itemImagesByID().get(item.ID()), imageBubbleBox);
+    drawItemShopImage(graphics, data, imgLoader.itemImagesByID().get(item.info().ID()), imageBubbleBox);
     var titleBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
     drawItemShopName(graphics, item, titleBubbleBox);
     drawItemShopInfo(graphics, item, price, data.getShopLst().getCurrentShop().size());    
@@ -1225,7 +1233,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   private void drawItemShopName(Graphics2D graphics, Item item, BoundingBox titleBubbleBox) {
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setFont(font);
-    graphics.setColor(switch(item.rarity()) {
+    graphics.setColor(switch(item.info().rarity()) {
 	    case COMMON -> Color.GRAY;
 	    case RARE -> Color.GREEN;
 	    case SUPERARE -> Color.BLUE;

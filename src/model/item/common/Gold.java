@@ -10,21 +10,28 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.ItemStats;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Gold(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int value, int AP) implements Item {
+public record Gold(XY[] shape, Direction direction, ItemStats info, int value) implements Item {
+	private static final Rarity RARITY_VALUE = Rarity.COMMON;
+	private static final int ID_VALUE = 2;
+	private static final int SCORE_VALUE = -1;
+	private static final int AP_VALUE = 1;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
 	
 	public Gold(int value) {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 2, -1, value, 0);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, value);
   }
 
 	public Gold(XY[] shape, Direction direction, int value) {
-		this(shape, direction, Rarity.COMMON, 2, -1, value, 1);
+		this(shape, direction, ITEM_STATS,value);
 	}
 	
 	public Gold(XY coord, Direction direction, int value) {
-    this(initShape(coord, direction), direction, Rarity.COMMON, 2, -1, value, 0);
+    this(initShape(coord, direction), direction, ITEM_STATS, value);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {

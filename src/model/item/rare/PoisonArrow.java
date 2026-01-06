@@ -14,19 +14,28 @@ import model.Item;
 import model.Rarity;
 import model.Synergy;
 import model.XY;
+import model.item.ItemStats;
 import model.monster.Enemy;
 
-public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP, Effect effect) implements Item{
+public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int durability, Effect effect) implements Item{
+	private static final int DURABILITY = 5;
+	private static final Rarity RARITY_VALUE = Rarity.RARE;
+	private static final int ID_VALUE = 11;
+	private static final int SCORE_VALUE = 15;
+	private static final int AP_VALUE = 1;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+	
 	public PoisonArrow() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 11, 15, 5, 1, Effect.POISON);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, DURABILITY, Effect.POISON);
   }
 
 	public PoisonArrow(XY[] shape, Direction direction, int durability, Effect effect) {
-    this(shape, direction, Rarity.RARE, 11, 15, durability, 1, effect);
+    this(shape, direction, ITEM_STATS, durability, effect);
   }
 	
 	public PoisonArrow(XY coord, Direction direction, int durability, Effect effect) {
-    this(initShape(coord, direction), direction, Rarity.RARE, 11, 15, durability, 1, effect);
+    this(initShape(coord, direction), direction, ITEM_STATS, durability, effect);
   }
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -82,13 +91,12 @@ public record PoisonArrow(XY[] shape, Direction direction, Rarity rarity, int ID
       enemy.addEffect(effect, 3);
       // Sub durability to the bow
       var bow = data.bag().bagItemLst().stream()
-																				.filter(item -> item.ID() == 10)
+																				.filter(item -> item.info().ID() == 10)
 																				.min(Comparator.comparingInt(Item::durability))
 																				.orElseThrow();
       																						
       data.bag().removeItemFromBackpack(bow);
-      if (bow.durability() - bow.AP() > 0) data.bag().addItemToBackpack(bow.subDurability(bow.AP()));
-      data.hero().sub("energy", AP);
+      if (bow.durability() - bow.info().AP() > 0) data.bag().addItemToBackpack(bow.subDurability(bow.info().AP()));
       return subDurability(1);
   	}
   	GameDataCombat.addLog("Vous devez avoir un arc pour tirer !");

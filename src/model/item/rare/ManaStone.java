@@ -10,21 +10,26 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.ItemStats;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record ManaStone(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int maxMana, int value, int AP) implements Item {
+public record ManaStone(XY[] shape, Direction direction, ItemStats info, int maxMana, int value) implements Item {
+	private static final Rarity RARITY_VALUE = Rarity.RARE;
+	private static final int ID_VALUE = 16;
+	private static final int SCORE_VALUE = 15;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, 0, 0);
 	
 	public ManaStone(int value) {
-  this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 16, 15, value, value, 0);
+		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, value, value);
   }
 
 	public ManaStone(XY[] shape, Direction direction, int maxMana, int value) {
-		this(shape, direction, Rarity.RARE, 16, 15, maxMana, value, 1);
+		this(shape, direction, ITEM_STATS, maxMana, value);
 	}
 	
 	public ManaStone(XY coord, Direction direction, int maxMana, int value) {
-    this(initShape(coord, direction), direction, Rarity.RARE, 16, 15, maxMana, value, 0);
+    this(initShape(coord, direction), direction, ITEM_STATS, maxMana, value);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {

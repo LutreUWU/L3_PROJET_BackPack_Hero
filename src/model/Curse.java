@@ -1,28 +1,29 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import game.GameData;
 import game.data.GameDataCombat;
-import game.data.GameDataHero;
-import model.Direction;
-import model.Item;
-import model.Rarity;
-import model.XY;
+import model.item.ItemStats;
 import model.monster.Enemy;
 
-public record Curse(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
-
+public record Curse(XY[] shape, Direction direction, ItemStats info, int durability) implements Item{
+	private static final int DURABILITY = 1;
+	private static final Rarity RARITY_VALUE = Rarity.RARE;
+	private static final int ID_VALUE = 13;
+	private static final int SCORE_VALUE = 0;
+	private static final int AP_VALUE = 3;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
 		public Curse() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 13, 0, 1, 3);
+	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, DURABILITY);
 	  }
 		public Curse(XY[] shape, Direction direction, int durability) {
-      this(shape, direction, Rarity.COMMON, 13, 0, durability, 3);
+      this(shape, direction, ITEM_STATS, durability);
     }
 		
 		public Curse(XY coord, Direction direction, int durability) {
-      this(initShape(coord, direction), direction, Rarity.COMMON, 13, 0, durability, 3);
+      this(initShape(coord, direction), direction, ITEM_STATS, durability);
     }
     private static XY[] initShape(XY coord, Direction direction) {
       XY[] b = new XY[4];

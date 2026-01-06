@@ -14,19 +14,28 @@ import model.Item;
 import model.Rarity;
 import model.Synergy;
 import model.XY;
+import model.item.ItemStats;
 import model.monster.Enemy;
 
-public record FireBall(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP, Effect effect) implements Item{
+public record FireBall(XY[] shape, Direction direction, int durability, ItemStats info, Effect effect) implements Item{
+	private static final int DURABILITY = 2;
+	private static final Rarity RARITY_VALUE = Rarity.RARE;
+	private static final int ID_VALUE = 15;
+	private static final int SCORE_VALUE = 20;
+	private static final int AP_VALUE = 2;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+	
 	public FireBall() {
-    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.RARE, 15, 20, 2, 2, Effect.FIRE);
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, DURABILITY, ITEM_STATS, Effect.FIRE);
   }
 
 	public FireBall(XY[] shape, Direction direction, int durability, Effect effect) {
-    this(shape, direction, Rarity.RARE, 15, 20, durability, 2, effect);
+    this(shape, direction, durability, ITEM_STATS, effect);
   }
 	
 	public FireBall(XY coord, Direction direction, int durability, Effect effect) {
-    this(initShape(coord, direction), direction, Rarity.RARE, 15, 20, durability, 2, effect);
+    this(initShape(coord, direction), direction, durability, ITEM_STATS, effect);
   }
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -81,7 +90,6 @@ public record FireBall(XY[] shape, Direction direction, Rarity rarity, int ID, i
 			target.subHP(6);
 			target.addEffect(effect, 3);
 		}
-    data.hero().sub("energy", AP);
     return subDurability(1);
   }
   

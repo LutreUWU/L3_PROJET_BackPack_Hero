@@ -13,19 +13,28 @@ import model.Item;
 import model.Rarity;
 import model.Synergy;
 import model.XY;
+import model.item.ItemStats;
 import model.monster.Enemy;
 
-public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item {
+public record Bomb(XY[] shape, Direction direction, ItemStats info, int durability) implements Item {
+	private static final int DURABILITY = 1;
+	private static final Rarity RARITY_VALUE = Rarity.RARE;
+	private static final int ID_VALUE = 12;
+	private static final int SCORE_VALUE = 25;
+	private static final int AP_VALUE = 2;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+	
 	public Bomb() {
-		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.COMMON, 12, 25, 1, 2);
+		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, DURABILITY);
 	}
 
 	public Bomb(XY[] shape, Direction direction, int durability) {
-		this(shape, direction, Rarity.COMMON, 12, 20, durability, 2);
+		this(shape, direction, ITEM_STATS, DURABILITY);
 	}
 	
 	public Bomb(XY coord, Direction direction, int durability) {
-		this(initShape(coord, direction), direction, Rarity.COMMON, 12, 20, durability, 2);
+		this(initShape(coord, direction), direction, ITEM_STATS, DURABILITY);
 	}
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -84,7 +93,6 @@ public record Bomb(XY[] shape, Direction direction, Rarity rarity, int ID, int s
 		for (var target : lstEnemy) {
 			target.subHP(6 + bonus);
 		}
-		data.hero().sub("energy", AP);
 		return subDurability(1);
 	}
 

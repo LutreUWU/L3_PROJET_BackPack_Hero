@@ -11,20 +11,30 @@ import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
+import model.item.ItemStats;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, int score, int durability, int AP) implements Item{
-		public Mimicry() {
-	    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, Rarity.MYTHIC, 5, 100, 2, 2);
-	  }
+public record Mimicry(XY[] shape, Direction direction, int durability, ItemStats info) implements Item{
+	private static final int DURABILITY = 2;
+	private static final Rarity RARITY_VALUE = Rarity.MYTHIC;
+	private static final int ID_VALUE = 5;
+	private static final int SCORE_VALUE = 100;
+	private static final int AP_VALUE = 2;
+	private static final int MANA_VALUE = 0;
+	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
+	
+	
+	public Mimicry() {
+    this(initShape(new XY(0, 0), Direction.UP), Direction.UP, DURABILITY, ITEM_STATS);
+  }
 	
 		public Mimicry(XY[] shape, Direction direction, int durability) {
-      this(shape, direction, Rarity.MYTHIC, 5, 100, durability, 2);
+      this(shape, direction, durability, ITEM_STATS);
     }
 		
 		public Mimicry(XY coord, Direction direction, int durability) {
-      this(initShape(coord, direction), direction, Rarity.MYTHIC, 5, 100, durability, 2);
+      this(initShape(coord, direction), direction, durability, ITEM_STATS);
     }
 
     private static XY[] initShape(XY coord, Direction direction) {
@@ -88,7 +98,6 @@ public record Mimicry(XY[] shape, Direction direction, Rarity rarity, int ID, in
       GameDataCombat.addLog("Le héro FOUDROIE " + enemy + " (-30PV), mais en échange de 5PV");
       GameDataHero.sub("hp", 5);
       enemy.subHP(30);
-      data.hero().sub("energy", AP);
       return subDurability(1);
     }
     

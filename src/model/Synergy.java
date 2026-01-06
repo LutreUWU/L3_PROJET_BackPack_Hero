@@ -40,7 +40,7 @@ public class Synergy {
 					if (indexInBagPack(data, coord.x() + i, coord.y() + j)) {
 						var itemNeighbor = data.bag().getItem(coord.x() + i, coord.y() + j);
 						// IO.println(coord.x() + i + " : " + (coord.y() + j) + " ITEM " + itemNeighbor);
-						if (itemNeighbor != null && itemNeighbor.ID() == item.ID()) {
+						if (itemNeighbor != null && itemNeighbor.info().ID() == item.info().ID()) {
 							neighbor.add(itemNeighbor);
 							// IO.println(coord.x() + i + " : " + (coord.y() + j));
 						}
