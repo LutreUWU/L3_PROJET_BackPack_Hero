@@ -211,6 +211,7 @@ public class GameController {
 	 * @param mouseY coordY of the mouse.
 	 */
 	private static void newDragItem(GameData data, Item item, int mouseX, int mouseY) {
+		data.bag().updateManaConnected();
 		if (data.bag().bagItemLst().contains(item)) {
 			switch(item) {
 			case Curse _ -> {}
@@ -291,6 +292,7 @@ public class GameController {
 			int y = mouse.y();
 			GameDataClick.clickUp(x, y);
 			data.setDragItem(null);
+			data.bag().updateManaConnected();
 		}
 	}
 	

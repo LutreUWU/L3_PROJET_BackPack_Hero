@@ -140,6 +140,7 @@ public class GameDataCombat {
 				}
 			}
 		}
+		data.bag().updateManaConnected();
 	}
 	
 	/**

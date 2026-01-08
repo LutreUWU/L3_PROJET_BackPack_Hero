@@ -228,8 +228,9 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    */
   private void drawManaGrid(Graphics2D graphics, GameData data) {
     int size = data.bag().getGridSize();
-		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box(); 
-		for (XY coord : data.bag().getManaConnectedCoords(data.bag().getManaStone())) {
+		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box();
+		
+		for (XY coord : data.bag().getManaConnectedCoords()) {
   		graphics.drawImage(imgLoader.bgImages().get("BG_BAG_MANA"), boundingBox.northWest().x() + (size * coord.x()), boundingBox.northWest().y() + (size * coord.y()), size, size, null);
 		}
 	}

@@ -20,9 +20,11 @@ public class Backpack {
 			{ -2, -2, -1, -1, -1, -2, -2 }, { -2, -1, -1, -1, -1, -1, -2 }, { -2, -1, -1, -1, -1, -1, -2 },
 			{ -2, -1, -1, -1, -1, -1, -2 }, { -2, -2, -1, -1, -1, -2, -2 } };
 
-	private int gridSize;
-	private ArrayList<Item> bagItemLst = new ArrayList<>(); // List of items I have (Index = ID)
+	final private int gridSize;
+	final private ArrayList<Item> bagItemLst = new ArrayList<>(); // List of items I have (Index = ID)
 	private int caseUnlock = 0; // Number of case we can currently unlock.
+	final private Set<XY> connected = new HashSet<>();
+	final private Set<Item> connectedItem = new HashSet<>();
 
 	public Item getItem(int x, int y) {
 		var itemFromBag = bagItemLst.stream()
@@ -62,9 +64,10 @@ public class Backpack {
 	}
 
 	public int getManaInBag() {
-		return bagItemLst.stream().filter(item -> item instanceof ManaStone).mapToInt(item -> ((ManaStone) item).value()).sum();
+		return bagItemLst.stream().filter(item -> item instanceof ManaStone).mapToInt(item -> ((ManaStone) item).value())
+				.sum();
 	}
-	
+
 	public int getGoldInBag() {
 		return bagItemLst.stream().filter(item -> item instanceof Gold).mapToInt(item -> ((Gold) item).value()).sum();
 	}
@@ -179,30 +182,44 @@ public class Backpack {
 		return false;
 	}
 
+	/**
+	 * Get all coord arround an item
+	 * 
+	 * @param xy
+	 * @return list of coord arrount the item with coord xy
+	 */
 	private Set<XY> getArround(XY xy) {
 		Set<XY> arround = new HashSet<>();
 		for (var coord : getItem(xy.x(), xy.y()).shape()) {
 			for (int i = -1; i < 2; i++) {
 				for (int j = -1; j < 2; j++) {
 					if (i == 0 || j == 0) {
-						arround.add(new XY(coord.x() + i, coord	.y() + j));
+						arround.add(new XY(coord.x() + i, coord.y() + j));
 					}
 				}
 			}
 		}
 		return arround;
 	}
-	
-	public List<Item> getManaStone() {
-		return bagItemLst.stream()
-														.filter(t -> t.info().ID() == 16)
-														.toList();
+
+	/**
+	 * Get all mana stone
+	 * 
+	 * @return a list of mana stone
+	 */
+	private List<Item> getManaStone() {
+		return bagItemLst.stream().filter(t -> t.info().ID() == 16).toList();
 	}
 
-	public Set<XY> getManaConnectedCoords(List<Item> manaStones) {
+	/**
+	 * Update all coord where mana can be found. Update all Item that can use mana.
+	 */
+	public void updateManaConnected() {
+		connected.clear();
+		connectedItem.clear();
+		var manaStones = getManaStone();
 		List<XY> queue = new ArrayList<>();
 		Set<XY> visited = new HashSet<>();
-		Set<XY> connected = new HashSet<>();
 		for (Item mana : manaStones) {
 			for (XY coord : mana.shape()) {
 				queue.add(coord);
@@ -218,8 +235,8 @@ public class Backpack {
 					if (!inBackpack(acc.x(), acc.y())) {
 						Item item = getItem(acc.x(), acc.y());
 						if (item != null) {
+							connectedItem.add(item); // An item can use mana even if it is not conductive
 							if (item.isConductive()) {
-								
 								queue.add(acc);
 								connected.add(acc);
 							}
@@ -230,23 +247,18 @@ public class Backpack {
 			}
 			queue.remove(0);
 		}
-		return connected;
 	}
-	
+
 	/**
-	 * Check if the item is connected to a manastone 
-	 * in the bag.
+	 * Check if the item is connected to a manastone in the bag.
 	 * 
 	 * @param item {@code Item} we wants to check
 	 * @return true if connected to a manastone, else false
 	 */
 	public boolean itemConnectedToMana(Item item) {
-		if (item.info().mana() == 0) {
-			return true;
-		}
-		return true;
+		return connectedItem.contains(item);
 	}
-	
+
 	/**
 	 * Remove an item from the backpack
 	 * 
@@ -275,5 +287,9 @@ public class Backpack {
 
 	public void addCaseUnlock(int value) {
 		caseUnlock += value;
+	}
+
+	public Set<XY> getManaConnectedCoords() {
+		return Set.copyOf(connected);
 	}
 }
