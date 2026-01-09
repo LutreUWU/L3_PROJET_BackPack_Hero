@@ -15,6 +15,7 @@ public class Hero {
 	private int manaPoint = 0;
 	private int maxManaPoint = 3;
 	private int curseRefuse = 0;
+	private float boostDmg = 0;
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;
@@ -147,6 +148,26 @@ public class Hero {
 	public int getLevel() {
 		return level;
 	}
+	
+	public float getBoostDmg() {
+		return boostDmg;
+	}
+	
+	public void resetBoostDmg() {
+		boostDmg = 0;
+	}
+	
+	public void addBoostDmg(int value) {
+		if (value <= 0) throw new IllegalArgumentException("! VALUE MUST BE NOT NEGATIVE !");
+		boostDmg += value;
+	}
+	
+	public void subBoostDmg(int value) {
+		if (value <= 0) throw new IllegalArgumentException("! VALUE MUST BE NOT NEGATIVE !");
+		boostDmg -= value;
+	}
+	
+	
 	
 	public void setHP(int value) {
 		HP = value;

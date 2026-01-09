@@ -10,6 +10,7 @@ import model.Hero;
 import model.RandomItem;
 import model.item.common.Gold;
 import model.item.common.KeyDoor;
+import model.item.rare.Cookie;
 import model.item.superrare.Massue;
 import model.map.Exit;
 import model.map.Healer;
@@ -57,15 +58,16 @@ public class Consequence {
 	public void applyConsequence(GameData data) {
 		var hero = data.hero();
 		switch (idConsequence) {
-		case "sub_hp" -> conseqSubHP(hero);
-		case "add_gold" -> GameDataClick.addDragItem(new Gold(floor * 5 * (int) bonus));
-		case "add_weapon" -> GameDataClick.addDragItem(RandomItem.generate(data.floor()));
+		case "subHP" -> conseqSubHP(hero);
+		case "addGold" -> GameDataClick.addDragItem(new Gold(floor * 5 * (int) bonus));
+		case "addWeapon" -> GameDataClick.addDragItem(RandomItem.generate(data.floor()));
 		case "key" -> consequenceKeyEvent(data);
 		case "lifeExchangeGold" -> consequenceHealer(data);
 		case "openTreasure" -> consequenceTreasure(data);
 		case "floor" -> data.newFloor();
 		case "curseInBag" -> GameDataClick.addDragItem(new Curse());
 		case "curseNotInBag" -> consequenceCurseEvent(data);
+		case "cookie" -> GameDataClick.addDragItem(new Cookie());
 		case null -> {
 			GameDataCombat.startCombat(enemyList, data);
 			var heroPos = data.map().getHeroPos();

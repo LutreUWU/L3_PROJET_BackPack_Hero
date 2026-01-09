@@ -69,6 +69,7 @@ public class GameDataCombat {
 	}
 	
 	private static void useAllPassive(GameData data) {
+		data.hero().resetBoostDmg();
 		ListIterator<Item> it = data.bag().bagItemLst().listIterator();
 		while (it.hasNext()) {
 			var item = it.next();

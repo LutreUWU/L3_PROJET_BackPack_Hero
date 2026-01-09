@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import game.GameData;
+import model.monster.Chicken;
 import model.monster.Enemy;
 import model.monster.Robot;
 import model.monster.Soldat;
@@ -14,7 +15,7 @@ public class LinkedEvent {
 
 	private NodeEvent root;
 	private NodeEvent initialRoot;
-	private final int totalEvent = 1;
+	private final int TOTAL_EVENT = 3;
 
 	/**
 	 * Constructor to create all linkedEvent
@@ -25,7 +26,7 @@ public class LinkedEvent {
 	 */
 	public LinkedEvent(int floor, String whatEvent) {
 		switch (whatEvent) {
-		case "eventRoom" -> createEventForEventRoom(floor);
+		case "eventRoom" -> createEventForEventRoom(floor); // Random Event
 		case "exitRoom" -> createEventForExitRoom(floor);
 		case "lockedDoor" -> createEventForLockedRoom(floor);
 		case "healerRoom" -> createEventForHealerRoom(floor);
@@ -43,9 +44,11 @@ public class LinkedEvent {
 	 */
 	private void createEventForEventRoom(int floor) {
 		Random rand = new Random();
-		var x = rand.nextInt(totalEvent) + 1;
+		var x = rand.nextInt(TOTAL_EVENT) + 1;
 		switch (x) {
 		case 1 -> event1(floor);
+		case 2 -> event2(floor);
+		case 3 -> event3(floor);
 		default -> {
 		}
 		}
@@ -127,7 +130,7 @@ public class LinkedEvent {
 	}
 
 	/**
-	 * Create an event
+	 * Create an event with Revuz
 	 * 
 	 * @param current floor
 	 */
@@ -137,10 +140,10 @@ public class LinkedEvent {
 		var choiceOne = new NodeEvent("Le C c'est trop cool !", "Et tu en fais souvent ?");
 		root.setChoice1(choiceOne);
 
-		var choiceOneOne = createNodeWithConsequence("Oui j'en fait souvent !", floor, 1.5, "add_weapon",
+		var choiceOneOne = createNodeWithConsequence("Oui j'en fait souvent !", floor, 1.5, "addWeapon",
 				"C'est bien continu ! J'ai même un petit cadeau pour toi !\nVoici une arme!");
 		choiceOne.setChoice1(choiceOneOne);
-		var choiceOneTwo = createNodeWithConsequence("Non presque jamais...", floor, 1, "add_gold",
+		var choiceOneTwo = createNodeWithConsequence("Non presque jamais...", floor, 1, "addGold",
 				"Dommage c'est vachement cool pourtant...\nJe viens de te donner de l'or");
 		choiceOne.setChoice2(choiceOneTwo);
 		// BAD CHOICE
@@ -155,6 +158,40 @@ public class LinkedEvent {
 				"On peut dire que c'est réciproque...\n*M. Revuz veut se battre !*");
 		choiceTwo.setChoice2(choiceTwoTwo);
 	}
+	
+	/**
+	 * Create an event at the Crous
+	 * 
+	 * @param current floor
+	 */
+	private void event2(int floor) {
+		root = new NodeEvent(null, "Vous arrivez au Crous. \"T'es boursier?\"");
+		
+		var choiceOne = createNodeWithConsequence("Oui", floor, 1, "cookie",
+				"C'est mon dernier cookie de la journée, tient cadeau !");
+		root.setChoice1(choiceOne);
+		
+		var choiceTwo = createNodeWithConsequence("Non. *Mettre un cookie dans le sac et partir*", floor, 1, new ArrayList<Enemy>(List.of(new Chicken())), "\"EH ! Je t'ai vu!\" *CrousChicken reprend le cookie et engage le combat*");
+		root.setChoice2(choiceTwo);
+	}
+	
+	/**
+	 * Create an event with a goblin
+	 * 
+	 * @param current floor
+	 */
+	private void event3(int floor) {
+		root = new NodeEvent(null, "Vous trouvez un goblin, que voulez vous faire ?");
+		
+		var choiceOne = createNodeWithConsequence("Lui demander gentillement de l'or", floor, 1, "addGold",
+				"Il vous donne un peu d'or, la violence ne résout rien :)");
+		root.setChoice1(choiceOne);
+		
+		var choiceTwo = createNodeWithConsequence("Coup de tête balayette", floor, 2, "addGold", "Vous l'assommez avant de dépouiller son or");
+		root.setChoice2(choiceTwo);
+	}
+	
+	
 
 	/**
 	 * Create the node with the consequences

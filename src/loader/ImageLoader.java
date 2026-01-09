@@ -71,6 +71,7 @@ public record ImageLoader(Map<String, BufferedImage> bgImages, Map<Integer, Buff
 	  case "fireBall" -> 15;
 	  case "manaStone" -> 16;
 	  case "enchantedDiamondSword" -> 17;
+	  case "cookie" -> 18;
 		default -> throw new IllegalArgumentException("Unexpected value: " + name);
 		};
 	}

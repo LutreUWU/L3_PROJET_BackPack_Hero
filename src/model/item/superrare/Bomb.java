@@ -86,12 +86,13 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 
 	@Override
 	public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-		Synergy.checkSynergie(data, this);
+		Synergy.checkSynergie(data, this); // Check bonus
 		var bonus = Synergy.getBonusDmg();
-		GameDataCombat.addLog("EXPLOSION ! Chaque ennemi perd 6 PV");
+		var dmg = (int) (6 * (1 + data.hero().getBoostDmg() / 100)); 
+		GameDataCombat.addLog("EXPLOSION ! Chaque ennemi perd " + dmg + " HP");
 		if (bonus != 0) GameDataCombat.addLog("SYNERGIE ! Chaque ennemi perd " + bonus + " PV supplémentaire(s)");
 		for (var target : lstEnemy) {
-			target.subHP(6 + bonus);
+			target.subHP(dmg + bonus);
 		}
 		return subDurability(1);
 	}

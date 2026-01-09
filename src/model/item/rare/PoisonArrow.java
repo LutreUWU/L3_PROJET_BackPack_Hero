@@ -86,8 +86,9 @@ public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int d
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
-  		GameDataCombat.addLog("Vous tirez sur l'ennemi (-6HP) ! Et vous l'empoisonnez !");
-      enemy.subHP(6);
+  		var dmg = (int) (6 * (1 + data.hero().getBoostDmg() / 100)); 
+  		GameDataCombat.addLog("Vous tirez sur l'ennemi (-" + dmg + "HP) ! Et vous l'empoisonnez !");
+      enemy.subHP(dmg);
       enemy.addEffect(effect, 3);
       // Sub durability to the bow
       var bow = data.bag().bagItemLst().stream()

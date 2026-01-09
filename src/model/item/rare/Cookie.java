@@ -17,24 +17,24 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
-public record FireBall(XY[] shape, Direction direction, int durability, ItemStats info, Effect effect) implements Item{
-	private static final int DURABILITY = 2;
+public record Cookie(XY[] shape, Direction direction, int durability, ItemStats info, Effect effect) implements Item{
+	private static final int DURABILITY = -1;
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
-	private static final int ID_VALUE = 15;
+	private static final int ID_VALUE = 18;
 	private static final int SCORE_VALUE = 20;
-	private static final int AP_VALUE = 2;
+	private static final int AP_VALUE = 0;
 	private static final int MANA_VALUE = 0;
 	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
 	
-	public FireBall() {
+	public Cookie() {
     this(initShape(new XY(0, 0), Direction.UP), Direction.UP, DURABILITY, ITEM_STATS, Effect.FIRE);
   }
 
-	public FireBall(XY[] shape, Direction direction, int durability, Effect effect) {
+	public Cookie(XY[] shape, Direction direction, int durability, Effect effect) {
     this(shape, direction, durability, ITEM_STATS, effect);
   }
 	
-	public FireBall(XY coord, Direction direction, int durability, Effect effect) {
+	public Cookie(XY coord, Direction direction, int durability, Effect effect) {
     this(initShape(coord, direction), direction, durability, ITEM_STATS, effect);
   }
 
@@ -59,13 +59,13 @@ public record FireBall(XY[] shape, Direction direction, int durability, ItemStat
   @Override
   public Item addDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new FireBall(shape, direction, durability + nb, effect); 
+  	return new Cookie(shape, direction, durability + nb, effect); 
   }
   
   @Override
   public Item subDurability(int nb) {
   	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
-  	return new FireBall(shape, direction, durability - nb, effect); 
+  	return new Cookie(shape, direction, durability - nb, effect); 
   }
   
   @Override
@@ -74,33 +74,29 @@ public record FireBall(XY[] shape, Direction direction, int durability, ItemStat
   }
   
   @Override
-  public FireBall setXY(XY coord) {
-    return new FireBall(coord, direction, durability, effect);
+  public Cookie setXY(XY coord) {
+    return new Cookie(coord, direction, durability, effect);
   }
   
   @Override
   public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-  	return new FireBall(shape, direction, durability, effect);
+  	data.hero().addBoostDmg(10);
+  	return new Cookie(shape, direction, durability, effect);
   }
 
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-  	var dmg = (int) (6 * (1 + data.hero().getBoostDmg() / 100)); 
-		GameDataCombat.addLog("Tous les ennemies perdent de la vie (-" + dmg + "HP) et sont brulés");
-		for (var target : lstEnemy) {
-			target.subHP(dmg);
-			target.addEffect(effect, 3);
-		}
-    return subDurability(1);
+  	GameDataCombat.addLog("Ce cookie est congelé, il se mange pas...");
+    return new Cookie(shape, direction, durability, effect);
   }
   
   @Override
-  public FireBall rotateXY() {
-    return new FireBall(rotate90(shape(), shape()[0]), direction.next(), durability, effect);
+  public Cookie rotateXY() {
+    return new Cookie(rotate90(shape(), shape()[0]), direction.next(), durability, effect);
   }
 
   @Override
   public String toString() {
-    return "Boule de feu";
+    return "Cookie";
   }
 }

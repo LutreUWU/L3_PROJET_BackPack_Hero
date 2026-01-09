@@ -93,8 +93,9 @@ public record EnchantedDiamondSword(XY[] shape, Direction direction, int durabil
 
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-    GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée DIVINE");
-    enemy.subHP(10);
+  	var dmg = (int) (8 * (1 + data.hero().getBoostDmg() / 100)); 
+    GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée DIVINE (-" + dmg + "HP)");
+    enemy.subHP(dmg);
     return subDurability(1);
   }
   

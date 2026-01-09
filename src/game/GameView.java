@@ -40,6 +40,7 @@ import model.item.epic.EnchantedDiamondSword;
 import model.item.epic.Shield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
+import model.item.rare.Cookie;
 import model.item.rare.FireBall;
 import model.item.rare.Gant;
 import model.item.rare.ManaStone;
@@ -264,7 +265,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 				case 11 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
 				case 12 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
 				case 13 -> drawInBagSpecial(graphics, new XY(coordinate.x() - 1, coordinate.y()), 3, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.2); 
-				case 14, 15, 16 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+				case 14, 15, 16, 18 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
 				case 17 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.75); 
 				default ->{}
 		  }
@@ -316,6 +317,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case FireBall _ -> "Ca chauffe !!";
 	  	case ManaStone _ -> "Le mana se propage entre les éléments conduteurs (ceux avec du métal)";
 	  	case EnchantedDiamondSword _ -> "Une épée DIVINE";
+	  	case Cookie _ -> "Cookie congelé du crous ! Il est incassable !";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.info().ID());
   	};
   }
@@ -345,6 +347,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  	case FireBall _ -> "Inflige -6PV à l'ennemi et enflamme l'ennemi";
 	  	case ManaStone m -> "Cette pierre contient " + m.value() + " mana !";
 	  	case EnchantedDiamondSword _ -> "Inflige -8PV à l'ennemi (nécessite 1 point de Mana)";
+	  	case Cookie _ -> "Augmente de 10% les dégats !";
 	  	default -> throw new IllegalArgumentException("Unexpected value: " + item.info().ID());
   	};
   }
@@ -381,7 +384,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		  graphics.setColor(Color.GREEN);
 		  drawTextInfo(graphics, "AP : " + item.info().AP(), NW.x(), NW.y() + height / 4, 20);
 		  drawTextInfo(graphics, "MANA : " + item.info().mana(), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 1.5), 20);
-		  drawTextInfo(graphics, "Durability : " + item.durability(), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 3), 20);
+		  var durabilityText = item.durability() == -1 ? "Infiny" : item.durability();
+		  drawTextInfo(graphics, "Durability : " + durabilityText, NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 3), 20);
 		  graphics.setColor(Color.WHITE);
 		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 5), 23);
 		}
@@ -496,6 +500,9 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     drawHeroLevel(graphics, data);
     drawHeroGold(graphics, data);
     drawFloorLevel(graphics, data);
+    if (GameDataCombat.combat()) {
+    	drawHeroBoost(graphics, data);
+    }
   }
   
   private void drawHeroHP(Graphics2D graphics, GameData data) {
@@ -545,6 +552,28 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.drawImage(img, render.transform() , null);
 	  graphics.setColor(Color.CYAN);
 	  graphics.drawString((GameDataCombat.combat() ? GameDataCombat.getNbMana()  : data.bag().getManaInBag()) + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
+  }
+  
+  private void drawHeroBoost(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("ICON_BOOST");
+  	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
+  	int logoHeight = (int) (height * 0.04);
+  	int size = (int) (height * 0.03);
+    Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    BufferedImage img = imgLoader.bgImages().get("ICON_BOOST");
+    graphics.drawImage(img, render.transform() , null);
+    var boostDmg = data.hero().getBoostDmg();
+    String boostText;
+    if (boostDmg < 0) {
+    	graphics.setColor(Color.RED);
+    	boostText = boostDmg + "%";
+    } else {
+    	graphics.setColor(Color.GREEN);
+    	boostText = "+" + boostDmg + "%";
+    }
+	  
+	  graphics.drawString(boostText + " BOOST DMG" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
   private void drawHeroAction(Graphics2D graphics, GameData data) {
@@ -728,7 +757,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 			case 11 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
 			case 12 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
 			case 13 -> drawDragSpecialItem(graphics, box.northWest(), 3, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.2); 
-			case 14, 15, 16 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
+			case 14, 15, 16, 18 -> drawDragItem(graphics, box.northWest(), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
 			case 17 -> drawDragSpecialItem(graphics, box.northWest(), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.75); 
 			default ->{}
 	  }

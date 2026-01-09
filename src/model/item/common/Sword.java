@@ -94,8 +94,9 @@ public record Sword(XY[] shape, Direction direction, int durability, ItemStats i
 
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-    GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée");
-    enemy.subHP(3);
+    var dmg = (int) (3 * (1 + data.hero().getBoostDmg() / 100)); 
+    enemy.subHP(dmg);
+    GameDataCombat.addLog("Le héro tranche " + enemy + " avec l'épée (-" + dmg + "HP)");
     return subDurability(1);
   }
   

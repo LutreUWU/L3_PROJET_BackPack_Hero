@@ -95,8 +95,9 @@ public record DespairShield(XY[] shape, Direction direction, int durability, Ite
 
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-    GameDataCombat.addLog("Le héro gagne 10 Shield, mais en échange de 3PV ...");
-    enemy.subHP(3);
+  	var dmg = (int) (3 * (1 + data.hero().getBoostDmg() / 100));
+    GameDataCombat.addLog("Le héro gagne 10 Shield, mais en échange de " + dmg + "HP ...");
+    enemy.subHP(dmg);
     data.hero().add("protection", 10);
     return subDurability(1);
   }

@@ -95,9 +95,10 @@ public record Mimicry(XY[] shape, Direction direction, int durability, ItemStats
 
     @Override
     public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-      GameDataCombat.addLog("Le héro FOUDROIE " + enemy + " (-30PV), mais en échange de 5PV");
+    	var dmg = (int) (30 * (1 + data.hero().getBoostDmg() / 100));
+      GameDataCombat.addLog("Le héro FOUDROIE " + enemy + " (-" + dmg + "HP), mais en échange de 5PV");
       GameDataHero.sub("hp", 5);
-      enemy.subHP(30);
+      enemy.subHP(dmg);
       return subDurability(1);
     }
     

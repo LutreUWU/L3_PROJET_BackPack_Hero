@@ -93,8 +93,9 @@ public record Axe(XY[] shape, Direction direction, int durability, ItemStats inf
 
     @Override
     public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-      GameDataCombat.addLog("Le héro EXPLOSE " + enemy + " avec SA GROSSE HACHE (-10PV)");
-      enemy.subHP(10);
+    	var dmg = (int) (10 * (1 + data.hero().getBoostDmg() / 100)); 
+      GameDataCombat.addLog("Le héro EXPLOSE " + enemy + " avec SA GROSSE HACHE (-" + dmg + "HP)");
+      enemy.subHP(dmg);
       return subDurability(1);
     }
     

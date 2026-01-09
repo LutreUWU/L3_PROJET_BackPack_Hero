@@ -25,7 +25,10 @@ import model.Curse;
 import model.Item;
 import model.XY;
 import model.item.epic.EnchantedDiamondSword;
+import model.item.legendary.Axe;
+import model.item.rare.Cookie;
 import model.item.rare.ManaStone;
+import model.item.superrare.Bomb;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -129,6 +132,7 @@ public class GameController {
 				var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
 				data.setShortestPath(shortestPath);
 				data.map().setHeroPos(coord);
+		
 				var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
 				switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
 				case EnemyRoom enemyRoom -> {
@@ -315,8 +319,10 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
+				 GameDataClick.addDragItem(new Axe());
 				 GameDataClick.addDragItem(new ManaStone(2));
 				 GameDataClick.addDragItem(new EnchantedDiamondSword());
+				 GameDataClick.addDragItem(new Cookie());
 			}
 		}
 		case Key.I -> {

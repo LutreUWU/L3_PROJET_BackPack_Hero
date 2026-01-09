@@ -95,9 +95,9 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
 
     @Override
     public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-      GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-5PV)");
-      enemy.subHP(5);
-      data.hero().sub("energy", info.AP());
+    	var dmg = (int) (5 * (1 + data.hero().getBoostDmg() / 100)); 
+      GameDataCombat.addLog("Le héro bonk " + enemy + " avec la massue (-" + dmg +"HP)");
+      enemy.subHP(dmg);
       return subDurability(1);
     }
     

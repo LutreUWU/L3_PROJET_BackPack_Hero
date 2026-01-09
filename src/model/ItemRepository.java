@@ -10,9 +10,11 @@ import model.item.common.Arrow;
 import model.item.common.Gold;
 import model.item.epic.Bow;
 import model.item.epic.DespairShield;
+import model.item.epic.EnchantedDiamondSword;
 import model.item.epic.Shield;
 import model.item.legendary.Axe;
 import model.item.mythic.Mimicry;
+import model.item.rare.Cookie;
 import model.item.rare.FireBall;
 import model.item.rare.Gant;
 import model.item.rare.ManaStone;
@@ -33,10 +35,12 @@ public class ItemRepository {
   	  registerWeapon(new Gant()); // Rare
   	  registerWeapon(new PoisonArrow()); // Rare
   	  registerWeapon(new FireBall()); // Rare
-  	  registerWeapon(new ManaStone(2)); // Rare 
+  	  registerWeapon(new ManaStone(2)); // Rare
+  	  registerWeapon(new Cookie()); // Rare 
   	  registerWeapon(new Massue()); // SuperRare
   	  registerWeapon(new Bomb()); // SuperRare
   	  registerWeapon(new DespairShield()); // Epic
+  	  registerWeapon(new EnchantedDiamondSword()); // Epic
   	  registerWeapon(new Shield()); // Epic
   	  registerWeapon(new Bow()); // Epic
   	  registerWeapon(new Axe()); // Legendary

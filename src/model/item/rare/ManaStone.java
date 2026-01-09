@@ -63,7 +63,7 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int val
   
   @Override
   public boolean canMerge() {
-  	return true;
+  	return false;
   }
   
   @Override

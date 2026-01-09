@@ -83,8 +83,11 @@ public record Arrow(XY[] shape, Direction direction, int durability, ItemStats i
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	if (Synergy.checkSynergie(data, this)) {
-  		GameDataCombat.addLog("Vous tirez sur l'ennemi (-8HP) !");
-      enemy.subHP(8);
+  		var dmg = (int) (8 * ( 1 + data.hero().getBoostDmg() / 100)); 
+  		enemy.subHP(dmg);
+  		GameDataCombat.addLog("Vous tirez sur l'ennemi (-" + dmg + "HP) !");
+  		
+      
       // Sub durability to the bow
       var bow = data.bag().bagItemLst().stream()
 																				.filter(item -> item.info().ID() == 10)
