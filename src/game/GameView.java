@@ -8,6 +8,9 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -1297,9 +1300,74 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		if (data.event() != null) {
 			drawEvent(graphics, data);	
 		}
- }
+  }
   
   public static void draw(ApplicationContext context, GameData data, GameView view) {
 		context.renderFrame(graphics -> view.draw(graphics, data));
 	}
+  
+  /**
+   * Methods for drawing the game 
+   * 
+   * @param context		{@code ApplicationContext} of the game.
+   * @param data			GameData containing the game data. 
+   */
+  private void drawLobby(Graphics2D graphics, GameData data) {
+		BufferedImage img = imgLoader.bgImages().get("BG_LOBBY");
+		graphics.drawImage(img, MathLoader.getMapEvent().get("BG_LOBBY").transform(), null);
+		drawButtonLobby(graphics);
+		if (data.getScore()) {
+			drawScore(graphics, data);
+		}
+  }
+  
+  public void drawScore(Graphics2D graphics, GameData data) {
+  	BufferedImage img = imgLoader.bgImages().get("BG_SCORE");
+		graphics.drawImage(img, MathLoader.getMapEvent().get("HOF").transform(), null);
+  	Path scoreFile = Path.of("data", "score");
+    try {
+      printAllLines(scoreFile, graphics, data);
+	  } catch (IOException e) {
+	    IO.println("Impossible de lire le fichier des scores.");
+	  }
+  }
+  
+  private void printAllLines(Path path, Graphics2D graphics, GameData data) throws IOException {
+  	int nbScore = 0;
+  	var boundingBox = MathLoader.getMapEvent().get("HOF").box();
+  	int size = FontLoader.getH2();
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH2());
+  	graphics.setFont(font);
+  	graphics.setColor(Color.WHITE);
+  	try (var reader = Files.newBufferedReader(path)) {
+        String line;
+        for (nbScore = 0; nbScore < 10;) {
+        	if((line = reader.readLine()) == null) {
+        		break;
+        	}
+        	graphics.drawString(line, boundingBox.northWest().x() + (int) (width * 0.01), boundingBox.northWest().y() + (int) (height * 0.01) + size * (nbScore + 1));
+          nbScore++;
+        }
+    }
+  	if (nbScore == 0) {
+      graphics.drawString("Aucun score", boundingBox.northWest().x(), boundingBox.northWest().y() + size);
+  	}
+}
+  
+  private void drawButtonLobby(Graphics2D graphics) {
+  	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
+  	graphics.setFont(font);
+  	var boundingBox = MathLoader.getMapEvent().get("START_GAME").box();
+  	graphics.setColor(Color.WHITE);
+    graphics.drawString("DEBUTER", boundingBox.northWest().x(), boundingBox.southEast().y());
+    boundingBox = MathLoader.getMapEvent().get("HOF_BUTTON").box();
+    graphics.drawString("HALL OF FAME", boundingBox.northWest().x(), boundingBox.southEast().y());
+    boundingBox = MathLoader.getMapEvent().get("LEAVE_BUTTON").box();
+    graphics.drawString("QUITTER", boundingBox.northWest().x(), boundingBox.southEast().y());
+  }
+  
+  public static void drawLobby(ApplicationContext context, GameData data, GameView view) {
+  	context.renderFrame(graphics -> view.drawLobby(graphics, data));
+  }
+  
 }

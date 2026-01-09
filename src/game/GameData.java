@@ -23,6 +23,8 @@ import model.map.eventManager.LinkedEvent;
  * 
  */
 public class GameData {
+  private boolean scoreLobby = false;
+	
   private static Backpack backpack;
   private static Floor map;
   private static Hero hero;
@@ -219,5 +221,13 @@ public class GameData {
 	
 	public boolean getBin() {
 		return onBin;
+	}
+	
+	public void setScore(boolean statut) {
+		this.scoreLobby = statut;
+	}
+	
+	public boolean getScore() {
+		return scoreLobby;
 	}
 }

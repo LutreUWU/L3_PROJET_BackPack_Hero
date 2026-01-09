@@ -14,22 +14,22 @@ import model.item.ItemStats;
 import model.item.legendary.Axe;
 import model.monster.Enemy;
 
-public record ManaStone(XY[] shape, Direction direction, ItemStats info, int maxMana, int value) implements Item {
+public record ManaStone(XY[] shape, Direction direction, ItemStats info, int value) implements Item {
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
 	private static final int ID_VALUE = 16;
 	private static final int SCORE_VALUE = 15;
 	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, 0, 0);
 	
 	public ManaStone(int value) {
-		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, value, value);
+		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, value);
   }
 
-	public ManaStone(XY[] shape, Direction direction, int maxMana, int value) {
-		this(shape, direction, ITEM_STATS, maxMana, value);
+	public ManaStone(XY[] shape, Direction direction, int value) {
+		this(shape, direction, ITEM_STATS, value);
 	}
 	
-	public ManaStone(XY coord, Direction direction, int maxMana, int value) {
-    this(initShape(coord, direction), direction, ITEM_STATS, maxMana, value);
+	public ManaStone(XY coord, Direction direction, int value) {
+    this(initShape(coord, direction), direction, ITEM_STATS, value);
   }
 
   private static XY[] initShape(XY coord, Direction direction) {
@@ -68,23 +68,23 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int max
   
   @Override
   public ManaStone setXY(XY coord) {
-    return new ManaStone(coord, direction, maxMana, value);
+    return new ManaStone(coord, direction, value);
   }
   
   @Override
   public Item usePassive(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
-  	return new ManaStone(shape, direction, maxMana, value);
+  	return new ManaStone(shape, direction, value);
   }
 
   @Override
   public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
   	GameDataCombat.addLog("Tu comptes lui jeter du mana dessus ????");
-  	return new ManaStone(shape, direction, maxMana, value);
+  	return new ManaStone(shape, direction, value);
   }
   
   @Override
   public ManaStone rotateXY() {
-    return new ManaStone(rotate90(shape(), shape()[0]), direction.next(), maxMana, value);
+    return new ManaStone(rotate90(shape(), shape()[0]), direction.next(), value);
   }
   
   @Override

@@ -238,7 +238,7 @@ public class GameDataCombat {
 		Objects.requireNonNull(hero);
 		lstEnemy.forEach(enemy -> enemy.action());
 		if(hero.getHP() == 0) {
-			// TO DO 
+			// FAIRE LA METHODE POUR AJOUTER LE SCORE DANS LE FICHIER TXT
 		}
 		GameDataHero.reset();
 		GameDataHero.add("energy", 3 - hero.getEnergyPoint());

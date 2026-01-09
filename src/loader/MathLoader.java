@@ -1,5 +1,7 @@
 package loader;
 
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
@@ -17,8 +19,6 @@ public class MathLoader {
 	private static int screenHeight;
 	private static GameData data;
 	private static ImageLoader imgLoader;
-
-	
 	private static LinkedHashMap<String, RenderData> renderDataGame = new LinkedHashMap<>();
 	
 	public MathLoader(GameData dataGame, ImageLoader imageLoader) {
@@ -27,6 +27,7 @@ public class MathLoader {
 		screenWidth = data.screenInfo().width();
 		screenHeight = data.screenInfo().height();
 		getBGValue();
+		getBGLobbyValue();
 		getIconHeroValue();
 		getBackpackValue();
 		getInfoItemValue();
@@ -37,6 +38,61 @@ public class MathLoader {
 		getShopValue();
 	}
 	
+	private static void getBGLobbyValue() {
+		getBGImgLobbyValue();
+		getStartButtonLobbyValue();
+		getHOFButtonLobbyValue();
+		getLeaveButtonLobbyValue();
+		getHOFLobbyValue();
+	}
+
+	private static void getStartButtonLobbyValue() {
+		int height = FontLoader.getH1();
+		int width = FontLoader.getH1() * 10;
+		XY NW = new XY((int) (screenWidth * 0.80), (int) (screenHeight * 0.25));
+		XY SE = new XY(NW.x() + width, NW.y() + height);
+		renderDataGame.put("START_GAME", new RenderData(null, new BoundingBox(NW, SE)));	
+	}
+	
+	private static void getHOFButtonLobbyValue() {
+		int height = FontLoader.getH1();
+		int width = FontLoader.getH1() * 10;
+		XY NW = new XY((int) (screenWidth * 0.80), (int) (screenHeight * 0.25 + height) );
+		XY SE = new XY(NW.x() + width, NW.y() + height);
+		renderDataGame.put("HOF_BUTTON", new RenderData(null, new BoundingBox(NW, SE)));	
+	}
+
+	private static void getLeaveButtonLobbyValue() {
+		int height = FontLoader.getH1();
+		int width = FontLoader.getH1() * 10;
+		XY NW = new XY((int) (screenWidth * 0.80), (int) (screenHeight * 0.25 + height * 2) );
+		XY SE = new XY(NW.x() + width, NW.y() + height);
+		renderDataGame.put("LEAVE_BUTTON", new RenderData(null, new BoundingBox(NW, SE)));	
+	}
+	
+	private static void getHOFLobbyValue() {
+		int height = (int) (FontLoader.getH2() * 10);
+		int width = (int) (screenWidth * 0.15);
+		XY NW = new XY((int) (screenWidth * 0.01), (int) (screenHeight * 0.99 - height) );
+		XY SE = new XY(NW.x() + width, NW.y() + height);
+		BufferedImage img = imgLoader.bgImages().get("BG_SCORE");
+		double scaleW = (double) (width) / img.getWidth();
+		double scaleH = (double) (height) / img.getHeight();
+    var transform = new AffineTransform();
+    transform.translate(NW.x(), NW.y());
+    transform.scale(scaleW, scaleH);
+		renderDataGame.put("HOF", new RenderData(transform, new BoundingBox(NW, SE)));	
+	}
+	
+	private static void getBGImgLobbyValue() {
+		BufferedImage img = imgLoader.bgImages().get("BG_LOBBY");
+		double scale =  (double) (screenWidth) / img.getWidth();
+    var transform = new AffineTransform();
+    transform.scale(scale, scale);
+		XY NW = new XY(0, 0);
+		XY SE = new XY(screenWidth, screenHeight);
+		renderDataGame.put("BG_LOBBY", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
 // ================= ICON =====================
 	private static void getIconHeroValue() {
   	double sizeY =  screenHeight * 0.04;
@@ -112,6 +168,7 @@ public class MathLoader {
 		XY SE = new XY(screenWidth, screenHeight);
 		renderDataGame.put(BG_name, new RenderData(transform, new BoundingBox(NW, SE)));
 	}
+
 // ============================================	
 
 	

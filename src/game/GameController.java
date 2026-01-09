@@ -1,6 +1,9 @@
 package game;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +43,7 @@ import model.monster.Soldat;
  * GameData, and dealing with time events.
  */
 public class GameController {
+	private static boolean inLobby = true;
 	/**
 	 * Default constructor, which does basically nothing.
 	 */
@@ -338,6 +342,65 @@ public class GameController {
 		return true;
 	}
 	
+	private static int gameLoopLobby(ApplicationContext context, GameData data, GameView view) {
+		Event event = context.pollOrWaitEvent(10);
+		if (event != null) {
+			switch (event) {
+				// Mouse event
+				case PointerEvent pointerEvent -> {
+					switch(pointerEvent.action()) {
+					case POINTER_UP -> {
+						int res = checkPointerUpLobby(context, pointerEvent.location());
+						switch(res) {
+						case 0 -> {
+							data.setScore(true);
+							GameView.drawLobby(context, data, view);
+						}
+						case 1 -> {
+							GameView.draw(context, data, view);
+							inLobby = false;
+						}
+						
+						}
+						return res;
+					}
+					default -> {}
+					
+					}
+				}
+				default -> {}
+			}
+		}
+		return 1;
+	}
+	
+	/**
+	 * Check and trigger all event when we're releasing the mouse
+	 *
+	 * @param data	{@code GameData} of the game.
+	 * @param mouse	{@code Location} containing the coordinate of the mouse.
+	 */
+	private static int checkPointerUpLobby(ApplicationContext context, Location mouse) {
+		var boundingBoxStart = MathLoader.getMapEvent().get("START_GAME").box();
+		var boundingBoxHOF = MathLoader.getMapEvent().get("HOF_BUTTON").box(); // TO DO
+		var boundingBoxLeave = MathLoader.getMapEvent().get("LEAVE_BUTTON").box(); // TO DO
+		int x = mouse.x();
+		int y = mouse.y();
+		if (boundingBoxStart.northWest().x() <= x && boundingBoxStart.southEast().x() >= x &&
+				boundingBoxStart.northWest().y() <= y && boundingBoxStart.southEast().y() >= y) {
+			return 1;
+		}
+		if (boundingBoxHOF.northWest().x() <= x && boundingBoxHOF.southEast().x() >= x &&
+				boundingBoxHOF.northWest().y() <= y && boundingBoxHOF.southEast().y() >= y) {
+			return 0;
+		}
+		if (boundingBoxLeave.northWest().x() <= x && boundingBoxLeave.southEast().x() >= x &&
+				boundingBoxLeave.northWest().y() <= y && boundingBoxLeave.southEast().y() >= y) {
+			return -1;
+		}
+		return -2;
+	}
+	
 	/**
 	 * Sets up the game, then launches the game loop.
 	 * 
@@ -350,16 +413,29 @@ public class GameController {
 		FontLoader.load_font(screenInfo);
 		new MathLoader(data, imageLoader);
 		var view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize(), imageLoader);
-		GameView.draw(context, data, view);
+		GameView.drawLobby(context, data, view);
+		int n = 1; 
 		while (true) {
-			if (!gameLoop(context, data, view)) {
+			if (inLobby) {
+				n = gameLoopLobby(context, data, view);
+			}
+			else {
+				if (!gameLoop(context, data, view)) {
+					GameView.drawLobby(context, data, view);
+					inLobby = true;
+					// A enlever, car théoriquement, on retourne aux lobby seulement si le héro meurt
+					// Si tu veux quitter directement avec E à l'intérieur du jeu, faut rajouter ça :
+					// n = -1;
+				}
+			}
+			if (n == -1) {
 				System.out.println("Thank you for quitting!");
 				context.dispose();
 				return;
 			}
 		}
 	}
-
+	
 	/**
 	 * Executable program.
 	 * 
