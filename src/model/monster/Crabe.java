@@ -9,11 +9,12 @@ import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Effect;
+import model.map.eventManager.LinkedEvent;
 
 /**
  * Class of a Chicken
  */
-public class Robot implements Enemy{
+public class Crabe implements Enemy{
 	/**
 	 * - HP :				 	When it reach 0, the enemy die
 	 * - Shield : 		Can mitigate damage received
@@ -21,16 +22,15 @@ public class Robot implements Enemy{
 	 * - lst_attack : List of all attack the enemy has 
 	 * - action : 		To register which action the enemy will do next turn
 	 */
-	final private int maxHP = 50;
 	private int HP = 50;
 	private int shield = 0;
 	private String action;
 	private final Map<Effect, Integer> effects = new HashMap<>();
-	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Hoo...", "HOHOHOH", "HEHEHEH"), 1.2, 1.2, "robot");
+	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Vomissement", "Pince"), 1.7, 1, "crabe");
 
 	@Override
 	public void resetStats() {
-		HP = maxHP;
+		HP = info.maxHP();
 		shield = 0;
 		effects.clear();
 	}
@@ -79,17 +79,14 @@ public class Robot implements Enemy{
 	@Override
 	public void action(GameData data) {
 		switch(action) {
-			case "Hoo..." -> {
-				this.subHP(3);
-				GameDataCombat.addLog("Robot n'a pas eu de chance et perd 3PV ...");
+			case "Vomissement" -> {
+				data.inEvent(new LinkedEvent(data.floor(), "curse"));
+				GameDataCombat.setCurseEvent(true);
+				GameDataCombat.addLog("Le crabe vomit sur le héro et lui crache une MALEDICTION");
 			}
-			case "HOHOHOH" -> {
-				GameDataHero.sub("HP", 15);
-				GameDataCombat.addLog("Robot est content et inflige 15PV au héro");
-			}
-			case "HEHEHEH" -> {
-				shield = 20;
-				GameDataCombat.addLog("Robot est peureux et gagne 20 de shield");
+			case "Pince" -> {
+				GameDataHero.sub("HP", 10);
+				GameDataCombat.addLog("Le crabe pince le héro et lui inflige -10PV");
 			}
 		}
 		preAction();
@@ -138,6 +135,6 @@ public class Robot implements Enemy{
 	
 	@Override
 	public String toString() {
-		return "Revuz PRIME";
+		return "Crabe toxique";
 	}
 }

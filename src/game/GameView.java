@@ -1305,6 +1305,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    */
   private void draw(Graphics2D graphics, GameData data) {
 		drawBG(graphics, data);
+		// Draw enemy if we're in combat
+
 		if (data.mapOrBag()) {
 			drawGrid(graphics, data);
 			drawItemBag(graphics, data);
@@ -1313,18 +1315,18 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 			if (data.getShop()) {
 				drawShop(graphics, data);
 			}
+			if (GameDataCombat.combat()) {
+				updateCombat(graphics, data, GameDataCombat.getLstEnemy());
+			}
 			if(!GameDataClick.getDragItemMap().isEmpty()) {
 				updateDragItem(graphics, data);
 			}
 		} else {
 			drawMap(graphics, data);
 		}
+
 		drawHero(graphics, data);
 		drawButton(graphics, data);
-		// Draw enemy if we're in combat
-		if (GameDataCombat.combat()) {
-			updateCombat(graphics, data, GameDataCombat.getLstEnemy());
-		}
 
 		if (data.event() != null) {
 			drawEvent(graphics, data);	
@@ -1370,7 +1372,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	graphics.setColor(Color.WHITE);
   	try (var reader = Files.newBufferedReader(path)) {
         String line;
-        for (nbScore = 0; nbScore < 10;) {
+        for (nbScore = 0; nbScore < 9;) {
         	if((line = reader.readLine()) == null) {
         		break;
         	}

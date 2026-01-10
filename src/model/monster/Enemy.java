@@ -2,6 +2,7 @@ package model.monster;
 
 import java.util.Map;
 
+import game.GameData;
 import model.Effect;
 
 /**
@@ -50,7 +51,7 @@ public interface Enemy {
 	 * Since all enemy has different attacks, we do an interface
 	 * 
 	 */
-	void action();
+	void action(GameData data);
 	
 	EnemyInfo getInfo();
 	void resetStats();

@@ -33,6 +33,7 @@ public class GameDataCombat {
 	 * - lst_enemy : List of all enemy we're fighting
 	 */
 	private static boolean combat = false;
+	private static boolean curseEvent = false;
 	private static Item hoverItem = null;
 	private static Enemy target;
   private static List<Enemy> lstEnemy;
@@ -88,26 +89,23 @@ public class GameDataCombat {
 	 * @param heroSizeY		sizeY of the Hero
 	 */
 	private static void getEnemyBox(List<Enemy> lstEnemy, ScreenInfo screenInfo, int heroSizeX, int heroSizeY) {
-		double gap = 1.3;
+		double gap = 0.5;
+		double totalWidth = 0;
+    int startX = (int) (screenInfo.width() * 0.75);
+    for (int i = 0; i < lstEnemy.size(); i++) {
+			var enemy = lstEnemy.get(i);
+			double sizeX = heroSizeX * enemy.getInfo().sizeX();
+    	totalWidth += sizeX + gap * heroSizeX;
+    }
+    startX -= totalWidth / 2;
 		for (int i = 0; i < lstEnemy.size(); i++) {
 			var enemy = lstEnemy.get(i);
 			double sizeX = heroSizeX * enemy.getInfo().sizeX();
 	  	double sizeY = heroSizeY * enemy.getInfo().sizeY();
-	  	double offsetOdd = heroSizeX * gap * (i + 1 / 2);
-	  	double offsetEven = heroSizeX * gap * i / 2;
-	  	double northWestX = (i % 2 == 1) ? screenInfo.width() * 0.70 - offsetOdd - enemy.getInfo().sizeX() 
-	  																	 : screenInfo.width() * 0.70 + offsetEven + enemy.getInfo().sizeY();
-	  	boolean isTopRow;
-	    if (i == 0) {
-	        isTopRow = true; 
-	    } else if ((i-1) % 4 < 2) {
-	        isTopRow = false; 
-	    } else {
-	        isTopRow = true; 
-	    }	  	
-	    double northWestY =  screenInfo.height() * 0.5 + (isTopRow ? 0 : heroSizeY / 2 + heroSizeY - sizeY);
-	  	var NW = new XY((int) northWestX, (int) northWestY);
+	    double northWestY =  screenInfo.height() * 0.6 + heroSizeY - sizeY;
+	  	var NW = new XY(startX, (int) northWestY);
 	  	var SE = new XY(NW.x() + (int) sizeX, NW.y() + (int) sizeY);
+	  	startX += sizeX + gap * heroSizeX;
 	  	enemyBox.put(enemy, new BoundingBox(NW, SE));
 		}
 	}
@@ -126,19 +124,22 @@ public class GameDataCombat {
 		if (item != null) {
 			if (item.info().AP() > data.hero().getEnergyPoint()) {
 				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
+				return;
 			}
-			else if (item.info().mana() > nbMana) {
-				addLog("Vous n'avez pas assez de mana pour utiliser " + item.toString());
-			}
-			else if (!data.bag().itemConnectedToMana(item)) {
-				addLog(item.toString() + " n'est pas connecté à une source de mana");
-			}
-			else {
-				useItemOnEnemies(data, item);
-				killMonster(data);
-				if(data.hero().getEnergyPoint() <= 0) {
-					endTour(data);
+			if (item.info().mana() > 0) {
+				if (item.info().mana() > nbMana) {
+					addLog("Vous n'avez pas assez de mana pour utiliser " + item.toString());
+					return;
 				}
+				else if (!data.bag().itemConnectedToMana(item)) {
+					addLog(item.toString() + " n'est pas connecté à une source de mana");
+					return;
+				}
+			}
+			useItemOnEnemies(data, item);
+			killMonster(data);
+			if(data.hero().getEnergyPoint() <= 0) {
+				endTour(data);
 			}
 		}
 		data.bag().updateManaConnected();
@@ -212,7 +213,11 @@ public class GameDataCombat {
 		log = new ArrayList<>();
 		applyEffects();
 		killMonster(data);
-		enemyAction(data.hero());
+		enemyAction(data);
+		if(data.hero().getHP() == 0) {
+			combat = false;
+			data.endGame();
+		}
 		useAllPassive(data);
 	}
 	
@@ -235,14 +240,10 @@ public class GameDataCombat {
 	 * 
 	 * @param hero 
 	 */
-	public static void enemyAction(Hero hero) {
-		Objects.requireNonNull(hero);
-		lstEnemy.forEach(enemy -> enemy.action());
-		if(hero.getHP() == 0) {
-			// FAIRE LA METHODE POUR AJOUTER LE SCORE DANS LE FICHIER TXT
-		}
+	private static void enemyAction(GameData data) {
+		lstEnemy.forEach(enemy -> enemy.action(data));
 		GameDataHero.reset();
-		GameDataHero.add("energy", 3 - hero.getEnergyPoint());
+		GameDataHero.add("energy", 3 - data.hero().getEnergyPoint());
 	}
 	
 	/**
@@ -289,5 +290,13 @@ public class GameDataCombat {
 	
 	public static int getNbMana() {
 		return nbMana;
+	}
+	
+	public static void setCurseEvent(boolean bool) {
+		curseEvent = bool;
+	}
+	
+	public static boolean getCurseEvent() {
+		return curseEvent;
 	}
 }

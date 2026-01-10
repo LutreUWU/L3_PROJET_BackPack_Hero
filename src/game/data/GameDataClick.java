@@ -165,7 +165,7 @@ public class GameDataClick {
    * 				 null if no item was clicked
    */
   private static Item itemClick(int x, int y) {
-  	if (GameDataCombat.combat()) {
+  	if (GameDataCombat.combat() && !GameDataCombat.getCurseEvent()) {
   		return null;
   	}
   	Item item;
@@ -588,7 +588,6 @@ public class GameDataClick {
    * @return Map<String, Integer> String give the information of what we clicks, Integer that can be usefull dependent on what we click
    */
   public static ClickResult click(int x, int y) {
-  	// Here we add other click info
   	Item item = itemClick(x, y);
     if (item != null) {
         return new ClickResult(ClickType.ITEM, item);
@@ -613,8 +612,13 @@ public class GameDataClick {
     	return new ClickResult(ClickType.EVENT_CHOICE, choiceNumber);
     }
     if (GameDataCombat.combat()) {
-      mobClick(x, y);
-      endButtonClick(x, y);
+    	if (!dragItemMap.isEmpty()) {
+    		GameDataCombat.addLog("Range tes items pour pouvoir jouer");
+    	}
+    	else {
+        mobClick(x, y);
+        endButtonClick(x, y);		
+    	}
     }
     if (data.getShop()) {
     	if (!data.getShopLst().getCurrentShop().isEmpty()) {

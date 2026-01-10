@@ -57,7 +57,6 @@ public class LinkedEvent {
 	
 	private void createEventForCurse() {
 		root = new NodeEvent(null, "Souhaitez vous mettre la malédiction dans le sac ?");
-
 		var choiceOne = createNodeWithConsequence("Oui !", 0, 1, "curseInBag",
 				"Reste à le placer dedans");
 		root.setChoice1(choiceOne);
@@ -171,7 +170,7 @@ public class LinkedEvent {
 				"C'est mon dernier cookie de la journée, tient cadeau !");
 		root.setChoice1(choiceOne);
 		
-		var choiceTwo = createNodeWithConsequence("Non. *Mettre un cookie dans le sac et partir*", floor, 1, new ArrayList<Enemy>(List.of(new Chicken())), "\"EH ! Je t'ai vu!\" *CrousChicken reprend le cookie et engage le combat*");
+		var choiceTwo = createNodeWithConsequence("Non. Mettre un cookie dans le sac et partir", floor, 1, new ArrayList<Enemy>(List.of(new Chicken())), "\"EH ! Je t'ai vu!\" CrousChicken reprend le cookie et engage le combat");
 		root.setChoice2(choiceTwo);
 	}
 	

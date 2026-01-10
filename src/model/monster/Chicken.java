@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import game.GameData;
 import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Effect;
@@ -73,7 +74,7 @@ public class Chicken implements Enemy{
 	 * Apply the action the monster will do, and choose randomly the next action of the monster
 	 */
 	@Override
-	public void action() {
+	public void action(GameData data) {
 		switch(action) {
 			case "Morsure" -> {
 				GameDataHero.sub("HP", 3);

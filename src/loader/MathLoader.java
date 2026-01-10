@@ -146,8 +146,11 @@ public class MathLoader {
 		NW = new XY(0, (int) (height * scale * 5));
 		SE = new XY((int) (width * scale), (int) (height * scale * 6));
 		renderDataGame.put("gold", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON GOLD
+		// ICON BOOST
 		img = imgLoader.bgImages().get("ICON_BOOST");
+		width = img.getWidth();
+		height = img.getHeight();
+		scale = sizeY / height;
 		transform = new AffineTransform();
     transform.translate(0, height * scale * 6);
     transform.scale(scale, scale);

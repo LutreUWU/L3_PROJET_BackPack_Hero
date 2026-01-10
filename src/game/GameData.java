@@ -1,7 +1,15 @@
 package game;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.github.forax.zen.ScreenInfo;
 
@@ -23,21 +31,18 @@ import model.map.eventManager.LinkedEvent;
  * 
  */
 public class GameData {
+	private boolean endGame = false;
   private boolean scoreLobby = false;
-	
   private static Backpack backpack;
   private static Floor map;
   private static Hero hero;
   private static int floor;
   private static ScreenInfo screenInfo;
-
   private Item dragItem = null; 
   private boolean onBin = false;
-
   private boolean mapOrBag = true;
   private boolean shop = false;
   private Shop shopLst;
-
   private LinkedEvent event;
   private XY mouseCoord;
   /**
@@ -89,6 +94,59 @@ public class GameData {
   	Objects.requireNonNull(item);
   	return item.rotateXY();
   }
+  
+  public void endGame(){
+  	endGame = true;
+  	scoreLobby = false;
+  	Path scoreFile = Path.of("data", "score");
+  	Random r= new Random();
+  	double min = 0.8;
+  	double max = 1.0;
+  	var score = min + r.nextDouble() * (max - min) + 0.8 * floor * hero.getHP() + backpack.getGoldInBag() * 2;
+  	try {
+			submitScore(scoreFile, (int) score);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+  }
+  
+  private void submitScore(Path path, int newScore) throws IOException {
+  	Map<String, Integer> scores = new HashMap<>();
+  	int nbPlayer = 1;
+	  if (Files.exists(path)) {
+	    try (var reader = Files.newBufferedReader(path)) {
+	    	String line;
+	      while ((line = reader.readLine()) != null) {
+          String[] parts = line.split(" : ");
+          scores.put(parts[0], Integer.parseInt(parts[1]));
+          nbPlayer++;
+        }
+	    }
+	  }
+	  // Mettre à jour le score
+	  scores.put("Joueur" + nbPlayer, newScore);
+	  writeScores(path, sortScore(scores));
+  }
+  
+  private Map<String, Integer> sortScore(Map<String, Integer> scores) {
+  	return scores.entrySet()
+  							 .stream()
+  							 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+  							 .collect(Collectors.toMap(Map.Entry::getKey, 
+  									 											 Map.Entry::getValue,
+  									 											 (a, b) -> a,
+  									 											 LinkedHashMap::new));
+  }
+  
+  private void writeScores(Path path, Map<String, Integer> scores) throws IOException {
+	  try (var writer = Files.newBufferedWriter(path)) {
+	    for (var entry : scores.entrySet()) {
+	      writer.write(entry.getKey() + " : " + entry.getValue());
+	      writer.newLine();
+	    }
+	  }
+  }
+
   // ============
   // == GETTER ==
   // ============
@@ -229,5 +287,9 @@ public class GameData {
 	
 	public boolean getScore() {
 		return scoreLobby;
+	}
+	
+	public boolean getEndGame() {
+		return endGame;
 	}
 }

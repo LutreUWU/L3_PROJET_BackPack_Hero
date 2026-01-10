@@ -1,9 +1,6 @@
 package game;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +21,7 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.epic.EnchantedDiamondSword;
-import model.item.legendary.Axe;
-import model.item.rare.Cookie;
-import model.item.rare.ManaStone;
-import model.item.superrare.Bomb;
+import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -36,9 +29,8 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
-import model.monster.Gnome;
-import model.monster.Robot;
-import model.monster.Soldat;
+import model.monster.Chicken;
+import model.monster.Crabe;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
@@ -60,6 +52,9 @@ public class GameController {
 	 * @return True if the game continue, False if we press the button to stop
 	 */
 	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
+		if (data.getEndGame()) {
+			return false;
+		}
 		Event event = context.pollOrWaitEvent(10);
 		if (event != null) {
 			switch (event) {
@@ -319,15 +314,16 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				 GameDataClick.addDragItem(new Axe());
-				 GameDataClick.addDragItem(new ManaStone(2));
-				 GameDataClick.addDragItem(new EnchantedDiamondSword());
-				 GameDataClick.addDragItem(new Cookie());
+//				 GameDataClick.addDragItem(new Axe());
+//				 GameDataClick.addDragItem(new ManaStone(2));
+//				 GameDataClick.addDragItem(new EnchantedDiamondSword());
+//				 GameDataClick.addDragItem(new Cookie());
+				GameDataClick.addDragItem(new Mimicry());
 			}
 		}
 		case Key.I -> {
 			if (GameDataCombat.combat() == false) {
-				GameDataCombat.startCombat(new ArrayList<>(List.of(new Soldat(), new Robot(), new Gnome())), data);
+				GameDataCombat.startCombat(new ArrayList<>(List.of(new Crabe(), new Chicken())), data);
 			}
 		}
 		///////////////////////////////////////////////////////////////
@@ -341,7 +337,7 @@ public class GameController {
 		}
 		// Leave the game
 		case Key.E -> {
-			return false;
+			data.endGame();
 		}
 		default -> {}
 		}
@@ -429,6 +425,7 @@ public class GameController {
 				if (!gameLoop(context, data, view)) {
 					GameView.drawLobby(context, data, view);
 					inLobby = true;
+					data = new GameData(screenInfo);
 					// A enlever, car théoriquement, on retourne aux lobby seulement si le héro meurt
 					// Si tu veux quitter directement avec E à l'intérieur du jeu, faut rajouter ça :
 					// n = -1;
