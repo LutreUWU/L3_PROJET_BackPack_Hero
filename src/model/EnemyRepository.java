@@ -16,7 +16,7 @@ import model.monster.Soldat;
 public class EnemyRepository {
     // Stocke les ennemies
     private static List<Enemy> enemyLst = new ArrayList<>();
-
+    private static List<Enemy> bossLst = new ArrayList<>();
     
     public static void createEnemyRepository() {
   	  registerEnemy(new Chicken());
@@ -25,10 +25,22 @@ public class EnemyRepository {
   	  registerEnemy(new Soldat());
     }
     
-    // Méthode pour enregistrer une arme
+    private static void registerBoss(Enemy enemy) {
+    	bossLst.add(enemy);
+    }
+    
+    
     private static void registerEnemy(Enemy enemy) {
     	enemyLst.add(enemy);
     }
+    
+    public static List<Enemy> getBossLst() {
+			return List.copyOf(bossLst);
+		}
+    
+    public static List<Enemy> getBossRankLst() {
+			return List.copyOf(bossLst);
+		}
     
     public static List<Enemy> getEnemyLst() {
 			return List.copyOf(enemyLst);

@@ -18,7 +18,7 @@ public final class EventRoom implements Room {
 	 * @param floor2
 	 */
   public EventRoom(int floor2) {
-      floor = floor2;
+      floor = floor2;	
       event = new LinkedEvent(floor, "eventRoom");
   }
   

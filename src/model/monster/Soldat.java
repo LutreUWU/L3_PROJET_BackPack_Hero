@@ -51,14 +51,8 @@ public class Soldat implements Enemy{
 	 */
 	@Override
 	public void updateEffects() {
-		for (var effect : effects.keySet()) {
-			var value = effects.get(effect);
-			if (value <= 1) {
-				effects.remove(effect);
-			} else {
-				effects.put(effect, value - 1);
-			}
-		}
+    effects.replaceAll((k, v) -> v - 1);
+    effects.values().removeIf(v -> v <= 0);
 	}
 	
 	/**

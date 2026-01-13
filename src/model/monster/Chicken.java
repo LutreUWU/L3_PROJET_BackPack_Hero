@@ -48,14 +48,8 @@ public class Chicken implements Enemy{
 	 */
 	@Override
 	public void updateEffects() {
-		for (var effect : effects.keySet()) {
-			var value = effects.get(effect);
-			if (value <= 1) {
-				effects.remove(effect);
-			} else {
-				effects.put(effect, value - 1);
-			}
-		}
+    effects.replaceAll((k, v) -> v - 1);
+    effects.values().removeIf(v -> v <= 0);
 	}
 	
 	/**
@@ -78,7 +72,9 @@ public class Chicken implements Enemy{
 		switch(action) {
 			case "Morsure" -> {
 				GameDataHero.sub("HP", 3);
-				GameDataCombat.addLog("Le poulet malicieux mord l'ennemi (-3PV)");
+				GameDataCombat.addLog("Le poulet malicieux mord le héro (-3PV)");
+				GameDataCombat.addLog("La morsure du poulet t'empoisonne");
+				data.hero().addEffect(Effect.POISON, 2);
 				}
 			case "Protection" -> {
 				shield += 2;

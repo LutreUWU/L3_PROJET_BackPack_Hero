@@ -24,12 +24,10 @@ import model.item.superrare.Massue;
 
 public class ItemRepository {
 
-    // Stocke les armes par ID
     private static final Map<Integer, Item> itemRepositoryMap = new HashMap<>();
     private static List<Item> itemRankLst;
 
     
-    // Trier du moins rare au plus rare
     public static void createItemRepository() {
   	  registerWeapon(new Arrow()); // Common
   	  registerWeapon(new Gant()); // Rare
@@ -63,7 +61,6 @@ public class ItemRepository {
     	itemRankLst.sort((a, b) -> Integer.compare(finalScore(a), finalScore(b)));
     }
 
-    // Récupérer une arme par ID
     public static Item getWeapon(int id) {
         return itemRepositoryMap.get(id);
     }

@@ -77,6 +77,7 @@ public class GameDataCombat {
 			var newItem = item.usePassive(target, lstEnemy, data);
 			it.set(newItem);
 		}
+		
 	}
 	
 	/**
@@ -211,7 +212,8 @@ public class GameDataCombat {
 	public static void endTour(GameData data) {
 		Objects.requireNonNull(data);
 		log = new ArrayList<>();
-		applyEffects();
+		applyEffectsToEnemy();
+		applyEffectsToHero(data);
 		killMonster(data);
 		enemyAction(data);
 		if(data.hero().getHP() == 0) {
@@ -224,7 +226,7 @@ public class GameDataCombat {
 	/**
 	 * Apply effects that was on enemies.
 	 */
-	private static void applyEffects() {
+	private static void applyEffectsToEnemy() {
 		for (var enemy : lstEnemy) { 
 			for (var effect : enemy.getEffects().keySet()) {
 				var dmg = effect.getDamage();
@@ -233,6 +235,20 @@ public class GameDataCombat {
 			}
 			enemy.updateEffects();
 		}
+	}
+	
+	/**
+	 * Apply effects that was on hero
+	 */
+	private static void applyEffectsToHero(GameData data) {
+		for (var effect : data.hero().getEffects().keySet()) {
+			var dmg = effect.getDamage();
+			data.hero().sub("hp", dmg);
+			addLog("Le hero recoit " + dmg + " dégats à cause de l'effet " + effect);
+		}
+		IO.println("AVANT : " + data.hero().getEffects());
+		data.hero().updateEffects();
+		IO.println("APRES : " + data.hero().getEffects());
 	}
 	
 	/**

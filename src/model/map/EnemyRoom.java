@@ -42,7 +42,6 @@ public final class EnemyRoom implements Room {
 				enemyLst.add(enemy);
 				differentEnemy.add(enemy);
 			}
-			
 		}
 	}
 	

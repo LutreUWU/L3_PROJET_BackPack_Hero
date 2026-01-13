@@ -1,5 +1,8 @@
 package model;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 
 import model.item.common.Gold;
@@ -16,6 +19,7 @@ public class Hero {
 	private int maxManaPoint = 3;
 	private int curseRefuse = 0;
 	private float boostDmg = 0;
+	private final Map<Effect, Integer> effects = new HashMap<>();
 	
 	private int xp = 0; // (between 0 and 10 + (level - 1) * 2)
 	private int level = 1;
@@ -167,7 +171,21 @@ public class Hero {
 		boostDmg -= value;
 	}
 	
+	public void addEffect(Effect effect, int value) {
+		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
+	}
 	
+	/**
+	 * Update all effects and remove them if necessary
+	 */
+	public void updateEffects() {
+    effects.replaceAll((k, v) -> v - 1);
+    effects.values().removeIf(v -> v <= 0);
+	}
+
+	public Map<Effect, Integer> getEffects() {
+		return effects;
+	}
 	
 	public void setHP(int value) {
 		HP = value;
