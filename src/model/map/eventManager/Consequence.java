@@ -66,7 +66,10 @@ public class Consequence {
 		case "openTreasure" -> consequenceTreasure(data);
 		case "floor" -> data.newFloor();
 		case "curseInBag" -> GameDataClick.addDragItem(new Curse());
-		case "curseNotInBag" -> consequenceCurseEvent(data);
+		case "curseNotInBag" -> {
+			consequenceCurseEvent(data);
+			GameDataCombat.setCurseEvent(false);
+		}
 		case "cookie" -> GameDataClick.addDragItem(new Cookie());
 		case null -> {
 			GameDataCombat.startCombat(enemyList, data);

@@ -28,6 +28,7 @@ public class MathLoader {
 		screenHeight = data.screenInfo().height();
 		getBGValue();
 		getBGLobbyValue();
+		getHeroValue();
 		getIconHeroValue();
 		getBackpackValue();
 		getInfoItemValue();
@@ -246,6 +247,19 @@ public class MathLoader {
 	
 	
 // ================= Hero =====================
+	private static void getHeroValue() {
+		BufferedImage img = imgLoader.bgImages().get("Roland");
+    int imgW = img.getWidth();
+    int imgH = img.getHeight();
+    double scale = 0.10 * screenWidth / imgW;
+    AffineTransform transform = new AffineTransform();
+    transform.translate(screenWidth * 0.20, screenHeight * 0.50);
+    transform.scale(scale, scale);
+    XY northWest = new XY((int) (screenWidth *0.20), (int) (screenHeight * 0.5));
+    var boundingBox = new BoundingBox(northWest, new XY((int) (northWest.x() + imgW*scale), (int) (northWest.y() + imgH*scale)));
+    renderDataGame.put("Roland", new RenderData(transform, boundingBox));
+	}
+	
 	
 // ============================================
 	

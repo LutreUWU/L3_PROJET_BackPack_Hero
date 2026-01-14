@@ -28,6 +28,7 @@ import model.BoundingBox;
 import model.Curse;
 import model.Direction;
 import model.Effect;
+import model.Hero;
 import model.Item;
 import model.XY;
 import model.item.common.Arrow;
@@ -477,8 +478,9 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	double size_x = data.hero().getSizeX();
   	double size_y = data.hero().getSizeY();
   	if (!data.getShop()) {
-  		BufferedImage img = imgLoader.bgImages().get("Roland");
-  		drawElement(graphics, img, width * 0.20, height * 0.50, size_x, size_y, Direction.UP);
+    	var render = MathLoader.getMapEvent().get("Roland");
+      BufferedImage img = imgLoader.bgImages().get("Roland");
+      graphics.drawImage(img, render.transform() , null);
   	}
 		drawHeroStats(graphics, data, (int) (width * 0.20 + size_x/2),  (int) (height * 0.50 + size_y));
   }
@@ -502,6 +504,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     drawFloorLevel(graphics, data);
     if (GameDataCombat.combat()) {
     	drawHeroBoost(graphics, data);
+    	drawHeroEffect(graphics, data);
     }
   }
   
@@ -576,7 +579,44 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(boostText + " BOOST DMG" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
-  private void drawHeroAction(Graphics2D graphics, GameData data) {
+  private void drawHeroEffect(Graphics2D graphics, GameData data) {
+  	var render = MathLoader.getMapEvent().get("Roland");
+  	var boundingBox = render.box();
+		var width = boundingBox.southEast().x() - boundingBox.northWest().x();
+		var centerX = boundingBox.northWest().x() + width / 2;
+		int size = (int) (height * 0.04);
+		int gap = (int) (size * 0.1);
+  	var i = 0;
+  	for (var effect : data.hero().getEffects().keySet()) {
+	    int offset = (i + 1) / 2;
+	    int dir = (i % 2 == 0) ? 1 : -1;
+	    int pos = offset * dir;
+	    int x = centerX + pos * (size + gap);
+	    drawHeroEffectImageAndValue(graphics, data, effect, x, (int) (boundingBox.southEast().y()), size);
+	    i++;
+  	}
+  }
+  
+  
+  
+  private void drawHeroEffectImageAndValue(Graphics2D graphics, GameData data, Effect effect, int x, int y, int size) {
+		var img = switch(effect) {
+		case POISON -> imgLoader.bgImages().get("ICON_POISON");
+		case FIRE -> imgLoader.bgImages().get("ICON_BURN");
+		default -> throw new IllegalArgumentException("This is not an effect : " + effect);
+		};
+		drawElement(graphics, img, x, y, size, size, Direction.UP); 
+		var charNumber = Integer.toString(data.hero().getEffects().get(effect));
+		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
+    FontMetrics fm = graphics.getFontMetrics();
+ 		graphics.setFont(font);
+ 		graphics.setColor(Color.BLACK);
+    graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, (int) (y + size * 1.05));
+ 		graphics.setColor(Color.WHITE);
+    graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, y + size);
+	}
+
+	private void drawHeroAction(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_ACTION");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
   	int logoHeight = (int) (height * 0.04);

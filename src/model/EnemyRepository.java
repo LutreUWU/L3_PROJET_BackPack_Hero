@@ -1,12 +1,10 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import model.monster.Chicken;
+import model.monster.Crabe;
 import model.monster.Enemy;
 import model.monster.Gnome;
 import model.monster.Robot;
@@ -21,8 +19,9 @@ public class EnemyRepository {
     public static void createEnemyRepository() {
   	  registerEnemy(new Chicken());
   	  registerEnemy(new Gnome());
-  	  registerEnemy(new Robot());
   	  registerEnemy(new Soldat());
+  	  registerBoss(new Robot());
+  	  registerBoss(new Crabe());
     }
     
     private static void registerBoss(Enemy enemy) {

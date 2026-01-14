@@ -20,18 +20,11 @@ public class GameDataClick {
 	private static GameData data;
 	private static Backpack backpack;
 	private static ScreenInfo screenInfo;
-	/**
-   * Has a record {@code XY} containing the mouse coordinate before moving the cursor.
-   */
-  private static XY oldPosition;
-	/**
-   * Contains all items movable in the screen.<br>
-   * For exemple, if there's one item, we can only only move this item. <br>
-   * If {@code itemAdd} is empty, no items can be move
-   */
-  private static LinkedHashMap<Item, BoundingBox> dragItemMap;
+  private static XY oldPosition; // contains the mouse coordinate before moving the cursor.
+  private static LinkedHashMap<Item, BoundingBox> dragItemMap; // Contains all movable items on the screen.
 	
 	public GameDataClick(GameData dataGame) {
+		Objects.requireNonNull(dataGame);
 		data = dataGame;
 		backpack = data.bag();
 		screenInfo = data.screenInfo();
@@ -65,7 +58,7 @@ public class GameDataClick {
   
   
   /**
-	 * Check the column of the clicked position inside the grid
+	 * Check the column of the clicked position inside the map grid
 	 * 
 	 * The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.
 	 * This method determines in which row the x-coordinate of a mouse click falls.
@@ -91,7 +84,7 @@ public class GameDataClick {
 	}
 	
   /**
-	 * Check the row of the the clicked position inside the grid
+	 * Check the row of the the clicked position inside the map grid
 	 * 
 	 * The grid is composed of square cells of size {@code grid_size}, separated by a constant gap.
 	 * This method determines in which row the y-coordinate of a mouse click falls.
@@ -156,7 +149,14 @@ public class GameDataClick {
   }
   
   /**
-   * Method that look if we click on a item draggable on the screen
+   * Method that look if we click on a draggable item on screen.
+   * This method is used for dragging item on the screen.
+   * 
+   * If we click on a item on the screen, simply return it.
+   * If we click on a item in the bag, remove it from the bag and add it to the screen.
+   * 
+   * Since when we're in combat, we don't want to drag item (except if it's a curse event),
+   * so we add a condition to check if we're in combat and in curse event.
    * 
    * @param x	Coordinate x we click
    * @param y Coordinate y we click
@@ -165,11 +165,30 @@ public class GameDataClick {
    * 				 null if no item was clicked
    */
   private static Item itemClick(int x, int y) {
-  	if (GameDataCombat.combat() && !GameDataCombat.getCurseEvent()) {
+  	if (GameDataCombat.combat() && !GameDataCombat.getCurseEvent()) { // If we're in combat and not in a curse event
   		return null;
   	}
   	Item item;
   	// For each item outside the bag
+  	item = itemOutBagClick(x, y);
+  	if (item == null) {
+  		// For each item inside the bag 
+    	item = itemInBagClick(x, y);
+  	}
+  	return item;
+  }
+  
+  /**
+   * Take a mouse coordinate (x, y) and check for all items on the screen to see if we're inside.
+   * 
+   * @param x	Coordinate x we click
+   * @param y Coordinate y we click
+   * 
+   * @return {@code Item} we click
+   * 				 null if no item was clicked
+   */
+  private static Item itemOutBagClick(int x, int y) {
+  	Item item;
   	for (Map.Entry<Item, BoundingBox> entry : dragItemMap.entrySet()) {
       item = entry.getKey();
       BoundingBox box = entry.getValue();
@@ -178,22 +197,34 @@ public class GameDataClick {
           return item;
       }
   	}
-  	// For each item inside the bag 
+  	return null;
+  }
+  
+  /**
+   * Take a mouse coordinate (x, y) and check all items in the bag to see if we're inside.
+   * If we click on a item, we drag it, so we remove it from the bag.
+   * 
+   * @param x	Coordinate x we click
+   * @param y Coordinate y we click
+   * 
+   * @return {@code Item} we click
+   * 				 null if no item was clicked
+   */
+  private static Item itemInBagClick(int x, int y) {
+  	Item item;
   	var res = bagClick(x,y);
   	if (res != null) {
   		item = backpack.getItem(res.x(), res.y());
-  		if (item == null) {
-  	    return null;
+  		if (item != null) {
+	  		switch(item) {
+	  		case Curse _ -> {return null;}
+	  		default -> {
+	  			data.bag().removeItemFromBackpack(item);
+	    		addDragItemFromBag(item, res.x(), res.y());
+	    		return item;
+	  		}
+	  		}
   		}
-  		switch(item) {
-  		case Curse _ -> {return null;}
-  		default -> {
-  			data.bag().removeItemFromBackpack(item);
-    		addDragItemFromBag(item, res.x(), res.y());
-    		return item;
-  		}
-  		}
-  		
   	}
   	return null;
   }
@@ -205,7 +236,10 @@ public class GameDataClick {
    * @param y Old coordinate y before we move
    */
   public static void setOldPosition(int x, int y) {
-  	oldPosition = new XY(x, y);
+    if (x < 0 || y < 0) {
+        throw new IllegalArgumentException("x and y are negatives");
+    }
+    oldPosition = new XY(x, y);
   }
   
   /**
@@ -267,7 +301,6 @@ public class GameDataClick {
   	dragItemMap.remove(item);
   }
   
-  
   /**
    * Reset the list of draggable item. 
    */
@@ -297,7 +330,7 @@ public class GameDataClick {
   /**
    * Add an item from the bag in the list of items draggable.
    * 
-   * @param item item we wants to move
+   * @param item item we wants to add
    * @param x		 position X in the bag before dragging it.
    * @param y 	 position Y in the bag before dragging it.
    */
@@ -310,7 +343,7 @@ public class GameDataClick {
   }
   
   /**
-   * Update the BoundingBox of the items when moving it. 
+   * Update the BoundingBox of the item when moving it. 
    * To update the boundingbox, we use the old and new coordinate of the item to calculate the new value.
    * 
    * @param item item we wants to move
@@ -324,31 +357,50 @@ public class GameDataClick {
   	int addY = y - oldPosition.y();
   	var nw = bb.northWest();
   	var se = bb.southEast();
-  	dragItemMap.put(item,
-  	    new BoundingBox(
-  	        new XY(nw.x() + addX, nw.y() + addY),
-  	        new XY(se.x() + addX, se.y() + addY)
-  	    )
+  	dragItemMap.put(item,  new BoundingBox(
+								  	         new XY(nw.x() + addX, nw.y() + addY),
+								  	         new XY(se.x() + addX, se.y() + addY)
+										  	   )
   	);
   }
   
   /**
    * Check if we click in a choice during an event.
-   * Everyone event has 2 buttons, and a button to end an event.
+   * Every event has 2 buttons, and a button to end an event.
+   * 
    * First we check if we click the end button event.
    * Then we check if we click a choice event.
-   * 
-   * 
+   *  
    * @param  x Coordinate x of the mouse.
    * @param  y Coordinate y of the mouse.
    * @return 1 or 2 if we click a choice
    * 				 3 if we click the end button
+   * 				 else -1
    */
-  public static int eventChoiceClick(int x, int y) {
+  private static int eventClick(int x, int y) {
   	if (data.event() == null) {
   		return -1;
   	}
-  	// End button
+  	int res;
+  	if (data.event().getRoot().getChoice2() == null) { // If there's no second choice, we're in the case where it's the endbutton
+  		res = eventEndClick(x, y);
+  	}
+  	else {
+    	res = eventChoiceClick(x, y);
+  	}
+  	return res;
+  }
+  
+  /**
+   * Check if we click inside the end button event
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   * 
+   * @return 3 if click in the endbutton
+   * 				 else -1
+   */
+  private static int eventEndClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("BG_CHOICE_END").box();
   	if (data.event().getRoot().getChoice2() == null) {
     	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
@@ -357,18 +409,30 @@ public class GameDataClick {
     		}
     	}
   	}
-  	// Choice button
-  	else {
-    	for (int i = 0; i < 2; i++) {
-    		String key = "BG_CHOICE" + Integer.toString(i + 1);
-    		boundingBox = MathLoader.getMapEvent().get(key).box();
-      	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
-      		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
-      			return i + 1;
-      		}
-      	}
-    	}  
-  	}
+  	return -1;
+  }
+  
+  /**
+   * Check if we click inside the choice button event
+   * 
+   * @param  x Coordinate x of the mouse.
+   * @param  y Coordinate y of the mouse.
+   * 
+   * @return 1 if click the first choice endbutton
+   * 				 2 if click the first choice endbutton
+   * 				 else -1
+   */
+  private static int eventChoiceClick(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("BG_CHOICE_END").box();
+  	for (int i = 0; i < 2; i++) {
+  		String key = "BG_CHOICE" + Integer.toString(i + 1);
+  		boundingBox = MathLoader.getMapEvent().get(key).box();
+    	if (boundingBox.northWest().x() <= x  && x <= boundingBox.southEast().x()) {
+    		if (boundingBox.northWest().y() <= y  && y <= boundingBox.southEast().y()) {
+    			return i + 1;
+    		}
+    	}
+  	}  
   	return -1;
   }
   
@@ -395,6 +459,7 @@ public class GameDataClick {
    * 
    * @param  x Coordinate x of the mouse.
    * @param  y Coordinate y of the mouse.
+   * 
    */
   private static void endButtonClick(int x, int y) {
   	var boundingBox = MathLoader.getMapEvent().get("BG_ENDTURN").box();
@@ -443,8 +508,8 @@ public class GameDataClick {
 				data.setBin(false);
 				var item = data.dragItem();
 				switch(item) {
-				case Curse _ -> {}
-				default -> {removeItemFromDrag(data.dragItem());}
+					case Curse _ -> {}
+					default -> removeItemFromDrag(data.dragItem());
 				}
 				return;
 			}
@@ -471,7 +536,7 @@ public class GameDataClick {
   }
   
   /**
-   * Check if we click the arrow button in the shop.
+   * Check if we click one of the arrow button in the shop.
    * We call the method for the left and right arrow.
    * 
    * @param  x Coordinate x of the mouse.
@@ -580,59 +645,180 @@ public class GameDataClick {
 	}
   
   /**
-   * Main function treating the click and returning information about what we clicks.
+   * Main method treating the click and returning information about what we clicks.
    * 
    * @param x coordinate x of the mouse click
    * @param y coordinate y of the mouse click
    * 
-   * @return Map<String, Integer> String give the information of what we clicks, Integer that can be usefull dependent on what we click
+   * @return {@code ClickResult} that gives information of what we clicks.
    */
   public static ClickResult click(int x, int y) {
-  	Item item = itemClick(x, y);
-    if (item != null) {
-        return new ClickResult(ClickType.ITEM, item);
-    }
-    XY bag = bagClick(x, y);
-    if (bag != null) {
-        return new ClickResult(ClickType.BAG, bag);
-    }
-    if (!data.mapOrBag()) {
-    	XY mapPos = floorClick(x, y);
-      if (mapPos != null) {
-          return new ClickResult(ClickType.MAP, mapPos);
-      }
-    }
-    int mapOrBag = mapOrBagClick(x, y);
-    if (mapOrBag != 0) {
-        return new ClickResult(ClickType.MAP_OR_BAG, mapOrBag);
-    }
-    
-    int choiceNumber = eventChoiceClick(x, y);
-    if (choiceNumber != -1) {
-    	return new ClickResult(ClickType.EVENT_CHOICE, choiceNumber);
-    }
-    if (GameDataCombat.combat()) {
-    	if (!dragItemMap.isEmpty()) {
-    		GameDataCombat.addLog("Range tes items pour pouvoir jouer");
-    	}
-    	else {
-        mobClick(x, y);
-        endButtonClick(x, y);		
-    	}
-    }
-    if (data.getShop()) {
-    	if (!data.getShopLst().getCurrentShop().isEmpty()) {
-    		arrowButtonClick(x, y);
-    		buyButtonClick(x, y);
-    	}
-    	exitButtonClick(x, y);
-    }
-    return new ClickResult(ClickType.NOTHING, null);
+    return firstNonNull(x, y,
+        GameDataClick::clickItem,
+        GameDataClick::clickBag,
+        GameDataClick::clickMap,
+        GameDataClick::clickMapOrBag,
+        GameDataClick::clickEvent,
+        GameDataClick::clickCombat,
+        GameDataClick::clickShop
+    );
+  }
+  
+  /**
+   * Take a list of methods and for each of them test
+   * if we're inside, return a {@code ClickResult}.
+   * 
+   * @param x 				coordinate x of the mouse click
+   * @param y 				coordinate y of the mouse click
+   * @param handlers	List of all methods
+   * 
+   * @return {@code ClickResult} containing information.
+   */
+  private static ClickResult firstNonNull(int x, int y, ClickHandler... handlers) {
+	  for (ClickHandler h : handlers) {
+	      ClickResult res = h.handle(x, y);
+	      if (res != null) return res;
+	  }
+	  return new ClickResult(ClickType.NOTHING, null);
+	}
+  
+  @FunctionalInterface
+  interface ClickHandler {
+      ClickResult handle(int x, int y);
+  }
+  
+  /**
+   * Checks whether the mouse click targets an item.
+   * 
+   * This method determines if an {@link Item} has been clicked, either on the screen
+	 * or inside the backpack. If an item is detected, it wraps the result into a
+	 * {@link ClickResult} with the type {@link ClickType#ITEM}.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code ClickResult} of type {@code ITEM} containing the clicked item,
+	 *         {@code null} if no item was clicked
+   */
+  private static ClickResult clickItem(int x, int y){
+      Item item = itemClick(x, y);
+      return item == null ? null : new ClickResult(ClickType.ITEM, item);
+  }
+  
+  /**
+   * Checks whether the mouse click targets a case in the bag.
+   * 
+   * This method determines if a case in the {@link Backpack} has been clicked. 
+   * If detected, it wraps the result into a {@link ClickResult} with the type {@link ClickType#BAG}.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code ClickResult} of type {@code BAG} containing the clicked item,
+	 *         {@code null} if no item was clicked
+   */
+  private static ClickResult clickBag(int x, int y) {
+      XY bag = bagClick(x, y);
+      return bag == null ? null : new ClickResult(ClickType.BAG, bag);
   }
 
+  /**
+   * Checks whether the mouse click targets a case in the map.
+   * 
+   * This method determines if a case in the {@link Floor} has been clicked. 
+   * If detected, it wraps the result into a {@link ClickResult} with the type {@link ClickType#MAP}.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code ClickResult} of type {@code MAP} containing the clicked item,
+	 *         {@code null} if no item was clicked
+   */
+  private static ClickResult clickMap(int x, int y) {
+      if (data.mapOrBag()) return null;
+      XY map = floorClick(x, y);
+      return map == null ? null : new ClickResult(ClickType.MAP, map);
+  }
+
+  /**
+   * Checks whether the mouse click targets the switch button between map and bag.
+   * 
+   * This method determines if the switch button has been clicked. 
+   * If detected, it wraps the result into a {@link ClickResult} with the type {@link ClickType#MAP}.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code ClickResult} of type {@code MAP_OR_BAG} containing the clicked item,
+	 *         {@code null} if no item was clicked
+   */
+  private static ClickResult clickMapOrBag(int x, int y) {
+      int v = mapOrBagClick(x, y);
+      return v == 0 ? null : new ClickResult(ClickType.MAP_OR_BAG, v);
+  }
+
+  /**
+   * Checks whether during an event, the mouse click targets a choice button.
+   * 
+   * If detected, it wraps the result into a {@link ClickResult} with the type {@link ClickType#EVENT_CHOICE}.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code ClickResult} of type {@code EVENT_CHOICE} containing the clicked item,
+	 *         {@code null} if no item was clicked
+   */
+  private static ClickResult clickEvent(int x, int y) {
+      int choice = eventClick(x, y);
+      return choice == -1 ? null : new ClickResult(ClickType.EVENT_CHOICE, choice);
+  }
+  
+  /**
+   * Checks whether during a combat, the mouse click targets an enemy or the endturn button.
+   * 
+   * If detected, it apply the consequence when clicking.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code null} since the result is not usefull
+   */
+  private static ClickResult clickCombat(int x, int y) {
+      if (!GameDataCombat.combat()) return null;
+      if (!dragItemMap.isEmpty()) {
+          GameDataCombat.addLog("Range tes items pour pouvoir jouer");
+          return null;
+      }
+      mobClick(x, y);
+      endButtonClick(x, y);
+      return null;
+  }
+  
+  
+  /**
+   * Interact with all elements in the shop
+   * If detected, it apply the consequence when clicking.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code null} since the result is not usefull
+   */
+  private static ClickResult clickShop(int x, int y) {
+      if (!data.getShop()) return null;
+
+      if (!data.getShopLst().getCurrentShop().isEmpty()) {
+          arrowButtonClick(x, y);
+          buyButtonClick(x, y);
+      }
+      exitButtonClick(x, y);
+      return null;
+  }
+  
 	/**
    * Check where the mouse is when we release the mouse.
-   * We call this method when releasing an item above the bin button for exemple.
+   * 
+   * We call this method when releasing a dragging an item on something (bin button, sell button, bag)
    * 
    * @param x coordinate x of the mouse click
    * @param y coordinate y of the mouse click

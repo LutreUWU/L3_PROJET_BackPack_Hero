@@ -87,10 +87,6 @@ public class Hero {
     }
     if (remainingDamage > 0) {
         HP -= remainingDamage;
-        if (HP <= 0) {
-            HP = 0;
-            IO.println("Faudra qu'on s'occupe de la mort\n");
-        }
     }
 	}
 
