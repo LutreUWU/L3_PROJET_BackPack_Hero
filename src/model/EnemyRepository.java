@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.GameData;
 import model.monster.Chicken;
 import model.monster.Crabe;
 import model.monster.Enemy;
@@ -17,17 +18,26 @@ public class EnemyRepository {
     private static List<Enemy> bossLst = new ArrayList<>();
     
     public static void createEnemyRepository() {
-  	  registerEnemy(new Chicken());
-  	  registerEnemy(new Gnome());
-  	  registerEnemy(new Soldat());
-  	  registerBoss(new Robot());
-  	  registerBoss(new Crabe());
+    	registerAllEnemy();
+    	registerAllBoss();
+    	
     }
     
+    
+    private static void registerAllEnemy() {
+    	registerEnemy(new Chicken());
+  	  registerEnemy(new Gnome());
+  	  registerEnemy(new Soldat());
+    }
+    
+    
+    private static void registerAllBoss() {
+    	registerBoss(new Robot());
+  	  registerBoss(new Crabe());
+    }
     private static void registerBoss(Enemy enemy) {
     	bossLst.add(enemy);
     }
-    
     
     private static void registerEnemy(Enemy enemy) {
     	enemyLst.add(enemy);
@@ -37,15 +47,13 @@ public class EnemyRepository {
 			return List.copyOf(bossLst);
 		}
     
-    public static List<Enemy> getBossRankLst() {
-			return List.copyOf(bossLst);
+    public static Enemy getOneBossRankLst(int floor) {
+    	var bossNb = floor / 3;
+    	if (bossNb >= bossLst.size()) bossNb = bossLst.size() - 1;
+			return bossLst.get(bossNb);
 		}
     
     public static List<Enemy> getEnemyLst() {
-			return List.copyOf(enemyLst);
-		}
-    
-    public static List<Enemy> getEnemyRankLst() {
 			return List.copyOf(enemyLst);
 		}
 }

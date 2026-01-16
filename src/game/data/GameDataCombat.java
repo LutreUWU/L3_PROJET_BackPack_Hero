@@ -216,7 +216,7 @@ public class GameDataCombat {
 		applyEffectsToHero(data);
 		killMonster(data);
 		enemyAction(data);
-		if(data.hero().getHP() == 0) {
+		if(data.hero().getHP() <= 0) {
 			combat = false;
 			data.endGame();
 		}

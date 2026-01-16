@@ -30,7 +30,7 @@ public final class EnemyRoom implements Room {
 	
 	private void createEnemyLst(int floor) {
 		Set<Enemy> differentEnemy = new HashSet<>();
-		var allEnemy = EnemyRepository.getEnemyRankLst();
+		var allEnemy = EnemyRepository.getEnemyLst();
 		var random = new Random();
 		var nbEnemy = (int) random.nextGaussian(floor, 0.5);
 		if (nbEnemy < 1) nbEnemy = 1;

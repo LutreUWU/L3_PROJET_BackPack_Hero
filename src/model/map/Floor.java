@@ -13,9 +13,9 @@ import model.XY;
 public class Floor {
 
 	private final int ROW = 11;
-	private final int LINE = 5;
+	private final int COL = 5;
 
-	final private Room[][] grid = new Room[LINE][ROW];
+	final private Room[][] grid = new Room[COL][ROW];
 
 	final private HashSet<XY> heroVisited = new HashSet<>();
 	final private HashSet<XY> heroAccessible = new HashSet<>();
@@ -79,7 +79,7 @@ public class Floor {
 			listacc.add(new XY(x, y - 1));
 		if (x < ROW - 1)
 			listacc.add(new XY(x + 1, y));
-		if (y < LINE - 1)
+		if (y < COL - 1)
 			listacc.add(new XY(x, y + 1));
 		Collections.shuffle(listacc);
 	}
@@ -94,7 +94,7 @@ public class Floor {
 		List<XY> list1 = createXYList();
 		List<XY> list2 = shuffleList(list1);
 		createSpecialRoom(list2, floor);
-		for (int i = 0; i < LINE; i++) {
+		for (int i = 0; i < COL; i++) {
 			for (int j = 0; j < ROW; j++) {
 				if (grid[i][j] == null) {
 					grid[i][j] = new Hallway();
@@ -111,17 +111,31 @@ public class Floor {
 	 * @param floor
 	 */
 	private void createSpecialRoom(List<XY> list, int floor) {
-		grid[list.get(0).y()][list.get(0).x()] = new Shop(floor); // Create shop
-		grid[list.get(1).y()][list.get(1).x()] = new Treasure(floor); // Create treasure
-		grid[list.get(2).y()][list.get(2).x()] = new Treasure(floor); // Create treasure
-		grid[list.get(3).y()][list.get(3).x()] = new Exit(floor); // Create exit
-		grid[list.get(4).y()][list.get(4).x()] = new EnemyRoom(floor); // Create Enemy
-		grid[list.get(5).y()][list.get(5).x()] = new EnemyRoom(floor); // Create Enemy
-		grid[list.get(6).y()][list.get(6).x()] = new EnemyRoom(floor); // Create Enemy
-		grid[list.get(7).y()][list.get(7).x()] = new Healer(floor); // Create Healer
-		grid[list.get(8).y()][list.get(8).x()] = new Start(); // Create start
-		grid[list.get(9).y()][list.get(9).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the					// hero has a key)
-		grid[list.get(10).y()][list.get(10).x()] = new EventRoom(floor); // Create Event
+		var index = createOneSpecialRoomOfEach(list, floor);
+		for (int i = 0; i < (ROW * COL) / 60; i++) {
+			grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor); // Create shop
+			grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor); // Create Healer
+			grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor); // Create Event
+		}
+		for (int i = 0; i < (ROW * COL) / 30; i++) {
+			grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor); // Create Treasure
+		}
+		for (int i = 0; i < (ROW * COL) / 20; i++) {
+			grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor); // Create Treasure
+		}
+	}
+	
+	private int createOneSpecialRoomOfEach(List<XY> list, int floor) {
+		var index = 0;
+		grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor); // Create shop
+		grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor); // Create treasure
+		grid[list.get(index).y()][list.get(index++).x()] = new Exit(floor); // Create exit
+		grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor); // Create Enemy
+		grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor); // Create Healer
+		grid[list.get(index).y()][list.get(index++).x()] = new Start(); // Create start
+		grid[list.get(index).y()][list.get(index++).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the hero has a key)
+		grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor); // Create Event
+		return index;
 	}
 
 	/**
@@ -132,7 +146,7 @@ public class Floor {
 	private List<XY> createXYList() {
 		List<XY> list = new ArrayList<>();
 		for (int i = 0; i < ROW; i++) {
-			for (int j = 0; j < LINE; j++) {
+			for (int j = 0; j < COL; j++) {
 				list.add(new XY(i, j));
 			}
 		}

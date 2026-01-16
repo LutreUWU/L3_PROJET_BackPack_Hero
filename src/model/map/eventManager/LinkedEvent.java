@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import game.GameData;
+import model.EnemyRepository;
+import model.map.EnemyRoom;
 import model.monster.Chicken;
 import model.monster.Enemy;
 import model.monster.Robot;
@@ -73,7 +75,7 @@ public class LinkedEvent {
 	private void createEventForExitRoom(int floor) {
 		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour monter à l'étage ?");
 		
-		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(new Soldat())), "Bon courage !");
+		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(EnemyRepository.getOneBossRankLst(floor))), "Bon courage !");
 		root.setChoice1(choiceOne);
 
 		var choiceTwo = createNodeWithConsequence("Non ! Je vais finir de me préparer...", floor, 1, "nothing",

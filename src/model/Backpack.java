@@ -17,9 +17,10 @@ public class Backpack {
 	/**
 	 * - Backpack - grid_size - All items in the bag
 	 */
-	private int[][] backpack = { // -2 : not unlock, -1 empty, else ID of item
-			{ -2, -2, -1, -1, -1, -2, -2 }, { -2, -1, -1, -1, -1, -1, -2 }, { -2, -1, -1, -1, -1, -1, -2 },
-			{ -2, -1, -1, -1, -1, -1, -2 }, { -2, -2, -1, -1, -1, -2, -2 } };
+	
+	private int[][] backpack;
+	final private int ROW = 5;
+	final private int COL = 7;
 
 	final private int gridSize;
 	final private ArrayList<Item> bagItemLst = new ArrayList<>(); // List of items I have (Index = ID)
@@ -27,19 +28,35 @@ public class Backpack {
 	final private Set<XY> connected = new HashSet<>();
 	final private Set<Item> connectedItem = new HashSet<>();
 
-	public Item getItem(int x, int y) {
-		var itemFromBag = bagItemLst.stream()
-				.filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
-		return itemFromBag;
-	}
-
+		
 	/**
 	 * Register the grid size of each tile in the backpack
 	 * 
 	 * @param gridSize
 	 */
 	public Backpack(int screenHeight) {
+		backpack = createBackpackGrid();
 		gridSize = screenHeight / 15;
+	}
+	
+	private int[][] createBackpackGrid() {
+    int[][] backpack = new int[ROW][COL];
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            if (i == 0 || (i == ROW - 1) || j == 0 || j == COL - 1) {
+                backpack[i][j] = -2;
+            } else {
+                backpack[i][j] = -1;
+            }
+        }
+    }
+    return backpack;
+}
+	
+	public Item getItem(int x, int y) {
+		var itemFromBag = bagItemLst.stream()
+				.filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
+		return itemFromBag;
 	}
 
 	/**
