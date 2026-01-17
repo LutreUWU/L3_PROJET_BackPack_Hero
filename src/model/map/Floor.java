@@ -12,10 +12,10 @@ import model.XY;
 
 public class Floor {
 
-	private final int ROW = 11;
-	private final int COL = 5;
+	private final int ROW = 4; //5
+	private final int COL = 9; // 11
 
-	final private Room[][] grid = new Room[COL][ROW];
+	final private Room[][] grid = new Room[ROW][COL];
 
 	final private HashSet<XY> heroVisited = new HashSet<>();
 	final private HashSet<XY> heroAccessible = new HashSet<>();
@@ -77,9 +77,9 @@ public class Floor {
 			listacc.add(new XY(x - 1, y));
 		if (y > 0)
 			listacc.add(new XY(x, y - 1));
-		if (x < ROW - 1)
+		if (x < COL - 1)
 			listacc.add(new XY(x + 1, y));
-		if (y < COL - 1)
+		if (y < ROW - 1)
 			listacc.add(new XY(x, y + 1));
 		Collections.shuffle(listacc);
 	}
@@ -94,8 +94,8 @@ public class Floor {
 		List<XY> list1 = createXYList();
 		List<XY> list2 = shuffleList(list1);
 		createSpecialRoom(list2, floor);
-		for (int i = 0; i < COL; i++) {
-			for (int j = 0; j < ROW; j++) {
+		for (int i = 0; i < ROW; i++) {
+			for (int j = 0; j < COL; j++) {
 				if (grid[i][j] == null) {
 					grid[i][j] = new Hallway();
 				}
@@ -145,8 +145,8 @@ public class Floor {
 	 */
 	private List<XY> createXYList() {
 		List<XY> list = new ArrayList<>();
-		for (int i = 0; i < ROW; i++) {
-			for (int j = 0; j < COL; j++) {
+		for (int i = 0; i < COL; i++) {
+			for (int j = 0; j < ROW; j++) {
 				list.add(new XY(i, j));
 			}
 		}
@@ -323,5 +323,14 @@ public class Floor {
 	 */
 	public XY getHeroPos() {
 		return heroPos;
+	}
+	
+	
+	public int getRow() {
+		return ROW;
+	}
+	
+	public int getCol() {
+		return COL;
 	}
 }

@@ -8,12 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.github.forax.zen.ScreenInfo;
 
 import game.data.GameDataClick;
+import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Backpack;
 import model.EnemyRepository;
@@ -21,40 +21,60 @@ import model.Hero;
 import model.Item;
 import model.ItemRepository;
 import model.XY;
+import model.item.legendary.Axe;
 import model.map.Floor;
 import model.map.Shop;
 import model.map.eventManager.LinkedEvent;
 
- /**
- * The SimpleGameData class stores all relevant pieces of information for the
- * game status.
- * 
+/**
+ * Stores all global data related to the current game session.
+ * This class centralizes the state of the game such as 
+ * hero data, inventory, map, events, score, and screen information.
+ *
+ * GameData acts as the main data holder shared between the different
+ * systems of the game (combat, UI, map, events, shop ...).
  */
 public class GameData {
+	/** Current background identifier */
+	private String BGName = "BG1";
+	/** Indicates whether the game has ended */
 	private boolean endGame = false;
+	/** Indicates whether the score lobby screen is displayed */
   private boolean scoreLobby = false;
+	/** Player backpack */
   private static Backpack backpack;
+	/** Current floor map */
   private static Floor map;
+  /** Player hero */
   private static Hero hero;
+  /** Current floor */
   private static int floor;
-  private static ScreenInfo screenInfo;
+  /** Screen size information */
+	/** Item currently dragged by the player */
   private Item dragItem = null; 
+	/** Indicates whether the dragged item is over the trash bin */
   private boolean onBin = false;
+	/** True if bag is displayed, false if map is displayed */
   private boolean mapOrBag = true;
+	/** Indicates whether the player is currently in a shop */
   private boolean shop = false;
+	/** Current shop instance */
   private Shop shopLst;
+	/** Current active event */
   private LinkedEvent event;
+	/** Current mouse position */
   private XY mouseCoord;
-  /**
-   * Sortest Path
-   */
+	/** Player score */
+  private double score = 0.0;
+	/** Shortest path displayed on the map */
   private List<XY> shortestPath = new ArrayList<>();
   
   /**
-   * Initialize data of the game 
-   * 
-   * @param gridSize size of the grid in the backpack
-   */
+	 * Initializes all game data at the start of a new game.
+	 * Creates hero, backpack, map, repositories and starter items.
+	 *
+	 * @param screenInfo_ screen dimensions information
+	 */
   public GameData(ScreenInfo screenInfo_) {
   	Objects.requireNonNull(screenInfo_);
 	  backpack = new Backpack(screenInfo_.height());
@@ -63,16 +83,22 @@ public class GameData {
 	  ItemRepository.createItemRepository();
 	  EnemyRepository.createEnemyRepository();
 	  map = new Floor(floor);
-	  screenInfo = screenInfo_;
     new GameDataHero(hero);
-    new GameDataClick(this);
+    new GameDataClick(this, screenInfo_);
+    addStarterPack();
 	}
-
+  
   /**
-   * Switch the current value of the var mapOrBag
-   * - true : We wants to display Bag
-   * - false : We wants to display Map
-   */
+	 * Adds the initial items to the hero inventory when starting a new game.
+	 */
+  private void addStarterPack() {
+  	GameDataClick.addDragItem(new Axe());
+  }
+  
+  /**
+	 * Toggles between map view and backpack view.
+	 * True displays the bag, false displays the map.
+	 */
   public void swapMapOrBag() {
   	if (mapOrBag) {
   		mapOrBag = false;
@@ -81,35 +107,52 @@ public class GameData {
   	}
   }
   
-  public List<XY> getShortestPath () {
-  	return shortestPath;
-  }
-  
+  /**
+	 * Sets the shortest path on the map.
+	 *
+	 * @param shortestPath2 path to display
+	 */
   public void setShortestPath(List<XY> shortestPath2) {
   	Objects.requireNonNull(shortestPath2);
   	shortestPath = shortestPath2;
   }
   
+  /**
+	 * Rotates an item and returns the rotated version.
+	 *
+	 * @param item item to rotate
+	 * @return rotated item
+	 */
   public static Item rotateItem(Item item) {
   	Objects.requireNonNull(item);
   	return item.rotateXY();
   }
   
+  /**
+	 * Ends the game, computes final score and writes it to the score file.
+	 * Also stops combat and disables score lobby.
+	 */
   public void endGame(){
   	endGame = true;
+		GameDataCombat.setCombatEvent(false);
   	scoreLobby = false;
   	Path scoreFile = Path.of("data", "score");
-  	Random r= new Random();
-  	double min = 0.8;
-  	double max = 1.0;
-  	var score = min + r.nextDouble() * (max - min) + 0.8 * floor * hero.getHP() + backpack.getGoldInBag() * 2;
+  	// Score = ExpTotal * (1.2 * floor + heroLevel / 2.0)
+  	var newScore = score * (1.2 * floor + (hero().getLevel() / 2.0));
   	try {
-			submitScore(scoreFile, (int) score);
+			submitScore(scoreFile, (int) newScore);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
   }
   
+  /**
+	 * Submits a new score to the score file.
+	 *
+	 * @param path score file path
+	 * @param newScore score value
+	 * @throws IOException if file access fails
+	 */
   private void submitScore(Path path, int newScore) throws IOException {
   	Map<String, Integer> scores = new HashMap<>();
   	int nbPlayer = 1;
@@ -128,16 +171,29 @@ public class GameData {
 	  writeScores(path, sortScore(scores));
   }
   
+  /**
+	 * Sorts scores in descending order.
+	 *
+	 * @param scores unsorted score map
+	 * @return sorted score map
+	 */
   private Map<String, Integer> sortScore(Map<String, Integer> scores) {
   	return scores.entrySet()
   							 .stream()
   							 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
   							 .collect(Collectors.toMap(Map.Entry::getKey, 
   									 											 Map.Entry::getValue,
-  									 											 (a, b) -> a,
+  									 											 (a, _) -> a,
   									 											 LinkedHashMap::new));
   }
   
+  /**
+	 * Writes scores to the score file.
+	 *
+	 * @param path score file path
+	 * @param scores score map
+	 * @throws IOException if file writing fails
+	 */
   private void writeScores(Path path, Map<String, Integer> scores) throws IOException {
 	  try (var writer = Files.newBufferedWriter(path)) {
 	    for (var entry : scores.entrySet()) {
@@ -146,80 +202,23 @@ public class GameData {
 	    }
 	  }
   }
-
-  // ============
-  // == GETTER ==
-  // ============
   
   /**
-   * Return the weapon we drags
-   * 
-   * @return Item_Object weapon
-   */
-  public Item dragItem() {
-    return dragItem;
-  }
-  
-  /**
-   * Return the status of the button
-   * 
-   * @return true :  we display map
-   * 				 false : we display bag
-   */
-  public boolean mapOrBag() {
-  	return mapOrBag;
-  }
- 
-  /**
-   * Add the weapon we wants to move in the data.
-   * If we don't add an item, this information is null.
-   * 
-   * @param item
-   */
-  public void setDragItem(Item item) {
-    this.dragItem = item;
-  }
-  
-  /**
-   * Return the current backpack of the player from data
-   * @return Objects backpack
-   */
-  public Backpack bag() {
-    return backpack;
-  }
-  /**
-   * Return the current map of the player from data
-   * @return Objects MapGame
-   */
-  public Floor map() {
-    return map;
-  }
-  
-  /**
-   * Go up one floor
-   */
+	 * Moves the player to the next floor.
+	 * Generates a new map and updates the background.
+	 */
   public void newFloor() {
   	floor++;
   	shortestPath = null;
     map = new Floor(floor);
+    updateBG();
   }
   
   /**
-   * Return the current floor of the player from data
-   * @return int floor
-   */
-  public int floor() {
-    return floor;
-  }
-
-  /**
-   * Return the current hero's statue from data
-   * @return
-   */
-  public Hero hero() {
-    return hero;
-  }
-  
+	 * Enters an event and forces bag view.
+	 *
+	 * @param new_event event to enter
+	 */
   public void inEvent(LinkedEvent new_event) {
   	event = new_event;
   	if (!mapOrBag) {
@@ -227,69 +226,227 @@ public class GameData {
   	}
   }
   
+  /**
+	 * Leaves the current event.
+	 */
   public void outEvent() {
   	event = null;
   }
   
-  
-  /**
-   * Boolean to know if we're in a event or no
-   * 
-   * @return
-   */
-  public LinkedEvent event() {
-    return event;
-  }
-  
-  /**
-   * Return the width and height of the screen
-   * 
-   * @return
-   */
-  public ScreenInfo screenInfo() {
-    return screenInfo;
-  }
- 
-	public XY getMouseCoord() {
-		return mouseCoord;
-	}
-
+	/**
+	 * Sets the current mouse position.
+	 *
+	 * @param mouse_coord mouse coordinates
+	 */
 	public void setMouseCoord(XY mouse_coord) {
 		this.mouseCoord = mouse_coord;
 	}
-	
+  
+	/**
+	 * Sets whether the dragged item is over the trash bin.
+	 *
+	 * @param statut bin state
+	 */
 	public void setBin(boolean statut) {
 		this.onBin = statut;
 	}
 	
-	public boolean getShop() {
-		return shop;
-	}
-	
-	
+	/**
+	 * Sets the shop state and current shop instance.
+	 *
+	 * @param statut shop state
+	 * @param shop shop instance
+	 */
 	public void setShop(boolean statut, Shop shop) {
 		if (statut) swapMapOrBag();
 		this.shop = statut;
 		this.shopLst = shop;
 	}
 	
-	public Shop getShopLst() {
-		return shopLst;
-	}
-	
-	public boolean getBin() {
-		return onBin;
-	}
-	
+	/**
+	 * Enables or disables the score lobby.
+	 *
+	 * @param statut score lobby state
+	 */
 	public void setScore(boolean statut) {
 		this.scoreLobby = statut;
 	}
 	
-	public boolean getScore() {
+	/**
+	 * Sets the current background.
+	 *
+	 * @param name background identifier
+	 */
+	public void setBG(String name) {
+		BGName = name;
+	}
+	
+	/**
+	 * Updates the background based on the current floor.
+	 */
+	public void updateBG() {
+		BGName = "BG" + floor;
+	}
+	
+	/**
+	 * Sets the currently dragged item.
+	 *
+	 * @param item dragged item
+	 */
+  public void setDragItem(Item item) {
+    this.dragItem = item;
+  }
+  
+  /**
+	 * Returns the item currently being dragged.
+	 *
+	 * @return dragged item or null
+	 */
+  public Item dragItem() {
+    return dragItem;
+  }
+  
+  /**
+	 * Returns whether the bag or map is currently displayed.
+	 *
+	 * @return true for bag, false for map
+	 */
+  public boolean mapOrBag() {
+  	return mapOrBag;
+  }
+  
+  /**
+	 * Returns the player backpack.
+	 *
+	 * @return backpack
+	 */
+  public Backpack bag() {
+    return backpack;
+  }
+  
+  /**
+	 * Returns the current map.
+	 *
+	 * @return map
+	 */
+  public Floor map() {
+    return map;
+  }
+  
+  /**
+	 * Returns the current floor number.
+	 *
+	 * @return floor number
+	 */
+  public int floor() {
+    return floor;
+  }
+
+  /**
+	 * Returns the hero instance.
+	 *
+	 * @return hero
+	 */
+  public Hero hero() {
+    return hero;
+  }
+  
+  /**
+	 * Returns the current shortest path on the map.
+	 *
+	 * @return list of coordinates representing the path
+	 */
+  public List<XY> getShortestPath () {
+  	return shortestPath;
+  }
+  
+  /**
+	 * Returns the current event.
+	 *
+	 * @return event or null
+	 */
+  public LinkedEvent event() {
+    return event;
+  }
+  
+  /**
+	 * Returns the current mouse position.
+	 *
+	 * @return mouse coordinates
+	 */
+	public XY getMouseCoord() {
+		return mouseCoord;
+	}
+	
+	/**
+	 * Returns whether the player is in a shop.
+	 *
+	 * @return shop state
+	 */
+	public boolean getShop() {
+		return shop;
+	}
+	
+	/**
+	 * Returns the current shop.
+	 *
+	 * @return shop
+	 */
+	public Shop getShopLst() {
+		return shopLst;
+	}
+	
+	/**
+	 * Returns whether the dragged item is over the bin.
+	 *
+	 * @return bin state
+	 */
+	public boolean getBin() {
+		return onBin;
+	}
+	
+	/**
+	 * Returns whether the score lobby is displayed.
+	 *
+	 * @return score lobby state
+	 */
+	public boolean getScoreLobby() {
 		return scoreLobby;
 	}
 	
+	/**
+	 * Returns whether the game has ended.
+	 *
+	 * @return end game state
+	 */
 	public boolean getEndGame() {
 		return endGame;
+	}
+	
+	/**
+	 * Returns the current score.
+	 *
+	 * @return score
+	 */
+	public double getScore() {
+		return score;
+	}
+	
+	/**
+	 * Adds value to the score.
+	 *
+	 * @param value score increment
+	 */
+	public void addScore(int value) {
+		score += value;
+	}
+	
+	/**
+	 * Returns the current background name.
+	 *
+	 * @return background name
+	 */
+	public String getBG() {
+		return BGName;
 	}
 }

@@ -1,14 +1,13 @@
 package loader;
 
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 
+import com.github.forax.zen.ScreenInfo;
+
 import game.GameData;
 import model.BoundingBox;
-import model.Direction;
 import model.XY;
 
 /**
@@ -21,11 +20,11 @@ public class MathLoader {
 	private static ImageLoader imgLoader;
 	private static LinkedHashMap<String, RenderData> renderDataGame = new LinkedHashMap<>();
 	
-	public MathLoader(GameData dataGame, ImageLoader imageLoader) {
+	public MathLoader(GameData dataGame, ImageLoader imageLoader, ScreenInfo screenInfo) {
 		data = dataGame;
 		imgLoader = imageLoader;
-		screenWidth = data.screenInfo().width();
-		screenHeight = data.screenInfo().height();
+		screenWidth = screenInfo.width();
+		screenHeight = screenInfo.height();
 		getBGValue();
 		getBGLobbyValue();
 		getHeroValue();
@@ -37,6 +36,7 @@ public class MathLoader {
 		getEndTurnValue();
 		getBinValue();
 		getShopValue();
+		getFFButtonValue();
 	}
 	
 	private static void getBGLobbyValue() {
@@ -164,8 +164,9 @@ public class MathLoader {
 	
 // ================== BG ======================
 	private static void getBGValue() {
-		for (int i = 1; i < 8; i ++) {
-			getBGimgValue("BG" + i);
+		var allBg = imgLoader.bgImages().keySet().stream().filter(key -> key.contains("BG")).toList();
+		for (String bgName : allBg) {
+			getBGimgValue(bgName);
 		}
 	}
 	
@@ -186,17 +187,19 @@ public class MathLoader {
 // =============== Backpack ===================
 	private static void getBackpackValue() {
 		var size = data.bag().getGridSize();
-		var dimX = size * 9.0;
-		var dimY = size * 7.0;
-		XY NW = new XY((int) (screenWidth / 2 - 3.5 * size), (int) (screenHeight * 0.02 + size * 0.8));
-		XY SE = new XY((int) (screenWidth / 2 + 3.5 * size), (int) (screenHeight * 0.02 + size * 7.0));
+		int nbCol = data.bag().getCol();
+		int nbRow =  data.bag().getRow();
+		var dimX = (nbCol + 2) * size;
+		var dimY = (nbRow + 2) * size;
+		XY NW = new XY((int) (screenWidth / 2.0 - (nbCol / 2.0) * size), (int) (screenHeight * 0.02 + size * 0.8));
+		XY SE = new XY((int) (NW.x() + nbCol * size), (int) (NW.y() + nbRow * size));
 		BufferedImage img = imgLoader.bgImages().get("BG_BACKPACK");
 		var width = img.getWidth();
 		var height = img.getHeight();
-		var scaleX = dimX / width;
-		var scaleY = dimY / height;
+		double scaleX = (double) dimX / width;
+		double scaleY = (double) dimY / height;
 	  AffineTransform transform = new AffineTransform();
-		transform.translate(screenWidth / 2 - dimX / 2, screenHeight * 0.02) ;
+		transform.translate(screenWidth / 2.0 - dimX / 2.0, screenHeight * 0.02);
 	  transform.scale(scaleX, scaleY);
 		renderDataGame.put("BG_BACKPACK", new RenderData(transform, new BoundingBox(NW, SE)));
 	}
@@ -207,7 +210,7 @@ public class MathLoader {
 	private static  void getInfoItemValue() {
 		var size = data.bag().getGridSize();
 		var dimX = size * 5.0;
-		var dimY = size * 5.0;
+		var dimY = size * (data.bag().getRow() + 1.0);
 		var NW = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size, renderDataGame.get("BG_BACKPACK").box().northWest().y());
 		var SE = new XY(renderDataGame.get("BG_BACKPACK").box().southEast().x() + size + (int) dimX, renderDataGame.get("BG_BACKPACK").box().southEast().y() );
 		BufferedImage img = imgLoader.bgImages().get("BG_INFO_ITEM");
@@ -229,10 +232,12 @@ public class MathLoader {
 	private static void getMapValue() {
 		var size = data.bag().getGridSize();
   	var gap = size * 0.1;
-		var dimX = size * 12.0 + 10 * gap;
-		var dimY = size * 6.0 + 4 * gap;
-		XY NW = new XY((int) ((screenWidth / 2) - 5.5 * size - 5*gap), (int) ((screenHeight * 0.04 + size / 2.0)));
-		XY SE = new XY((int) ((screenWidth / 2) + 5.5 * size + 5*gap), (int) ((screenHeight * 0.04 + size / 2.0) + 5.0 * size + 4*gap));
+  	int nbCol = data.map().getCol();
+  	int nbRow = data.map().getRow();
+		var dimX = size * (nbCol + 1) + (nbCol - 1) * gap;
+		var dimY = size * (nbRow + 1) + (nbRow - 1) * gap;
+		XY NW = new XY((int) ((screenWidth / 2) - (nbCol / 2.0) * size - (nbCol / 2) * gap), (int) ((screenHeight * 0.04 + size / 2.0)));
+		XY SE = new XY((int) ((screenWidth / 2) + (nbCol / 2.0) * size + (nbCol / 2) * gap), (int) ((screenHeight * 0.04 + size / 2.0) + nbRow * size + (nbRow - 1) * gap));
 		BufferedImage img = imgLoader.bgImages().get("BG_MAP");
 		var width = img.getWidth();
 		var height = img.getHeight();
@@ -338,7 +343,7 @@ public class MathLoader {
 		var scale = (screenWidth * 0.10) / width;
 		AffineTransform transform = new AffineTransform();
 	  double posX = screenWidth * 0.5 - (width * scale) / 2;
-	  double posY = renderDataGame.get("BG_BACKPACK").box().southEast().y() * 0.95 ;
+	  double posY = renderDataGame.get("BG_BACKPACK").box().southEast().y() + data.bag().getGridSize();
 	  transform.translate(posX, posY);
 	  transform.scale(scale, scale);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
@@ -355,7 +360,7 @@ public class MathLoader {
 		var scale = (screenWidth * 0.10) / width;
 		AffineTransform transform = new AffineTransform();
 	  double posX = screenWidth * 0.5 - (width * scale) / 2;
-	  double posY = renderDataGame.get("BG_BACKPACK").box().southEast().y() * 0.95 ;
+	  double posY = renderDataGame.get("BG_BACKPACK").box().southEast().y() + data.bag().getGridSize();
 	  transform.translate(posX, posY);
 	  transform.scale(scale, scale);
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
@@ -539,11 +544,32 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scale), (int) (posY + img.getHeight() * scale)));
 	  renderDataGame.put("ICON_SOLDOUT", new RenderData(transform, boundingBox));
 	}
-
 //============================================	
+	private static void getFFButtonValue() {
+		var img = imgLoader.bgImages().get("ICON_ABANDON");	
+		int width = img.getWidth();
+		int height = img.getHeight();
+		var scale = (screenWidth * 0.05) / width;
+		AffineTransform transform = new AffineTransform();
+	  double posX = screenWidth - (width * scale);
+	  double posY = screenHeight - (height * scale);
+	  transform.translate(posX, posY);
+	  transform.scale(scale, scale);
+	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
+	  renderDataGame.put("ICON_ABANDON", new RenderData(transform, boundingBox));
+	}
+	
 //Getter Event
 	public static LinkedHashMap<String, RenderData> getMapEvent() {
 		return renderDataGame;
+	}
+	
+	public static int getScreenWidth() {
+		return screenWidth;
+	}
+	
+	public static int getScreenHeight() {
+		return screenWidth;
 	}
 	
 }

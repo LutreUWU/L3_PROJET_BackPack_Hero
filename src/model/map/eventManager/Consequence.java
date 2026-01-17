@@ -72,7 +72,6 @@ public class Consequence {
 		}
 		case "cookie" -> GameDataClick.addDragItem(new Cookie());
 		case null -> {
-			GameDataCombat.startCombat(enemyList, data);
 			var heroPos = data.map().getHeroPos();
 			switch(data.map().getGrid()[heroPos.y()][heroPos.x()]) {
 			case Exit _ -> {
@@ -80,6 +79,7 @@ public class Consequence {
 			}
 			default -> {}
 			}
+			GameDataCombat.startCombat(enemyList, data);
 		}
 		default -> {
 		} // Nothing
@@ -87,8 +87,11 @@ public class Consequence {
 	}
 	
 	private void consequenceCurseEvent(GameData data) {
-		data.hero().sub("HP3", data.hero().getCurseRefuse());
 		data.hero().add("curse", 1);
+		data.hero().sub("HP", data.hero().getCurseRefuse());
+		if(data.hero().getHP() <= 0) {
+			data.endGame();
+		}
 	}
 
 	/**

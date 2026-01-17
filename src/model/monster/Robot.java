@@ -132,6 +132,6 @@ public class Robot implements Enemy{
 	
 	@Override
 	public String toString() {
-		return "Revuz PRIME";
+		return "Robot";
 	}
 }

@@ -85,14 +85,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   /**
 	 * Draw the background of the game
 	 * 
-   * @param context		{@code ApplicationContext} of the game.
-   * @param data			GameData containing the game data. 
+   * @param context	{@code ApplicationContext} of the game.
+   * @param data		GameData containing the game data. 
 	 */
 	private void drawBG(Graphics2D graphics, GameData data) {
-//		graphics.setColor(Color.gray);
-//		graphics.fillRect(0, 0, width, height);
-		BufferedImage img = imgLoader.bgImages().get("BG1");
-		graphics.drawImage(img, MathLoader.getMapEvent().get("BG1").transform(), null);
+		graphics.setColor(Color.gray);
+		graphics.fillRect(0, 0, width, height);
+		BufferedImage img = imgLoader.bgImages().get(data.getBG());
+		graphics.drawImage(img, MathLoader.getMapEvent().get(data.getBG()).transform(), null);
 	}
 	
 	/**
@@ -209,8 +209,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		BufferedImage imgBackpack = imgLoader.bgImages().get("BG_BACKPACK");
 		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box(); 
 		graphics.drawImage(imgBackpack, MathLoader.getMapEvent().get("BG_BACKPACK").transform(), null);
-		for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 7; j++) {
+		for (int i = 0; i < data.bag().getRow(); i++) {
+      for (int j = 0; j < data.bag().getCol(); j++) {
 	    	final int fi = i;
 	    	final int fj = j;				  
 		  	if (grid[fi][fj] >= -1) {
@@ -676,7 +676,19 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     FontMetrics fm = graphics.getFontMetrics();
     int textWidth = fm.stringWidth("ETAGE : " + data.floor());
     graphics.setColor(Color.WHITE);
-	  graphics.drawString("ETAGE : " + data.floor(), width - (int) (textWidth * 1.2),	size);
+	  graphics.drawString("ETAGE : " + data.floor(), width - (int) (textWidth + width * 0.01),	size);
+	  drawScoreLevel(graphics, data);
+  }
+  
+  private void drawScoreLevel(Graphics2D graphics, GameData data) {
+  	var score = data.getScore() * (1.2 * data.floor()  + (data.hero().getLevel() / 2.0));
+  	int size = (int) (height * 0.03);
+  	Font font = new Font("Mikodacs", Font.PLAIN, size);
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    int textWidth = fm.stringWidth("SCORE : " + score);
+    graphics.setColor(Color.WHITE);
+	  graphics.drawString("SCORE : " + score, width - (int) (textWidth + width * 0.01),	size * 2);
   }
   
   /**
@@ -690,6 +702,9 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		graphics.setColor(data.mapOrBag() ? Color.ORANGE : Color.CYAN);
     graphics.fill(new Rectangle2D.Double(width - tileSize / 2, height/3.5 - 2.5 * tileSize, 
     																		 tileSize / 2, tileSize / 2));
+    BufferedImage img = imgLoader.bgImages().get("ICON_ABANDON");
+  	graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_ABANDON").transform(), null);
+    
   }
   
   /**
@@ -703,8 +718,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	var leftGrid = MathLoader.getMapEvent().get("BG_MAP").box();
   	var gap = tileSize * 0.1;
   	graphics.drawImage(imgMap, MathLoader.getMapEvent().get("BG_MAP").transform(), null);
-		for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 11; j++) {
+		for (int i = 0; i < data.map().getRow(); i++) {
+      for (int j = 0; j < data.map().getCol(); j++) {
 	    	final int fi = i;
 	    	final int fj = j;
 		  	var coordXY = new XY(fj, fi);
@@ -769,7 +784,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    * @param data     GameData containing the game data.
    */	
   private void updateDragItem(Graphics2D graphics, GameData data) {
-		GameDataClick.getDragItemMap().reversed().forEach((item, box) -> drawDrag(graphics, data, item, box));
+  	var dragItem = GameDataClick.getDragItemMap();
+  	if (!dragItem.isEmpty()) {
+  		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
+  	  graphics.setFont(font);
+  	  graphics.setColor(Color.WHITE);
+    	drawText(graphics, "Debarassez vous de vos items pour continuer", width / 2, (int) (height * 0.98), 100);	
+  		dragItem.reversed().forEach((item, box) -> drawDrag(graphics, data, item, box));
+  	}
+		
   }
   
   /**
@@ -1346,7 +1369,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   private void draw(Graphics2D graphics, GameData data) {
 		drawBG(graphics, data);
 		// Draw enemy if we're in combat
-
 		if (data.mapOrBag()) {
 			drawGrid(graphics, data);
 			drawItemBag(graphics, data);
@@ -1364,7 +1386,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		} else {
 			drawMap(graphics, data);
 		}
-
 		drawHero(graphics, data);
 		drawButton(graphics, data);
 
@@ -1387,7 +1408,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		BufferedImage img = imgLoader.bgImages().get("BG_LOBBY");
 		graphics.drawImage(img, MathLoader.getMapEvent().get("BG_LOBBY").transform(), null);
 		drawButtonLobby(graphics);
-		if (data.getScore()) {
+		if (data.getScore() != 0) {
+			Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
+	  	graphics.setFont(font);
+	  	graphics.setColor(Color.WHITE);
+	  	FontMetrics fm = graphics.getFontMetrics();
+    	graphics.drawString("SCORE FINAL : " + data.getScore(), width / 2 - (fm.stringWidth("SCORE FINAL : " + data.getScore())) / 2, height / 2);
+		}
+		if (data.getScoreLobby()) {
 			drawScore(graphics, data);
 		}
   }

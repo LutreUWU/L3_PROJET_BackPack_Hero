@@ -313,4 +313,12 @@ public class Backpack {
 	public Set<XY> getManaConnectedCoords() {
 		return Set.copyOf(connected);
 	}
+	
+	public int getRow() {
+		return ROW;
+	}
+	
+	public int getCol() {
+		return COL;
+	}
 }

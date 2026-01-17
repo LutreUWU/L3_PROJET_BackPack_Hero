@@ -1,24 +1,24 @@
 package game.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Random;
 
 import com.github.forax.zen.ScreenInfo;
 
 import game.GameData;
+import loader.MathLoader;
 import model.BoundingBox;
-import model.Hero;
 import model.Item;
 import model.RandomItem;
 import model.XY;
+import model.monster.Crabe;
 import model.monster.Enemy;
+import model.monster.Robot;
 
 /**
  * The game data with all methods for combat manipulation. 
@@ -27,27 +27,24 @@ import model.monster.Enemy;
  * All methods here are used when we initiate a combat.
  */
 public class GameDataCombat {
-	/**
-	 * - combat : True if we're in combat, else false
-	 * - target : Since we can have multiple enemy, target is the enemy we're focusing
-	 * - lst_enemy : List of all enemy we're fighting
-	 */
-	private static boolean combat = false;
-	private static boolean curseEvent = false;
-	private static Item hoverItem = null;
-	private static Enemy target;
-  private static List<Enemy> lstEnemy;
-  private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>();
-  private static ArrayList<String> log = new ArrayList<>();
-  private static int totalExp = 0;
-  private static int levelBeforeCombat;
-  private static int nbMana;
+	private static boolean combat = false; // To know if we're currently fighting or not
+	private static boolean curseEvent = false; // To know if we're currently in a curse event or no
+	private static Item hoverItem = null; // If in curse event, To know if we're holding an item
+	private static Enemy target; // Which ennemy we hit with our items
+  private static List<Enemy> lstEnemy; // List of all ennemies
+  private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>(); // The box of all current ennemies on the screen
+  private static ArrayList<String> log = new ArrayList<>(); // History of all actions
+  private static int totalExp = 0; // Exp we get after finishing the combat
+  private static int levelBeforeCombat; // Level before starting combat
+  private static int nbMana; // Mana before starting combat
   
-	/**
-	 * Methods that treats the loop for the combat. The loop stops when the hero or the enemy die. 
-	 * 
-	 * @param monster The data of the monster we fight
-	 * @param data		The data of the game
+  /**
+	 * Starts a new combat sequence.
+	 * Initializes enemies, hero resources, positions enemies on screen,
+	 * applies passive effects and sets the first target.
+	 *
+	 * @param monsters list of enemies to fight
+	 * @param data global game data
 	 */
 	public static void startCombat(List<Enemy> monsters, GameData data) {
 		if (combat) {
@@ -56,19 +53,44 @@ public class GameDataCombat {
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
 		GameDataClick.resetDragItemLst();
+		checkBackgroundChange(monsters.iterator(), data);
 		nbMana = data.bag().getManaInBag();
 		lstEnemy = monsters;
 		lstEnemy.forEach(monster -> monster.resetStats());
 		levelBeforeCombat = data.hero().getLevel();
-		getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());
+		getEnemyBox(lstEnemy, data.hero().getSizeX(), data.hero().getSizeY());
 		lstEnemy.forEach(monster -> monster.preAction());
-		setTarget(lstEnemy.get(0));
+		setTarget(lstEnemy.getFirst());
 		log = new ArrayList<>();
-		log.add("Le combat démarre !");
 		useAllPassive(data);
+		log.add("Le combat démarre !");
 		combat = true;
 	}
 	
+	/**
+	 * Check all ennemies and change the current background if a specific mob is inside
+	 * 
+	 * The background change especially when meeting a boss.
+	 * 
+	 * @param monsters Iterator containing all monsters
+	 * @param data		 data of the game
+	 */
+	private static void checkBackgroundChange(Iterator<Enemy> monsters, GameData data) {
+		while(monsters.hasNext()) {
+			switch (monsters.next()) {
+	      case Robot _ -> data.setBG("BG_BOSS_ROBOT");
+	      case Crabe _ -> data.setBG("BG_BOSS_CRABE");
+	      default -> {}
+			}
+		}
+	}
+	
+	/**
+	 * Applies all passive effects from the hero's items.
+	 * Passive effects may modify items, enemies or hero stats.
+	 *
+	 * @param data global game data
+	 */
 	private static void useAllPassive(GameData data) {
 		data.hero().resetBoostDmg();
 		ListIterator<Item> it = data.bag().bagItemLst().listIterator();
@@ -81,29 +103,29 @@ public class GameDataCombat {
 	}
 	
 	/**
-	 * Get the boundingBox of every enemy in the fight.
-	 * Since every enemy size is based from the hero's size, we need this value
-	 * 
-	 * @param lstEnemy		list of enemies
-	 * @param screenInfo	{@code screenInfo} of the window
-	 * @param heroSizeX		sizeX of the Hero
-	 * @param heroSizeY		sizeY of the Hero
+	 * Computes and assigns a bounding box for each enemy.
+	 * Enemy size is relative to the hero's size and screen dimensions.
+	 *
+	 * @param lstEnemy 	 list of enemies
+	 * @param screenInfo screen size information
+	 * @param heroSizeX  hero width
+	 * @param heroSizeY  hero height
 	 */
-	private static void getEnemyBox(List<Enemy> lstEnemy, ScreenInfo screenInfo, int heroSizeX, int heroSizeY) {
+	private static void getEnemyBox(List<Enemy> lstEnemy, int heroSizeX, int heroSizeY) {
 		double gap = 0.5;
 		double totalWidth = 0;
-    int startX = (int) (screenInfo.width() * 0.75);
-    for (int i = 0; i < lstEnemy.size(); i++) {
+    int startX = (int) (MathLoader.getScreenWidth() * 0.75);
+    for (int i = 0; i < lstEnemy.size(); i++) { // Get the total width of ALL ENNEMIES
 			var enemy = lstEnemy.get(i);
 			double sizeX = heroSizeX * enemy.getInfo().sizeX();
     	totalWidth += sizeX + gap * heroSizeX;
     }
     startX -= totalWidth / 2;
-		for (int i = 0; i < lstEnemy.size(); i++) {
+		for (int i = 0; i < lstEnemy.size(); i++) { // Then we start this "total width"
 			var enemy = lstEnemy.get(i);
 			double sizeX = heroSizeX * enemy.getInfo().sizeX();
 	  	double sizeY = heroSizeY * enemy.getInfo().sizeY();
-	    double northWestY =  screenInfo.height() * 0.6 + heroSizeY - sizeY;
+	    double northWestY =  MathLoader.getScreenHeight() * 0.6 + heroSizeY - sizeY;
 	  	var NW = new XY(startX, (int) northWestY);
 	  	var SE = new XY(NW.x() + (int) sizeX, NW.y() + (int) sizeY);
 	  	startX += sizeX + gap * heroSizeX;
@@ -112,45 +134,60 @@ public class GameDataCombat {
 	}
 	
 	/**
-	 * This methods is called after the user click on a item in the backpack.
-	 * This methods take an ID in parameter, it will checks in the bag if a weapon correspond to the ID, then it we'll use it.
-	 * 
-	 * @param data		The data of the game.
-	 * @param object	The ID of the item we click in the backpack.
+	 * Handles the hero action when an item is used.
+	 * Checks energy and mana requirements before applying the item effect.
+	 * Ends the hero turn if no energy remains.
+	 *
+	 * @param data global game data
 	 */
 	public static void heroAction(GameData data) {
 		Objects.requireNonNull(data);
 		log = new ArrayList<>();
 		var item = hoverItem;
 		if (item != null) {
-			if (item.info().AP() > data.hero().getEnergyPoint()) {
-				addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
-				return;
-			}
-			if (item.info().mana() > 0) {
-				if (item.info().mana() > nbMana) {
-					addLog("Vous n'avez pas assez de mana pour utiliser " + item.toString());
-					return;
-				}
-				else if (!data.bag().itemConnectedToMana(item)) {
-					addLog(item.toString() + " n'est pas connecté à une source de mana");
-					return;
+			if (checkItemCond(item, data)) {
+				useItemOnEnemies(data, item);
+				killMonster(data);
+				if(data.hero().getEnergyPoint() <= 0) {
+					endTour(data);
 				}
 			}
-			useItemOnEnemies(data, item);
-			killMonster(data);
-			if(data.hero().getEnergyPoint() <= 0) {
-				endTour(data);
-			}
+			data.bag().updateManaConnected(); // Update all connected items after using an item
 		}
-		data.bag().updateManaConnected();
 	}
 	
 	/**
-	 * Use the item against enemies.
+	 * Check if all conditions to use an item is meet.
 	 * 
-	 * @param data {@code GameData} of the game
-	 * @param item {@code Item} we wants to use
+	 * @param item Item we wants to check
+	 * @param data Data of the game
+	 * @return false if condition are not met, else true
+	 */
+	private static boolean checkItemCond(Item item, GameData data) {
+		if (item.info().AP() > data.hero().getEnergyPoint()) {
+			addLog("Vous n'avez pas assez d'AP pour utiliser " + item.toString());
+			return false;
+		}
+		if (item.info().mana() > 0) {
+			if (item.info().mana() > nbMana) {
+				addLog("Vous n'avez pas assez de mana pour utiliser " + item.toString());
+				return false;
+			}
+			else if (!data.bag().itemConnectedToMana(item)) {
+				addLog(item.toString() + " n'est pas connecté à une source de mana");
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Uses an item against the targeted enemy or all enemies.
+	 * Removes the item from the backpack, consumes resources,
+	 * applies the effect and re-adds the item if still usable.
+	 *
+	 * @param data global game data
+	 * @param item item to use
 	 */
 	private static void useItemOnEnemies(GameData data, Item item) {
 		data.bag().removeItemFromBackpack(item);
@@ -161,14 +198,16 @@ public class GameDataCombat {
 	}
 
 	/**
-	 * This method is called when there's no enemy left.
-	 * It will reset AP, give the exp, give the weapon and end the combat.
-	 * 
-	 * @param data {@code GameData} of the game.
+	 * Ends the combat when all enemies are defeated.
+	 * Restores hero energy, grants experience, score,
+	 * unlocks inventory slots and generates a reward item.
+	 *
+	 * @param data global game data
 	 */
 	private static void endCombat(GameData data) {
-		GameDataHero.add("energy", (3 - data.hero().getEnergyPoint()));
+		GameDataHero.add("energy", (data.hero().getMaxEnergyPoint() - data.hero().getEnergyPoint()));
 		GameDataHero.add("xp", totalExp);
+		data.addScore(totalExp);
 		for (int i = 0; i < data.hero().getLevel() - levelBeforeCombat; i++) {
 			Random r = new Random();
 			data.bag().addCaseUnlock(3 + r.nextInt(1));
@@ -176,13 +215,15 @@ public class GameDataCombat {
 		var itemGain = RandomItem.generate(data.floor());
 		GameDataClick.addDragItem(itemGain);
 		combat = false;
+		data.updateBG();
 	}
 
 	/**
-	 * Check the list of monster, and kill him if he has below 0 PV.
-	 * Add the exp, update the bounding box and swap the target if necessary.
-	 * 
-	 * @param data {@code data} of the game
+	 * Checks all enemies and removes those with zero or negative HP.
+	 * Updates experience gain, enemy positions and target selection.
+	 * Ends combat if no enemy remains.
+	 *
+	 * @param data global game data
 	 */
 	private static void killMonster(GameData data) {
 		Iterator<Enemy> it = lstEnemy.iterator();
@@ -195,7 +236,7 @@ public class GameDataCombat {
 				if (target == enemy && !lstEnemy.isEmpty()) {
 					setTarget(lstEnemy.getFirst());
 				}
-				getEnemyBox(lstEnemy, data.screenInfo(), data.hero().getSizeX(), data.hero().getSizeY());	
+				getEnemyBox(lstEnemy, data.hero().getSizeX(), data.hero().getSizeY());	
 			}
 		}
 		if (lstEnemy.isEmpty()) {
@@ -204,27 +245,32 @@ public class GameDataCombat {
 	}
 	
 	/**
-	 * End the hero's turn, apply effects and trigger enemies action.
-	 * Also reset the log.
+	 * Ends the hero's turn.
+	 * Applies effects to enemies and hero, triggers enemy actions,
+	 * checks hero death and reapplies passive effects.
 	 * 
-	 * @param data {@code data} of the game
+	 * public method because we call it in GameDataClick when clicking the endbutton
+	 *
+	 * @param data global game data
 	 */
 	public static void endTour(GameData data) {
 		Objects.requireNonNull(data);
-		log = new ArrayList<>();
-		applyEffectsToEnemy();
-		applyEffectsToHero(data);
-		killMonster(data);
-		enemyAction(data);
-		if(data.hero().getHP() <= 0) {
-			combat = false;
-			data.endGame();
+		if (!curseEvent) {
+			log = new ArrayList<>();
+			applyEffectsToEnemy();
+			applyEffectsToHero(data);
+			killMonster(data);
+			enemyAction(data);
+			if(data.hero().getHP() <= 0) {
+				data.endGame();
+			}
+			useAllPassive(data);
 		}
-		useAllPassive(data);
 	}
 	
 	/**
-	 * Apply effects that was on enemies.
+	 * Applies ongoing effects on all enemies,
+	 * dealing damage and updating their effect durations.
 	 */
 	private static void applyEffectsToEnemy() {
 		for (var enemy : lstEnemy) { 
@@ -238,7 +284,10 @@ public class GameDataCombat {
 	}
 	
 	/**
-	 * Apply effects that was on hero
+	 * Applies ongoing effects on the hero,
+	 * dealing damage and updating effect durations.
+	 *
+	 * @param data global game data
 	 */
 	private static void applyEffectsToHero(GameData data) {
 		for (var effect : data.hero().getEffects().keySet()) {
@@ -246,15 +295,14 @@ public class GameDataCombat {
 			data.hero().sub("hp", dmg);
 			addLog("Le hero recoit " + dmg + " dégats à cause de l'effet " + effect);
 		}
-		IO.println("AVANT : " + data.hero().getEffects());
 		data.hero().updateEffects();
-		IO.println("APRES : " + data.hero().getEffects());
 	}
 	
 	/**
-	 * Apply the action of each enemies.
-	 * 
-	 * @param hero 
+	 * Executes each enemy action during their turn
+	 * and resets the hero energy for the next turn.
+	 *
+	 * @param data global game data
 	 */
 	private static void enemyAction(GameData data) {
 		lstEnemy.forEach(enemy -> enemy.action(data));
@@ -263,56 +311,122 @@ public class GameDataCombat {
 	}
 	
 	/**
-	 * Getter to know if we're in a combat or nots
-	 * @return
+	 * Returns whether a combat is currently active.
+	 *
+	 * @return true if in combat, false otherwise
 	 */
 	public static boolean combat() {
 		return combat;
 	}
 	
+	/**
+	 * Sets the currently targeted enemy.
+	 *
+	 * @param enemy enemy to target
+	 */
 	public static void setTarget(Enemy enemy) {
 		Objects.requireNonNull(enemy);
 		target = enemy;
 	}
 	
+	/**
+	 * Returns the currently targeted enemy.
+	 *
+	 * @return current target
+	 */
 	public static Enemy getTarget(){
 		return target;
 	}
 	
+	/**
+	 * Returns the list of alive enemies.
+	 *
+	 * @return enemy list
+	 */
 	public static List<Enemy> getLstEnemy(){
 		return lstEnemy;
 	}
 	
+	/**
+	 * Returns the bounding boxes of all enemies.
+	 *
+	 * @return enemy bounding boxes
+	 */
 	public static LinkedHashMap<Enemy, BoundingBox> getEnemyBox() {
 		return enemyBox;
 	}
 	
+	/**
+	 * Adds a message to the combat log.
+	 *
+	 * @param content message to add
+	 */
 	public static void addLog(String content) {
 		Objects.requireNonNull(content);
 		log.add(content);
 	}
 	
+	/**
+	 * Returns an immutable copy of the combat log.
+	 *
+	 * @return combat log
+	 */
 	public static List<String> getLog() {
 		return List.copyOf(log);
 	}
 	
+	/**
+	 * Sets the item currently hovered by the player.
+	 *
+	 * @param item hovered item
+	 */
 	public static void setHoverItem(Item item) {
 		hoverItem = item;
 	}
 	
+	/**
+	 * Returns the currently hovered item.
+	 *
+	 * @return hovered item
+	 */
 	public static Item getHoverItem() {
 		return hoverItem;
 	}
 	
+	/**
+	 * Returns the remaining mana during combat.
+	 *
+	 * @return available mana
+	 */
 	public static int getNbMana() {
 		return nbMana;
 	}
 	
+	/**
+	 * Enables or disables the curse event state.
+	 *
+	 * @param bool curse state
+	 */
 	public static void setCurseEvent(boolean bool) {
 		curseEvent = bool;
 	}
 	
+	/**
+	 * Returns whether a curse event is active.
+	 *
+	 * @return true if curse event is active
+	 */
 	public static boolean getCurseEvent() {
 		return curseEvent;
 	}
+	
+	/**
+	 * Enables or disables the combat event state
+	 *
+	 * @param bool combat state
+	 */
+	public static void setCombatEvent(boolean bool) {
+		combat = bool;
+	}
+	
 }

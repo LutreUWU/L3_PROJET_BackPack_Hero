@@ -4,19 +4,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import model.item.common.Gold;
 
 public class Hero {
   // Statistics of the hero
-	private int maxHP = 40;
 	private int HP = 40;
+	private int maxHP = 40;
 	private int currentProtection = 0; // damage countered
 	private int currentArmor = 0; // as a percentage (between 0 and 100%)
 	private int energyPoint = 3;
 	private int maxEnergyPoint = 3;
 	private int manaPoint = 0;
-	private int maxManaPoint = 3;
 	private int curseRefuse = 0;
 	private float boostDmg = 0;
 	private final Map<Effect, Integer> effects = new HashMap<>();
@@ -175,7 +175,7 @@ public class Hero {
 	 * Update all effects and remove them if necessary
 	 */
 	public void updateEffects() {
-    effects.replaceAll((k, v) -> v - 1);
+    effects.replaceAll((_, v) -> v - 1);
     effects.values().removeIf(v -> v <= 0);
 	}
 

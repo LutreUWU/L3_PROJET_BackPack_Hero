@@ -3,7 +3,6 @@ package game.data;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 
 import com.github.forax.zen.ScreenInfo;
 
@@ -15,6 +14,7 @@ import model.Curse;
 import model.Item;
 import model.XY;
 import model.item.common.Gold;
+import model.map.Floor;
 
 public class GameDataClick {
 	private static GameData data;
@@ -23,11 +23,11 @@ public class GameDataClick {
   private static XY oldPosition; // contains the mouse coordinate before moving the cursor.
   private static LinkedHashMap<Item, BoundingBox> dragItemMap; // Contains all movable items on the screen.
 	
-	public GameDataClick(GameData dataGame) {
+	public GameDataClick(GameData dataGame, ScreenInfo screenInfo_) {
 		Objects.requireNonNull(dataGame);
 		data = dataGame;
 		backpack = data.bag();
-		screenInfo = data.screenInfo();
+		screenInfo = screenInfo_;
 		dragItemMap = new LinkedHashMap<>();
 	}
 	
@@ -41,13 +41,14 @@ public class GameDataClick {
    */
   public static XY bagClick(int x, int y) {
   	int size = backpack.getGridSize();
-  	double coordLeftGrid = (screenInfo.width() / 2) - 3.5 * size;
-  	double coordTopGrid = (screenInfo.height() / 4.5) - 2.5 * size;
+  	;
+  	double coordLeftGrid = (screenInfo.width() / 2) - backpack.getCol() / 2.0 * size;
+  	double coordTopGrid = (screenInfo.height() / 4.5) - backpack.getRow() / 2.0 * size;
   	if (data.mapOrBag() == false) {
   	  return null;
   	}
-  	if(x < coordLeftGrid || x > (coordLeftGrid + 7 * size) ||
-  		 y < coordTopGrid   || y > (coordTopGrid + 5 * size)
+  	if(x < coordLeftGrid || x > (coordLeftGrid + backpack.getCol() * size) ||
+  		 y < coordTopGrid   || y > (coordTopGrid + backpack.getRow() * size)
   		) {
   		return null;
   	}
@@ -73,7 +74,7 @@ public class GameDataClick {
 	private static int checkMapAbsClick(double leftGrid, double gridSize, double gap, int x) {
 		double positionX = leftGrid;
 		int newX = -1;
-		for (var i = 0; i < 11; i++) {
+		for (var i = 0; i < data.map().getCol(); i++) {
 			if (positionX <= x && x <= positionX + gridSize) {
 				newX = i;
 				break;
@@ -99,7 +100,7 @@ public class GameDataClick {
 	private static int checkMapOrdClick(double topGrid, double gridSize, double gap, int y) {
 		double positionY = topGrid;
 		int newY = -1;
-		for (var i = 0; i < 5; i++) {
+		for (var i = 0; i < data.map().getRow(); i++) {
 			if (positionY <= y && y <= positionY + gridSize) {
 				newY = i;
 				break;
@@ -120,11 +121,13 @@ public class GameDataClick {
    */
   private static XY floorClick(int x, int y) {
   	int size = backpack.getGridSize();
+  	int nbCol = data.map().getCol();
+  	int nbRow = data.map().getRow();
   	var gap = size * 0.1;
   	double leftGrid = MathLoader.getMapEvent().get("BG_MAP").box().northWest().x();
   	double topGrid = MathLoader.getMapEvent().get("BG_MAP").box().northWest().y();
-  	if(x < leftGrid || x > (leftGrid + 11 * size + 10 * gap) ||
-   		 y < topGrid   || y > (topGrid + 5 * size + 4 * gap)
+  	if(x < leftGrid || x > (leftGrid + nbCol * size + (nbCol - 1) * gap) ||
+   		 y < topGrid   || y > (topGrid + nbRow * size + (nbRow - 1) * gap)
    		) {
    		return null;
    	}
@@ -337,8 +340,8 @@ public class GameDataClick {
   public static void addDragItemFromBag(Item item, int x, int y) {
   	Objects.requireNonNull(item);
   	var size = backpack.getGridSize();
-  	var northWest = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)), (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * (y - 1))));
-  	var southEast = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + getWidth(item) * size, (int) (data.screenInfo().height()/4.5 - 2.5 * size + (size * y) + getHeight(item) * size));
+  	var northWest = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)), (int) (screenInfo.height()/4.5 - 2.5 * size + (size * (y - 1))));
+  	var southEast = new XY((int) (screenInfo.width() / 2 - 3.5 * size + (size * x)) + getWidth(item) * size, (int) (screenInfo.height()/4.5 - 2.5 * size + (size * y) + getHeight(item) * size));
   	dragItemMap.put(item, new BoundingBox(northWest, southEast));
   }
   
@@ -660,7 +663,8 @@ public class GameDataClick {
         GameDataClick::clickMapOrBag,
         GameDataClick::clickEvent,
         GameDataClick::clickCombat,
-        GameDataClick::clickShop
+        GameDataClick::clickShop,
+        GameDataClick::clickFF
     );
   }
   
@@ -735,7 +739,9 @@ public class GameDataClick {
 	 *         {@code null} if no item was clicked
    */
   private static ClickResult clickMap(int x, int y) {
-      if (data.mapOrBag()) return null;
+      if (data.mapOrBag()) {
+      	return null;
+      }
       XY map = floorClick(x, y);
       return map == null ? null : new ClickResult(ClickType.MAP, map);
   }
@@ -753,6 +759,9 @@ public class GameDataClick {
 	 *         {@code null} if no item was clicked
    */
   private static ClickResult clickMapOrBag(int x, int y) {
+  		if (!dragItemMap.isEmpty()) {
+  			return null;
+  		}
       int v = mapOrBagClick(x, y);
       return v == 0 ? null : new ClickResult(ClickType.MAP_OR_BAG, v);
   }
@@ -794,7 +803,6 @@ public class GameDataClick {
       return null;
   }
   
-  
   /**
    * Interact with all elements in the shop
    * If detected, it apply the consequence when clicking.
@@ -806,7 +814,6 @@ public class GameDataClick {
    */
   private static ClickResult clickShop(int x, int y) {
       if (!data.getShop()) return null;
-
       if (!data.getShopLst().getCurrentShop().isEmpty()) {
           arrowButtonClick(x, y);
           buyButtonClick(x, y);
@@ -815,6 +822,27 @@ public class GameDataClick {
       return null;
   }
   
+  /**
+   * Checks whether we click in the give up button.
+   * 
+   * If detected, end the game and display the score of the player.
+   * 
+   * @param x coordinate x of the mouse click
+   * @param y coordinate y of the mouse click
+   * 
+	 * @return {@code null} since the result is not usefull
+   */
+  private static ClickResult clickFF(int x, int y) {
+  	var boundingBox = MathLoader.getMapEvent().get("ICON_ABANDON").box();
+		var NW = boundingBox.northWest();
+		var SE = boundingBox.southEast();
+		if (x >= NW.x() && x <= SE.x()) {
+			if (y >= NW.y() && y <= SE.y()) {
+				data.endGame();
+			}
+		}
+		return null;
+  }
 	/**
    * Check where the mouse is when we release the mouse.
    * 

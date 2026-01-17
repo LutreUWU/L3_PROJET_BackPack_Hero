@@ -11,6 +11,7 @@ import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 import com.github.forax.zen.PointerEvent.Location;
+import com.github.forax.zen.ScreenInfo;
 
 import game.data.GameDataClick;
 import game.data.GameDataCombat;
@@ -21,7 +22,7 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.mythic.Mimicry;
+import model.item.legendary.Axe;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -29,7 +30,6 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
-import model.monster.Chicken;
 import model.monster.Crabe;
 
 /**
@@ -38,42 +38,42 @@ import model.monster.Crabe;
  * GameData, and dealing with time events.
  */
 public class GameController {
-	private static boolean inLobby = true;
+	private static ScreenInfo screenInfo;
+	private static GameData data;
+	private static GameView view;
+	private static boolean inLobby = true; // To know if we're in the lobby of the game or not
 	/**
 	 * Default constructor, which does basically nothing.
 	 */
 	public GameController() {}
+	
 	/**
 	 * Goes once in the game loop, which consists in retrieving user actions,
 	 * transmitting it to the GameView and GameData, and dealing with time events.
 	 * 
 	 * @param context {@code ApplicationContext} of the game.
-	 * @param data    GameData of the game.
-	 * @return True if the game continue, False if we press the button to stop
+	 * @param data    {@code GameData} of the game.
+	 * @param view    {@code GameView} of the game.
+	 * @return True   if the game continue, False if we press the button to stop
 	 */
-	private static boolean gameLoop(ApplicationContext context, GameData data, GameView view) {
+	private static boolean gameLoop(ApplicationContext context) {
 		if (data.getEndGame()) {
 			return false;
 		}
 		Event event = context.pollOrWaitEvent(10);
-		if (event != null) {
+		if (event != null) { 	
 			switch (event) {
-				// Mouse event
-				case PointerEvent pointerEvent -> {
-					checkPointerEvent(data, pointerEvent);
-					GameView.draw(context, data, view);
-				}
-				// Keyboard event
+				case PointerEvent pointerEvent -> checkPointerEvent(data, pointerEvent);
 				case KeyboardEvent key -> {
 					if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
 						if (!checkKeyEvent(data, key.key())) {
 							return false;
 						};
-						GameView.draw(context, data, view);
 					}
 				}
 				default -> {}
 			}
+			GameView.draw(context, data, view);
 		}
 		return true;
 	}
@@ -314,16 +314,12 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-//				 GameDataClick.addDragItem(new Axe());
-//				 GameDataClick.addDragItem(new ManaStone(2));
-//				 GameDataClick.addDragItem(new EnchantedDiamondSword());
-//				 GameDataClick.addDragItem(new Cookie());
-				GameDataClick.addDragItem(new Mimicry());
+				 GameDataClick.addDragItem(new Axe());
 			}
 		}
 		case Key.I -> {
 			if (GameDataCombat.combat() == false) {
-				GameDataCombat.startCombat(new ArrayList<>(List.of(new Crabe(), new Chicken())), data);
+				GameDataCombat.startCombat(new ArrayList<>(List.of(new Crabe())), data);
 			}
 		}
 		///////////////////////////////////////////////////////////////
@@ -344,36 +340,58 @@ public class GameController {
 		return true;
 	}
 	
-	private static int gameLoopLobby(ApplicationContext context, GameData data, GameView view) {
+	/**
+	 * Goes once in the game lobby loop, which consists in retrieving user actions,
+	 * transmitting it to the GameView and GameData, and dealing with time events.
+	 * 
+	 * @param context {@code ApplicationContext} of the game.
+	 * @param data    {@code GameData} of the game.
+	 * @param view    {@code GameView} of the game.
+	 * 
+	 * @return True   if the game continue, False if we press the button to stop
+	 */
+	private static int gameLoopLobby(ApplicationContext context) {
 		Event event = context.pollOrWaitEvent(10);
 		if (event != null) {
 			switch (event) {
-				// Mouse event
-				case PointerEvent pointerEvent -> {
+				case PointerEvent pointerEvent -> { // Mouse event
 					switch(pointerEvent.action()) {
 					case POINTER_UP -> {
 						int res = checkPointerUpLobby(context, pointerEvent.location());
-						switch(res) {
-						case 0 -> {
-							data.setScore(true);
-							GameView.drawLobby(context, data, view);
-						}
-						case 1 -> {
-							GameView.draw(context, data, view);
-							inLobby = false;
-						}
-						
-						}
+						applyResEffect(res, context);
 						return res;
 					}
 					default -> {}
-					
 					}
 				}
 				default -> {}
 			}
 		}
 		return 1;
+	}
+	
+	/**
+	 * Check the res of the pointerEvent and depending of the result,
+	 * apply the consequence.
+	 * 
+	 * 0 : We display the scoreboard
+	 * 1 : We start the game and leave the lobby
+	 * 
+	 * @param context {@code ApplicationContext} of the game.
+	 * @param data    {@code GameData} of the game.
+	 * @param view    {@code GameView} of the game.
+	 */
+	private static void applyResEffect(int res, ApplicationContext context) {
+		switch(res) {
+		case 0 -> {
+			data.setScore(true);
+			GameView.drawLobby(context, data, view);
+		}
+		case 1 -> {
+			GameView.draw(context, data, view);
+			inLobby = false;
+		}
+		}
 	}
 	
 	/**
@@ -409,34 +427,39 @@ public class GameController {
 	 * @param context {@code ApplicationContext} of the game.
 	 */
 	public static void memoryGame(ApplicationContext context) {
-		var screenInfo = context.getScreenInfo();
-		var data = new GameData(screenInfo);
-		var imageLoader = new ImageLoader();
-		FontLoader.load_font(screenInfo);
-		new MathLoader(data, imageLoader);
-		var view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize(), imageLoader);
+		initGame(context);
 		GameView.drawLobby(context, data, view);
 		int n = 1; 
 		while (true) {
 			if (inLobby) {
-				n = gameLoopLobby(context, data, view);
+				n = gameLoopLobby(context);
 			}
 			else {
-				if (!gameLoop(context, data, view)) {
+				if (!gameLoop(context)) {
 					GameView.drawLobby(context, data, view);
 					inLobby = true;
 					data = new GameData(screenInfo);
-					// A enlever, car théoriquement, on retourne aux lobby seulement si le héro meurt
-					// Si tu veux quitter directement avec E à l'intérieur du jeu, faut rajouter ça :
-					// n = -1;
 				}
 			}
 			if (n == -1) {
-				System.out.println("Thank you for quitting!");
 				context.dispose();
 				return;
 			}
 		}
+	}
+	
+	/**
+	 * Inits all elements when launching the game.
+	 * 
+	 * @param context {@code ApplicationContext} of the game.
+	 */
+	private static void initGame(ApplicationContext context) {
+		screenInfo = context.getScreenInfo();
+		data = new GameData(screenInfo);
+		var imageLoader = new ImageLoader();
+		FontLoader.load_font(screenInfo);
+		new MathLoader(data, imageLoader, screenInfo);
+		view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize(), imageLoader);
 	}
 	
 	/**
