@@ -22,6 +22,7 @@ import model.Item;
 import model.ItemRepository;
 import model.XY;
 import model.item.legendary.Axe;
+import model.item.superrare.Bomb;
 import model.map.Floor;
 import model.map.Shop;
 import model.map.eventManager.LinkedEvent;
@@ -92,7 +93,8 @@ public class GameData {
 	 * Adds the initial items to the hero inventory when starting a new game.
 	 */
   private void addStarterPack() {
-  	GameDataClick.addDragItem(new Axe());
+  	GameDataClick.addDragItem(new Bomb());
+  	GameDataClick.addDragItem(new Bomb());
   }
   
   /**

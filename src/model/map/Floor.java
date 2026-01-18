@@ -12,8 +12,8 @@ import model.XY;
 
 public class Floor {
 
-	private final int ROW = 4; //5
-	private final int COL = 9; // 11
+	private final int ROW = 5; //5
+	private final int COL = 11; // 11
 
 	final private Room[][] grid = new Room[ROW][COL];
 
@@ -101,7 +101,7 @@ public class Floor {
 				}
 			}
 		}
-		return new XY(list2.get(8).x(), list2.get(8).y());
+		return new XY(list2.get(0).x(), list2.get(0).y());
 	}
 
 	/**
@@ -127,12 +127,12 @@ public class Floor {
 	
 	private int createOneSpecialRoomOfEach(List<XY> list, int floor) {
 		var index = 0;
+		grid[list.get(index).y()][list.get(index++).x()] = new Start(); // Create start
 		grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor); // Create shop
 		grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor); // Create treasure
 		grid[list.get(index).y()][list.get(index++).x()] = new Exit(floor); // Create exit
 		grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor); // Create Enemy
 		grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor); // Create Healer
-		grid[list.get(index).y()][list.get(index++).x()] = new Start(); // Create start
 		grid[list.get(index).y()][list.get(index++).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the hero has a key)
 		grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor); // Create Event
 		return index;

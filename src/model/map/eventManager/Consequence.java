@@ -1,6 +1,7 @@
 package model.map.eventManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.GameData;
 import game.data.GameDataClick;
@@ -22,7 +23,7 @@ public class Consequence {
 	final private int floor;
 	final private double bonus; // OR *MALUS* !
 	private String idConsequence = null;
-	private ArrayList<Enemy> enemyList = null;
+	private List<Enemy> enemyList = null;
 
 	/**
 	 * Constructor for consequence
@@ -44,7 +45,7 @@ public class Consequence {
 	 * @param floor2
 	 * @param bonus2
 	 */
-	public Consequence(ArrayList<Enemy> enemyList2, int floor2, double bonus2) {
+	public Consequence(List<Enemy> enemyList2, int floor2, double bonus2) {
 		floor = floor2;
 		bonus = bonus2;
 		enemyList = enemyList2;

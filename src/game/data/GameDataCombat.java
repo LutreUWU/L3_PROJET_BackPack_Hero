@@ -236,7 +236,7 @@ public class GameDataCombat {
 				if (target == enemy && !lstEnemy.isEmpty()) {
 					setTarget(lstEnemy.getFirst());
 				}
-				getEnemyBox(lstEnemy, data.hero().getSizeX(), data.hero().getSizeY());	
+				getEnemyBox(lstEnemy, data.hero().getSizeX(), data.hero().getSizeY());
 			}
 		}
 		if (lstEnemy.isEmpty()) {
@@ -262,6 +262,9 @@ public class GameDataCombat {
 			killMonster(data);
 			enemyAction(data);
 			if(data.hero().getHP() <= 0) {
+				data.endGame();
+			}
+			if (data.floor() == 4) {
 				data.endGame();
 			}
 			useAllPassive(data);

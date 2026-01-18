@@ -44,6 +44,7 @@ public class ItemRepository {
   	  registerWeapon(new Axe()); // Legendary
   	  registerWeapon(new Mimicry()); // Mythics
   	  createRankingWeapon();
+  	  
     }
     
     // Méthode pour enregistrer une arme

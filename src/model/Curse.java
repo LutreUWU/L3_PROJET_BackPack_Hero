@@ -85,6 +85,7 @@ public record Curse(XY[] shape, Direction direction, ItemStats info, int durabil
     @Override
     public Item use(Enemy enemy, List<Enemy> lstEnemy, GameData data) {
       GameDataCombat.addLog("MUAAAHAAAHAAA ! J'espère que tu as aimé la malédiction !");
+      data.hero().addEffect(Effect.FIRE, 5);
       return subDurability(1);
     }
     

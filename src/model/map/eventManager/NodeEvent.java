@@ -1,5 +1,7 @@
 package model.map.eventManager;
 
+import java.util.Objects;
+
 public class NodeEvent {
 	final private String question;
 	final private String answer;
@@ -24,6 +26,7 @@ public class NodeEvent {
 	 * @param newChoice1
 	 */
 	public void setChoice1(NodeEvent newChoice1) {
+		Objects.requireNonNull(newChoice1);
 		choice1 = newChoice1;
 	}
 
@@ -33,6 +36,7 @@ public class NodeEvent {
 	 * @param newChoice2
 	 */
 	public void setChoice2(NodeEvent newChoice2) {
+		Objects.requireNonNull(newChoice2);
 		choice2 = newChoice2;
 	}
 

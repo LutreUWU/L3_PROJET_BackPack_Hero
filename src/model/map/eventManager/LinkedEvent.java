@@ -73,9 +73,10 @@ public class LinkedEvent {
 	 * @param current floor
 	 */
 	private void createEventForExitRoom(int floor) {
-		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour monter à l'étage ?");
+		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
+		root = new NodeEvent(null, "Souhaitez vous vous battre contre le boss pour " + question);
 		
-		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(EnemyRepository.getOneBossRankLst(floor))), "Bon courage !");
+		var choiceOne = createNodeWithConsequence("Oui ! Je suis prêt !", floor, 1, new ArrayList<Enemy>(List.of(EnemyRepository.getOneBossLst(floor))), "Bon courage !");
 		root.setChoice1(choiceOne);
 
 		var choiceTwo = createNodeWithConsequence("Non ! Je vais finir de me préparer...", floor, 1, "nothing",
@@ -222,7 +223,7 @@ public class LinkedEvent {
 	 * @param lastAnswer
 	 * @return a node
 	 */
-	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, ArrayList<Enemy> conseqEnemy, String lastAnswer) {
+	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, List<Enemy> conseqEnemy, String lastAnswer) {
 		var endNode = new NodeEvent("Mettre fin à l'évenement", null);
 		var node = new NodeEvent(answer, lastAnswer);
 		node.setChoice1(endNode);

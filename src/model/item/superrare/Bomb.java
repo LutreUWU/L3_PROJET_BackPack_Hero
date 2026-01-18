@@ -30,11 +30,11 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 	}
 
 	public Bomb(XY[] shape, Direction direction, int durability) {
-		this(shape, direction, ITEM_STATS, DURABILITY);
+		this(shape, direction, ITEM_STATS, durability);
 	}
 	
 	public Bomb(XY coord, Direction direction, int durability) {
-		this(initShape(coord, direction), direction, ITEM_STATS, DURABILITY);
+		this(initShape(coord, direction), direction, ITEM_STATS, durability);
 	}
 
 	private static XY[] initShape(XY coord, Direction direction) {
@@ -94,6 +94,7 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 		for (var target : lstEnemy) {
 			target.subHP(dmg + bonus);
 		}
+		IO.println(subDurability(1).durability());
 		return subDurability(1);
 	}
 

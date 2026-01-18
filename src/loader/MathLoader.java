@@ -569,7 +569,7 @@ public class MathLoader {
 	}
 	
 	public static int getScreenHeight() {
-		return screenWidth;
+		return screenHeight;
 	}
 	
 }

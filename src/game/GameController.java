@@ -23,6 +23,8 @@ import model.Curse;
 import model.Item;
 import model.XY;
 import model.item.legendary.Axe;
+import model.item.mythic.Mimicry;
+import model.item.superrare.Bomb;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -30,6 +32,7 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
+import model.monster.Chicken;
 import model.monster.Crabe;
 
 /**
@@ -314,19 +317,19 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				 GameDataClick.addDragItem(new Axe());
+				 GameDataClick.addDragItem(new Mimicry());
 			}
 		}
 		case Key.I -> {
 			if (GameDataCombat.combat() == false) {
-				GameDataCombat.startCombat(new ArrayList<>(List.of(new Crabe())), data);
+				GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken())), data);
 			}
 		}
 		///////////////////////////////////////////////////////////////
 		case Key.R -> {
 			if (data.dragItem() != null) {
 				GameDataClick.removeItemFromDrag(data.dragItem());
-				data.setDragItem(GameData.rotateItem(data.dragItem()));			
+				data.setDragItem(GameData.rotateItem(data.dragItem()));
 				GameDataClick.addDragItem(data.dragItem());
 				GameDataClick.updateBoundingBox(data.dragItem(), data.getMouseCoord().x(), data.getMouseCoord().y());
 			}

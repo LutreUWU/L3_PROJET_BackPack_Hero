@@ -19,7 +19,7 @@ public class Backpack {
 	 */
 	
 	private int[][] backpack;
-	final private int ROW = 5;
+	final private int ROW = 7;
 	final private int COL = 7;
 
 	final private int gridSize;
