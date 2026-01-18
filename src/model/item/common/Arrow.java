@@ -22,18 +22,46 @@ public record Arrow(XY[] shape, Direction direction, int durability, ItemStats i
 	private static final int MANA_VALUE = 0;
 	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
 	
+	/**
+	 * Creates a default Arrow positioned at (0, 0),
+	 * oriented upwards, with its default durability and item stats.
+	 */
 	public Arrow() {
-  this(initShape(new XY(0, 0), Direction.UP), Direction.UP, DURABILITY, ITEM_STATS);
+		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, DURABILITY, ITEM_STATS);
   }
 	
+	/**
+	 * Creates an Arrow with a predefined shape, direction and durability.
+	 * The item stats are automatically set to the Arrow default stats.
+	 *
+	 * @param shape 		  The grid cells occupied by the arrow
+	 * @param direction 	The orientation of the arrow
+	 * @param durability  The current durability of the arrow
+	 */
 	public Arrow(XY[] shape, Direction direction, int durability) {
 		this(shape, direction, durability, ITEM_STATS);
 	}
 	
+	/**
+	 * Creates an Arrow at the given grid coordinate, oriented in the given direction,
+	 * with the specified durability.
+	 *
+	 * @param coord 		 The pivot coordinate of the arrow
+	 * @param direction  The orientation of the arrow
+	 * @param durability The current durability of the arrow
+	 */
 	public Arrow(XY coord, Direction direction, int durability) {
     this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
-
+	
+	/**
+	 * Initializes the shape of the arrow based on a pivot coordinate and a direction.
+	 * The shape is rotated clockwise according to the direction ordinal.
+	 *
+	 * @param coord 		The pivot coordinate of the arrow
+	 * @param direction The initial orientation of the arrow
+	 * @return an array of grid coordinates representing the arrow shape
+	 */
 	private static XY[] initShape(XY coord, Direction direction) {
     XY[] b = new XY[1];
     b[0] = new XY(coord.x(), coord.y());
@@ -43,6 +71,13 @@ public record Arrow(XY[] shape, Direction direction, int durability, ItemStats i
     return b;
   }
   
+	/**
+	 * Rotates the given shape by 90 degrees clockwise around a pivot point.
+	 *
+	 * @param shape The current shape coordinates
+	 * @param pivot The rotation pivot
+	 * @return the rotated shape
+	 */
 	private static XY[] rotate90(XY[] shape, XY pivot) {
     return shape;
   }
