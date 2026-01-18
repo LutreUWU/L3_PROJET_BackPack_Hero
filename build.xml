@@ -34,7 +34,7 @@
 
     <!-- Nettoyage -->
     <target name="clean">
-        <delete dir="classes"/>
+        <delete dir="classes/"/>
         <delete file="BackpackHero.jar"/>
         <delete dir="docs/doc"/>
     </target>
