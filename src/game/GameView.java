@@ -90,8 +90,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data    GameData containing the game data.
 	 */
 	private void drawBG(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(graphics);
 		graphics.setColor(Color.gray);
 		graphics.fillRect(0, 0, width, height);
 		BufferedImage img = imgLoader.bgImages().get(data.getBG());
@@ -112,11 +110,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param direction Direction we wants to draw it
 	 */
 	private void drawElement(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(img);
-		if (dimX <= 0 || dimY <= 0) {
-			throw new IllegalArgumentException("dimX <= 0 || dimY <= 0");
-		}
 		double angle = Math.toRadians(90 * direction.ordinal());
 		var width = img.getWidth();
 		var height = img.getHeight();
@@ -158,11 +151,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 *                  wants the centerY, marginY = 0.5)
 	 */
 	private void drawSpecialElement(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction, double marginX, double marginY) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(img);
-		if (dimX <= 0 || dimY <= 0) {
-			throw new IllegalArgumentException("dimX <= 0 || dimY <= 0");
-		}
 		double angle = Math.toRadians(90 * direction.ordinal());
 		var width = img.getWidth();
 		var height = img.getHeight();
@@ -204,11 +192,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 *                  wants the centerY, marginY = 0.5)
 	 */
 	private void drawSpecialElementInBag(Graphics2D graphics, BufferedImage img, double x, double y, double dimX, double dimY, Direction direction, double marginX, double marginY) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(img);
-		if (dimX <= 0 || dimY <= 0) {
-			throw new IllegalArgumentException("dimX <= 0 || dimY <= 0");
-		}
 		double angle = Math.toRadians(90 * direction.ordinal());
 		var width = img.getWidth();
 		var height = img.getHeight();
@@ -230,8 +213,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data    Data of the game
 	 */
 	private void drawGrid(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		int size = data.bag().getGridSize();
 		int[][] grid = data.bag().grid();
 		BufferedImage imgBackpack = imgLoader.bgImages().get("BG_BACKPACK");
@@ -256,8 +237,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     {@code data} of the game
 	 */
 	private void drawManaGrid(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		int size = data.bag().getGridSize();
 		BoundingBox boundingBox = MathLoader.getMapEvent().get("BG_BACKPACK").box();
 
@@ -274,8 +253,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     Data of the game
 	 */
 	private void drawItemBag(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var itemLst = data.bag().bagItemLst();
 		for (var item : itemLst) {
 			var id = item.info().ID();
@@ -283,10 +260,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 			switch (id) {
 			case 1 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75);
 			case 2 -> drawItemGold(graphics, data, coordinate, item);
-			case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id));
+			case 3, 5, 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id));
 			case 4 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y()), 2, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.25, 0.25);
-			case 5 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id));
-			case 6 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 3, item.direction(), imgLoader.itemImagesByID().get(id));
 			case 7 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75);
 			case 8 -> drawInBagSpecial(graphics, new XY(coordinate.x(), coordinate.y() - 1), 2, 3, item.direction(), imgLoader.itemImagesByID().get(id), 0.20, 0.5);
 			case 9, 11, 12, 14, 15, 16, 18 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.itemImagesByID().get(id));
@@ -309,10 +284,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param item       {@Code Item} containing the amount of gold
 	 */
 	private void drawItemGold(Graphics2D graphics, GameData data, XY coordinate, Item item) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(coordinate);
-		Objects.requireNonNull(item);
 		var itemGold = (Gold) item;
 		switch (getSizeGold(itemGold.value())) {
 		case 3 -> drawInBag(graphics, new XY(coordinate.x(), coordinate.y()), 1, 1, item.direction(), imgLoader.bgImages().get("gold3"));
@@ -328,7 +299,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @return String description of the item
 	 */
 	private String getDescriptionItem(Item item) {
-		Objects.requireNonNull(item);
 		return switch (item) {
 		case KeyDoor _ -> "J'ai retrouvé mes clés de maison";
 		case Gold _ -> "Comme dans la vraie vie, sans argent c'est la merde";
@@ -359,7 +329,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @return String effect of the item
 	 */
 	private String getEffectItem(Item item) {
-		Objects.requireNonNull(item);
 		return switch (item) {
 		case KeyDoor _ -> "Déverouille une porte (1 fois)";
 		case Gold g -> "Il y a " + g.value() + "gold";
@@ -390,8 +359,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data
 	 */
 	private void drawItemInfo(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		BufferedImage imgItemInfo = imgLoader.bgImages().get("BG_INFO_ITEM");
 		BoundingBox itemInfoBoundingBox = MathLoader.getMapEvent().get("BG_INFO_ITEM").box();
 		XY NW = itemInfoBoundingBox.northWest();
@@ -426,11 +393,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param SE       south-east coordinate of the display area
 	 */
 	private void writeItemInfo(Graphics2D graphics, GameData data, Item item, XY NW, XY SE) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(item);
-		Objects.requireNonNull(NW);
-		Objects.requireNonNull(SE);
 		int height = SE.y() - NW.y();
 		drawTextInfoName(graphics, item, NW);
 		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH4());
@@ -459,9 +421,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param NW       north-west coordinate of the display area
 	 */
 	private void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(item);
-		Objects.requireNonNull(NW);
 		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
 		graphics.setFont(font);
 		graphics.setColor(switch (item.info().rarity()) {
@@ -489,8 +448,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param maxChar  maximum number of characters per line
 	 */
 	private void drawTextInfo(Graphics2D graphics, String content, int x, int y, int maxChar) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(content);
 		if (maxChar <= 0) {
 			throw new IllegalArgumentException("maxChar <= 0");
 		}
@@ -528,12 +485,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param img       {@code BufferedImage} of the item
 	 */
 	private void drawInBag(Graphics2D graphics, XY pos, int width, int height, Direction direction, BufferedImage img) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(pos);
-		Objects.requireNonNull(img);
-		if (width <= 0 || height <= 0) {
-			throw new IllegalArgumentException("width <= 0 || height <= 0");
-		}
 		BoundingBox coord = MathLoader.getMapEvent().get("BG_BACKPACK").box();
 		double centerX = 0, centerY = 0;
 		drawElement(graphics, img, coord.northWest().x() + (tileSize * pos.x()) + centerX, coord.northWest().y() + (tileSize * pos.y()) - centerY, tileSize * width, tileSize * height, direction);
@@ -554,18 +505,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param marginY   Value between 0.0 and 1.0 indicating the gap vertically
 	 */
 	private void drawInBagSpecial(Graphics2D graphics, XY pos, int width, int height, Direction direction, BufferedImage img, double marginX, double marginY) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(pos);
-		Objects.requireNonNull(img);
-		if (width <= 0 || height <= 0) {
-			throw new IllegalArgumentException("width <= 0 || height <= 0");
-		}
-		if (marginX < 0.0 || marginY < 0.0) {
-			throw new IllegalArgumentException("marginX <= 0.0 || marginY <= 0.0");
-		}
-		if (marginX > 1.0 || marginY > 1.0) {
-			throw new IllegalArgumentException("marginX > 1.0 || marginY > 1.0");
-		}
 		BoundingBox coord = MathLoader.getMapEvent().get("BG_BACKPACK").box();
 		double centerX = 0, centerY = 0;
 		drawSpecialElementInBag(graphics, img, coord.northWest().x() + (tileSize * pos.x()) + centerX, coord.northWest().y() + (tileSize * pos.y()) - centerY, tileSize * width, tileSize * height, direction, marginX, marginY);
@@ -578,8 +517,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data    GameData containing the game data.
 	 */
 	private void drawHero(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		double size_x = data.hero().getSizeX();
 		double size_y = data.hero().getSizeY();
 		if (!data.getShop()) {
@@ -599,8 +536,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param y        coordinate y where we wants to draw.
 	 */
 	private void drawHeroStats(Graphics2D graphics, GameData data, int x, int y) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		drawHeroHP(graphics, data);
 		drawHeroShield(graphics, data);
 		drawHeroAction(graphics, data);
@@ -626,8 +561,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing hero health information
 	 */
 	private void drawHeroHP(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("ICON_HEALTH");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -655,8 +588,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing hero protection information
 	 */
 	private void drawHeroShield(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("ICON_SHIELD");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -684,8 +615,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing mana information
 	 */
 	private void drawHeroMana(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("ICON_MANA");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -708,8 +637,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing hero boost information
 	 */
 	private void drawHeroBoost(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("ICON_BOOST");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -740,8 +667,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing hero effects
 	 */
 	private void drawHeroEffect(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("Roland");
 		var boundingBox = render.box();
 		var width = boundingBox.southEast().x() - boundingBox.northWest().x();
@@ -772,11 +697,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param size     size of the effect icon
 	 */
 	private void drawHeroEffectImageAndValue(Graphics2D graphics, GameData data, Effect effect, int x, int y, int size) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		if (size < 0) {
-			throw new IllegalArgumentException("sie < 0");
-		}
 		var img = switch (effect) {
 		case POISON -> imgLoader.bgImages().get("ICON_POISON");
 		case FIRE -> imgLoader.bgImages().get("ICON_BURN");
@@ -803,8 +723,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing hero action points
 	 */
 	private void drawHeroAction(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("ICON_ACTION");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -826,8 +744,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing unlock information
 	 */
 	private void drawHeroUnlock(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("ICON_UNLOCK");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -849,8 +765,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing gold information
 	 */
 	private void drawHeroGold(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var render = MathLoader.getMapEvent().get("gold");
 		int logoWidth = render.box().southEast().x() - render.box().northWest().x();
 		int logoHeight = (int) (height * 0.04);
@@ -873,8 +787,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing hero level and XP
 	 */
 	private void drawHeroLevel(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		int size = (int) (height * 0.03);
 		Font font = new Font("Mikodacs", Font.PLAIN, size);
 		graphics.setFont(font);
@@ -897,8 +809,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing floor information
 	 */
 	private void drawFloorLevel(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		int size = (int) (height * 0.03);
 		Font font = new Font("Mikodacs", Font.PLAIN, size);
 		graphics.setFont(font);
@@ -919,8 +829,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing score information
 	 */
 	private void drawScoreLevel(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		int score = (int) (data.getScore() * (1.2 * data.floor() + (data.hero().getLevel() / 2.0)));
 		int size = (int) (height * 0.03);
 		Font font = new Font("Mikodacs", Font.PLAIN, size);
@@ -938,8 +846,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data    GameData containing the game data.
 	 */
 	private void drawButton(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		graphics.setColor(Color.RED);
 		graphics.setColor(data.mapOrBag() ? Color.ORANGE : Color.CYAN);
 		graphics.fill(new Rectangle2D.Double(width - tileSize / 2, height / 3.5 - 2.5 * tileSize, tileSize / 2, tileSize / 2));
@@ -955,8 +861,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data    GameData containing the game data.
 	 */
 	private void drawMap(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		BufferedImage imgMap = imgLoader.bgImages().get("BG_MAP");
 		var leftGrid = MathLoader.getMapEvent().get("BG_MAP").box();
 		var gap = tileSize * 0.1;
@@ -994,9 +898,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param newY     screen Y position where the tile is drawn
 	 */
 	private void checkAndDrawTileMap(Graphics2D graphics, GameData data, XY coordXY, int newX, int newY) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(coordXY);
 		graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE"), newX, newY, tileSize, tileSize, null);
 		if (data.map().getHeroAccessible().contains(coordXY)) {
 			graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE_ACCES"), newX, newY, tileSize, tileSize, null);
@@ -1027,9 +928,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param gap      spacing between tiles on screen
 	 */
 	private void drawPathMap(Graphics2D graphics, GameData data, BoundingBox leftGrid, double gap) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(leftGrid);
 		graphics.setColor(Color.ORANGE);
 		graphics.setStroke(new BasicStroke(5));
 		for (var coord : data.map().getHeroVisibleLine()) {
@@ -1051,9 +949,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param gap      spacing between tiles on screen
 	 */
 	private void drawShortestPath(Graphics2D graphics, GameData data, BoundingBox leftGrid, double gap) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(leftGrid);
 		var shortestPath = data.getShortestPath();
 		if (shortestPath != null) {
 			graphics.setColor(Color.RED);
@@ -1072,8 +967,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     GameData containing the game data.
 	 */
 	private void updateDragItem(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		var dragItem = GameDataClick.getDragItemMap();
 		if (!dragItem.isEmpty()) {
 			Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
@@ -1095,10 +988,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param box      The boundingbox (border) of the item.
 	 */
 	private void drawDrag(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(item);
-		Objects.requireNonNull(box);
 		var id = item.info().ID();
 		switch (id) {
 		case 1 -> drawDragSpecialItem(graphics, box.northWest(), 1, 2, item.direction(), imgLoader.itemImagesByID().get(id), 0.5, 0.75);
@@ -1126,9 +1015,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @return an integer representing the size category
 	 */
 	private int getSizeGold(int value) {
-		if (value < 0) {
-			throw new IllegalArgumentException("Gold < 0");
-		}
 		if (value <= 15) {
 			return 1;
 		} else if (value <= 50) {
@@ -1638,7 +1524,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 				line.append(line.isEmpty() ? w : " " + w);
 			}
 		}
-
 		if (!line.isEmpty()) {
 			lines.add(line.toString());
 		}
@@ -1908,8 +1793,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     The current game data containing player information
 	 */
 	public void drawScore(Graphics2D graphics, GameData data) {
-		Objects.requireNonNull(graphics);
-		Objects.requireNonNull(data);
 		BufferedImage img = imgLoader.bgImages().get("BG_SCORE");
 		graphics.drawImage(img, MathLoader.getMapEvent().get("HOF").transform(), null);
 		Path scoreFile = Path.of("data", "score");

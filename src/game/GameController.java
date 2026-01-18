@@ -61,7 +61,6 @@ public class GameController {
 	 * @return True if the game continue, False if we press the button to stop
 	 */
 	private static boolean gameLoop(ApplicationContext context) {
-		Objects.requireNonNull(context);
 		if (data.getEndGame()) {
 			return false;
 		}
@@ -94,8 +93,6 @@ public class GameController {
 	 *                     is.
 	 */
 	private static void checkPointerEvent(GameData data, PointerEvent pointerEvent) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(pointerEvent);
 		switch (pointerEvent.action()) {
 		case POINTER_DOWN -> checkPointerDown(data, pointerEvent.location());
 		case POINTER_MOVE -> checkPointerMove(data, pointerEvent.location());
@@ -114,8 +111,6 @@ public class GameController {
 	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerDown(GameData data, Location mouse) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(mouse);
 		var res = GameDataClick.click(mouse.x(), mouse.y());
 		switch (res.type()) {
 		case ITEM -> newDragItem(data, (Item) res.value(), mouse.x(), mouse.y());
@@ -137,7 +132,6 @@ public class GameController {
 	 *              the map.
 	 */
 	private static void applyMap(GameData data, XY coord) {
-		Objects.requireNonNull(data);
 		if (coord != null) {
 			if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
 				var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
@@ -166,8 +160,6 @@ public class GameController {
 	 * @param coord (location)
 	 */
 	private static void applyMapShop(Shop shop, XY coord) {
-		Objects.requireNonNull(shop);
-		Objects.requireNonNull(coord);
 		data.setShop(true, shop);
 		new GameDataShop(shop, true, data);
 		data.map().updateMap(coord);
@@ -180,8 +172,6 @@ public class GameController {
 	 * @param coord    (location)
 	 */
 	private static void applyMapTreasure(Treasure treasure, XY coord) {
-		Objects.requireNonNull(treasure);
-		Objects.requireNonNull(coord);
 		if (!treasure.getAlreadyVisited()) {
 			var linkedEvent = treasure.getEvent();
 			data.inEvent(linkedEvent);
@@ -196,8 +186,6 @@ public class GameController {
 	 * @param coord (location)
 	 */
 	private static void applyMapExit(Exit roomExit, XY coord) {
-		Objects.requireNonNull(roomExit);
-		Objects.requireNonNull(coord);
 		var linkedEvent = roomExit.getEvent();
 		data.inEvent(linkedEvent);
 		data.map().updateMap(coord);
@@ -210,8 +198,6 @@ public class GameController {
 	 * @param coord  (location)
 	 */
 	private static void applyMapHealer(Healer healerRoom, XY coord) {
-		Objects.requireNonNull(healerRoom);
-		Objects.requireNonNull(coord);
 		if (!healerRoom.getAlreadyVisited()) {
 			var linkedEvent = healerRoom.getEvent();
 			data.inEvent(linkedEvent);
@@ -226,7 +212,6 @@ public class GameController {
 	 * @param coord    (location)
 	 */
 	private static void applyMapLock(LockedDoor roomDoor) {
-		Objects.requireNonNull(roomDoor);
 		if (roomDoor.getLock()) {
 			var linkedEvent = roomDoor.getEvent();
 			data.inEvent(linkedEvent);
@@ -240,8 +225,6 @@ public class GameController {
 	 * @param coord     (location)
 	 */
 	private static void applyMapEvent(EventRoom eventRoom, XY coord) {
-		Objects.requireNonNull(eventRoom);
-		Objects.requireNonNull(coord);
 		if (!eventRoom.getAlreadyVisited()) {
 			var linkedEvent = eventRoom.getEvent();
 			data.inEvent(linkedEvent);
@@ -257,8 +240,6 @@ public class GameController {
 	 * @param coord     (location)
 	 */
 	private static void applyMapEnemy(EnemyRoom enemyRoom, XY coord) {
-		Objects.requireNonNull(enemyRoom);
-		Objects.requireNonNull(coord);
 		if (!enemyRoom.getAlreadyVisited()) {
 			data.swapMapOrBag();
 			GameDataCombat.startCombat(enemyRoom.getLstEnemy(), data);
@@ -275,13 +256,6 @@ public class GameController {
 	 * @param int  1 is choice1 2 is choice2 3 is end button event
 	 */
 	private static void applyEvent(GameData data, int choice) {
-		Objects.requireNonNull(data);
-		if (choice < 1) {
-			throw new IllegalArgumentException("! CHOICE < 1 !");
-		}
-		if (choice > 3) {
-			throw new IllegalArgumentException("! CHOICE > 1 !");
-		}
 		if (choice == 1) {
 			data.event().choose1(data);
 		}
@@ -304,8 +278,6 @@ public class GameController {
 	 * @param mouseY coordY of the mouse.
 	 */
 	private static void newDragItem(GameData data, Item item, int mouseX, int mouseY) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(item);
 		data.bag().updateManaConnected();
 		if (data.bag().bagItemLst().contains(item)) {
 			switch (item) {
@@ -330,7 +302,6 @@ public class GameController {
 	 * @param data {@code GameData} of the game.
 	 */
 	private static void swapMapOrBag(GameData data) {
-		Objects.requireNonNull(data);
 		if (!data.getShop() && !GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
 			data.swapMapOrBag();
 		}
@@ -344,8 +315,6 @@ public class GameController {
 	 * @param coord {@code XY} of the grid we click
 	 */
 	private static void actionBag(GameData data, XY coord) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(coord);
 		if (GameDataCombat.combat()) {
 			var item = data.bag().getItem(coord.x(), coord.y());
 			if (item != null) {
@@ -367,8 +336,6 @@ public class GameController {
 	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerMove(GameData data, Location mouse) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(mouse);
 		if (data.dragItem() != null) {
 			if (data.getShop()) {
 				GameDataClick.sellButtonHover(mouse.x(), mouse.y());
@@ -386,8 +353,6 @@ public class GameController {
 	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerUp(GameData data, Location mouse) {
-		Objects.requireNonNull(data);
-		Objects.requireNonNull(mouse);
 		if (data.dragItem() != null) {
 			int x = mouse.x();
 			int y = mouse.y();
@@ -407,7 +372,6 @@ public class GameController {
 	 * @return false if we pressed E for leaving true otherwise
 	 */
 	private static boolean checkKeyEvent(GameData data, Key key) {
-		Objects.requireNonNull(data);
 		switch (key) {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
@@ -451,14 +415,13 @@ public class GameController {
 	 * @return True if the game continue, False if we press the button to stop
 	 */
 	private static int gameLoopLobby(ApplicationContext context) {
-		Objects.requireNonNull(context);
 		Event event = context.pollOrWaitEvent(10);
 		if (event != null) {
 			switch (event) {
 			case PointerEvent pointerEvent -> { // Mouse event
 				switch (pointerEvent.action()) {
 				case POINTER_UP -> {
-					int res = checkPointerUpLobby(context, pointerEvent.location());
+					int res = checkPointerUpLobby(pointerEvent.location());
 					applyResEffect(res, context);
 					return res;
 				}
@@ -484,7 +447,6 @@ public class GameController {
 	 * @param view    {@code GameView} of the game.
 	 */
 	private static void applyResEffect(int res, ApplicationContext context) {
-		Objects.requireNonNull(context);
 		switch (res) {
 		case 0 -> {
 			data.setScore(true);
@@ -503,9 +465,7 @@ public class GameController {
 	 * @param data  {@code GameData} of the game.
 	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
-	private static int checkPointerUpLobby(ApplicationContext context, Location mouse) {
-		Objects.requireNonNull(context);
-		Objects.requireNonNull(mouse);
+	private static int checkPointerUpLobby(Location mouse) {
 		var boundingBoxStart = MathLoader.getMapEvent().get("START_GAME").box();
 		var boundingBoxHOF = MathLoader.getMapEvent().get("HOF_BUTTON").box();
 		var boundingBoxLeave = MathLoader.getMapEvent().get("LEAVE_BUTTON").box();
@@ -537,12 +497,10 @@ public class GameController {
 		while (true) {
 			if (inLobby) {
 				n = gameLoopLobby(context);
-			} else {
-				if (!gameLoop(context)) {
-					GameView.drawLobby(context, data, view);
-					inLobby = true;
-					data = new GameData(screenInfo);
-				}
+			} else if (!gameLoop(context)) {
+				GameView.drawLobby(context, data, view);
+				inLobby = true;
+				data = new GameData(screenInfo);
 			}
 			if (n == -1) {
 				context.dispose();
@@ -557,7 +515,6 @@ public class GameController {
 	 * @param context {@code ApplicationContext} of the game.
 	 */
 	private static void initGame(ApplicationContext context) {
-		Objects.requireNonNull(context);
 		screenInfo = context.getScreenInfo();
 		data = new GameData(screenInfo);
 		var imageLoader = new ImageLoader();

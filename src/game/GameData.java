@@ -25,7 +25,6 @@ import model.XY;
 import model.item.common.KeyDoor;
 import model.item.common.Sword;
 import model.item.epic.Bow;
-import model.item.superrare.Bomb;
 import model.map.Floor;
 import model.map.Shop;
 import model.map.eventManager.LinkedEvent;
@@ -162,7 +161,6 @@ public class GameData {
 	 * @throws IOException if file access fails
 	 */
 	private void submitScore(Path path, int newScore) throws IOException {
-		Objects.requireNonNull(path);
 		Map<String, Integer> scores = new HashMap<>();
 		int nbPlayer = 1;
 		if (Files.exists(path)) {
@@ -187,7 +185,6 @@ public class GameData {
 	 * @return sorted score map
 	 */
 	private Map<String, Integer> sortScore(Map<String, Integer> scores) {
-		Objects.requireNonNull(scores);
 		return scores.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, _) -> a, LinkedHashMap::new));
 	}
@@ -264,11 +261,12 @@ public class GameData {
 	 * Sets the shop state and current shop instance.
 	 *
 	 * @param statut shop state
-	 * @param shop   shop instance
+	 * @param shop shop instance
 	 */
 	public void setShop(boolean statut, Shop shop) {
-		if (statut)
+		if (statut) {
 			swapMapOrBag();
+		}
 		GameData.shop = statut;
 		GameData.shopLst = shop;
 	}
@@ -288,6 +286,7 @@ public class GameData {
 	 * @param name background identifier
 	 */
 	public void setBG(String name) {
+		Objects.requireNonNull(name);
 		BGName = name;
 	}
 
@@ -304,7 +303,6 @@ public class GameData {
 	 * @param item dragged item
 	 */
 	public void setDragItem(Item item) {
-		Objects.requireNonNull(item);
 		GameData.dragItem = item;
 	}
 

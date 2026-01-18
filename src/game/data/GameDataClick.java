@@ -257,8 +257,12 @@ public class GameDataClick {
     int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
     for (XY block : b) {
       int x = block.x();
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
+      if (x < minX) {
+				minX = x;
+			}
+      if (x > maxX) {
+				maxX = x;
+			}
     }
     return maxX - minX + 1;
   }
@@ -275,8 +279,12 @@ public class GameDataClick {
     int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
     for (XY block : b) {
         int y = block.y();
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
+        if (y < minY) {
+					minY = y;
+				}
+        if (y > maxY) {
+					maxY = y;
+				}
     }
     return maxY - minY + 1;
 }
@@ -681,7 +689,9 @@ public class GameDataClick {
   private static ClickResult firstNonNull(int x, int y, ClickHandler... handlers) {
 	  for (ClickHandler h : handlers) {
 	      ClickResult res = h.handle(x, y);
-	      if (res != null) return res;
+	      if (res != null) {
+					return res;
+				}
 	  }
 	  return new ClickResult(ClickType.NOTHING, null);
 	}
@@ -793,7 +803,9 @@ public class GameDataClick {
 	 * @return {@code null} since the result is not usefull
    */
   private static ClickResult clickCombat(int x, int y) {
-      if (!GameDataCombat.combat()) return null;
+      if (!GameDataCombat.combat()) {
+				return null;
+			}
       if (!dragItemMap.isEmpty()) {
           GameDataCombat.addLog("Range tes items pour pouvoir jouer");
           return null;
@@ -813,7 +825,9 @@ public class GameDataClick {
 	 * @return {@code null} since the result is not usefull
    */
   private static ClickResult clickShop(int x, int y) {
-      if (!data.getShop()) return null;
+      if (!data.getShop()) {
+				return null;
+			}
       if (!data.getShopLst().getCurrentShop().isEmpty()) {
           arrowButtonClick(x, y);
           buyButtonClick(x, y);
@@ -860,23 +874,21 @@ public class GameDataClick {
 			} else {
 				var itemDrag = data.dragItem();
 				var colideItem = data.bag().getItem(coord.x(), coord.y());
-				if (item.canMerge()) {
-					if (colideItem != null && itemDrag.info().ID() == colideItem.info().ID()) {
-						switch(itemDrag) {
-						case Gold goldDrag -> {
-							var goldCollide = (Gold) colideItem;
-							data.bag().removeItemFromBackpack(goldCollide);
-							goldCollide = goldCollide.addGoldValue(goldDrag.value());
-							data.bag().addItemToBackpack(goldCollide);
-						}
-						default -> {
-							data.bag().removeItemFromBackpack(colideItem);
-							colideItem = colideItem.addDurability(itemDrag.durability());
-							data.bag().addItemToBackpack(colideItem);
-						}
-						}
-						removeItemFromDrag(itemDrag);
-					} else addDragItem(data.dragItem());
+				if (item.canMerge() && (colideItem != null && itemDrag.info().ID() == colideItem.info().ID())) {
+					switch(itemDrag) {
+					case Gold goldDrag -> {
+						var goldCollide = (Gold) colideItem;
+						data.bag().removeItemFromBackpack(goldCollide);
+						goldCollide = goldCollide.addGoldValue(goldDrag.value());
+						data.bag().addItemToBackpack(goldCollide);
+					}
+					default -> {
+						data.bag().removeItemFromBackpack(colideItem);
+						colideItem = colideItem.addDurability(itemDrag.durability());
+						data.bag().addItemToBackpack(colideItem);
+					}
+					}
+					removeItemFromDrag(itemDrag);
 				} else {
 					addDragItem(data.dragItem());
 				}
