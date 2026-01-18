@@ -1,5 +1,4 @@
 package model.map;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,24 +9,40 @@ import java.util.Set;
 
 import model.XY;
 
+/**
+ * Class representing a floor in the game. It contains rooms, manages hero
+ * position, visibility, and accessible paths.
+ */
 public class Floor {
 
-	private final int ROW = 5; //5
-	private final int COL = 11; // 11
+	// Number of rows in the grid
+	private final int ROW = 5;
 
+	// Number of columns in the grid
+	private final int COL = 11;
+
+	// Grid of rooms
 	final private Room[][] grid = new Room[ROW][COL];
 
+	// Set of rooms visited by the hero
 	final private HashSet<XY> heroVisited = new HashSet<>();
+
+	// Set of rooms accessible by the hero
 	final private HashSet<XY> heroAccessible = new HashSet<>();
+
+	// Set of visible rooms
 	final private HashSet<XY> heroVisible = new HashSet<>();
+
+	// Set of visible rooms including line-of-sight
 	final private HashSet<XY> heroVisibleForLine = new HashSet<>();
+
+	// Current hero position
 	private XY heroPos;
 
 	/**
-	 * Constructor for the floor
+	 * Constructor for the floor. Creates all rooms and sets initial hero position.
 	 * 
-	 * @param floor
-	 * @param hero
+	 * @param floor current floor number
 	 */
 	public Floor(int floor) {
 		XY start = createAllRoom(floor);
@@ -38,19 +53,19 @@ public class Floor {
 	}
 
 	/**
-	 * Setters for hero position
+	 * Set the hero's position.
 	 * 
-	 * @param hero_pos
+	 * @param heroPos2 new position of the hero
 	 */
 	public void setHeroPos(XY heroPos2) {
 		heroPos = heroPos2;
 	}
 
 	/**
-	 * Create all way between rooms
+	 * Recursively create paths between rooms.
 	 * 
-	 * @param visited
-	 * @param start
+	 * @param visited set of already visited rooms
+	 * @param start   starting room coordinate
 	 */
 	private void createWay(HashSet<XY> visited, XY start) {
 		List<XY> accessible = new ArrayList<>();
@@ -66,29 +81,33 @@ public class Floor {
 	}
 
 	/**
-	 * Add accessible room of each room
+	 * Add all possible accessible neighbors for a given coordinate.
 	 * 
-	 * @param listacc
-	 * @param x
-	 * @param y
+	 * @param listacc list of accessible coordinates
+	 * @param x       x-coordinate
+	 * @param y       y-coordinate
 	 */
 	private void addAcc(List<XY> listacc, int x, int y) {
-		if (x > 0)
+		if (x > 0) {
 			listacc.add(new XY(x - 1, y));
-		if (y > 0)
+		}
+		if (y > 0) {
 			listacc.add(new XY(x, y - 1));
-		if (x < COL - 1)
+		}
+		if (x < COL - 1) {
 			listacc.add(new XY(x + 1, y));
-		if (y < ROW - 1)
+		}
+		if (y < ROW - 1) {
 			listacc.add(new XY(x, y + 1));
+		}
 		Collections.shuffle(listacc);
 	}
 
 	/**
-	 * Create All Room
+	 * Create all rooms on the floor, including special rooms.
 	 * 
-	 * @param floor
-	 * @return Starter Room
+	 * @param floor current floor number
+	 * @return starting room coordinate
 	 */
 	private XY createAllRoom(int floor) {
 		List<XY> list1 = createXYList();
@@ -105,43 +124,51 @@ public class Floor {
 	}
 
 	/**
-	 * Create all special room
+	 * Create special rooms on the floor (shops, healers, events, treasures,
+	 * enemies).
 	 * 
-	 * @param list
-	 * @param floor
+	 * @param list  list of coordinates
+	 * @param floor current floor number
 	 */
 	private void createSpecialRoom(List<XY> list, int floor) {
 		var index = createOneSpecialRoomOfEach(list, floor);
 		for (int i = 0; i < (ROW * COL) / 60; i++) {
-			grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor); // Create shop
-			grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor); // Create Healer
-			grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor); // Create Event
+			grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor);
+			grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor);
+			grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor);
 		}
 		for (int i = 0; i < (ROW * COL) / 30; i++) {
-			grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor); // Create Treasure
+			grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor);
 		}
 		for (int i = 0; i < (ROW * COL) / 20; i++) {
-			grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor); // Create Treasure
+			grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor);
 		}
 	}
-	
+
+	/**
+	 * Create one of each special room on the floor.
+	 * 
+	 * @param list  list of coordinates
+	 * @param floor current floor number
+	 * @return index after creating special rooms
+	 */
 	private int createOneSpecialRoomOfEach(List<XY> list, int floor) {
 		var index = 0;
-		grid[list.get(index).y()][list.get(index++).x()] = new Start(); // Create start
-		grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor); // Create shop
-		grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor); // Create treasure
-		grid[list.get(index).y()][list.get(index++).x()] = new Exit(floor); // Create exit
-		grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor); // Create Enemy
-		grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor); // Create Healer
-		grid[list.get(index).y()][list.get(index++).x()] = new LockedDoor(floor); // Create LockedDoor (We need data to check if the hero has a key)
-		grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor); // Create Event
+		grid[list.get(index).y()][list.get(index++).x()] = new Start();
+		grid[list.get(index).y()][list.get(index++).x()] = new Shop(floor);
+		grid[list.get(index).y()][list.get(index++).x()] = new Treasure(floor);
+		grid[list.get(index).y()][list.get(index++).x()] = new Exit(floor);
+		grid[list.get(index).y()][list.get(index++).x()] = new EnemyRoom(floor);
+		grid[list.get(index).y()][list.get(index++).x()] = new Healer(floor);
+		grid[list.get(index).y()][list.get(index++).x()] = new LockedDoor(floor);
+		grid[list.get(index).y()][list.get(index++).x()] = new EventRoom(floor);
 		return index;
 	}
 
 	/**
-	 * Create the grid with coord
+	 * Create a list of all coordinates in the grid.
 	 * 
-	 * @return a list of 55 XY
+	 * @return list of coordinates
 	 */
 	private List<XY> createXYList() {
 		List<XY> list = new ArrayList<>();
@@ -154,8 +181,10 @@ public class Floor {
 	}
 
 	/**
-	 * @param list of 55 XY
-	 * @return a new list shuffled
+	 * Shuffle a list of coordinates.
+	 * 
+	 * @param list list to shuffle
+	 * @return shuffled list
 	 */
 	private List<XY> shuffleList(List<XY> list) {
 		List<XY> list2 = new ArrayList<>(list);
@@ -164,9 +193,9 @@ public class Floor {
 	}
 
 	/**
-	 * Update the map
+	 * Update the map for hero visibility and accessibility.
 	 * 
-	 * @param coord
+	 * @param coord hero coordinate
 	 */
 	public void updateMap(XY coord) {
 		updateAll(coord);
@@ -174,30 +203,43 @@ public class Floor {
 	}
 
 	/**
-	 * Add two more visible for each accessible room (not for the "LockedDoor")
+	 * Adds two additional visible rooms for each accessible room, excluding
+	 * LockedDoors.
 	 */
 	public void addTwoVisible() {
 		for (var coord : heroAccessible) {
 			var room = grid[coord.y()][coord.x()];
 			switch (room) {
-			case LockedDoor door -> {
+			case LockedDoor _ -> {
+			}
+			default -> updateVisibilityForRoom(room, coord);
+			}
+		}
+	}
+
+	/**
+	 * Updates visibility for a given room and its accessible neighbors.
+	 * 
+	 * - Adds the room itself to `heroVisible` and `heroVisibleForLine`. - Adds
+	 * directly accessible rooms to `heroVisible`. - Adds neighbors of those rooms
+	 * to `heroVisible` and `heroVisibleForLine`. - LockedDoor rooms are ignored.
+	 *
+	 * @param room  the room to update visibility for
+	 * @param coord the coordinate of the room
+	 */
+	private void updateVisibilityForRoom(Room room, XY coord) {
+		heroVisible.add(coord);
+		heroVisibleForLine.add(coord);
+		for (var coord_acc : room.getAccessible()) {
+			heroVisible.add(coord_acc);
+			var room2 = grid[coord_acc.y()][coord_acc.x()];
+			switch (room2) {
+			case LockedDoor _ -> {
 			}
 			default -> {
-				heroVisible.add(coord);
-				heroVisibleForLine.add(coord);
-				for (var coord_acc : room.getAccessible()) {
-					heroVisible.add(coord_acc);
-					var room2 = grid[coord_acc.y()][coord_acc.x()];
-					switch (room) {
-					case LockedDoor door -> {
-					}
-					default -> {
-						heroVisibleForLine.add(coord_acc);
-						for (var coord_acc2 : room2.getAccessible()) {
-							heroVisible.add(coord_acc2);
-						}
-					}
-					}
+				heroVisibleForLine.add(coord_acc);
+				for (var coord_acc2 : room2.getAccessible()) {
+					heroVisible.add(coord_acc2);
 				}
 			}
 			}
@@ -205,9 +247,9 @@ public class Floor {
 	}
 
 	/**
-	 * Update All hashMap: visited, visible, accessible, and accessible for line
+	 * Update all hash sets: visited, visible, accessible, and visible for line.
 	 * 
-	 * @param coord
+	 * @param coord hero coordinate
 	 */
 	public void updateAll(XY coord) {
 		if (!heroVisited.contains(coord)) {
@@ -219,7 +261,7 @@ public class Floor {
 			for (var coord_ac : room.getAccessible()) {
 				var room_acc = grid[coord_ac.y()][coord_ac.x()];
 				switch (room_acc) {
-				case Hallway coordHallWay -> updateAll(coord_ac);
+				case Hallway _ -> updateAll(coord_ac);
 				default -> {
 					if (!heroVisited.contains(coord_ac)) {
 						heroVisible.add(coord_ac);
@@ -232,104 +274,133 @@ public class Floor {
 	}
 
 	/**
-	 * Get the shortest Path
-	 * @param start
-	 * @param end
-	 * @return List of the best Way
+	 * Compute the shortest path for the hero between two points.
+	 * 
+	 * @param start starting coordinate
+	 * @param end   ending coordinate
+	 * @return list of coordinates for the best path
 	 */
 	public List<XY> heroShortestPath(XY start, XY end) {
-		if (start.equals(end)) return List.of();
-		List<XY> queue = new ArrayList<>();
-		Set<XY> visited = new HashSet<>();
-		Map<XY, XY> parents = new HashMap<>();
-		List<XY> bestPath = new ArrayList<>();
-		
-		queue.add(start);
-		
-		while (queue.size() != 0) {
-			var first = queue.get(0);
-			for (var acc : grid[first.y()][first.x()].getAccessible()) {
-				if (!visited.contains(acc) && (heroAccessible.contains(acc) || heroVisited.contains(acc))) {
-					parents.put(acc, first);
-					visited.add(acc);
-					if (!heroAccessible.contains(acc)) {
-						queue.add(acc);
-					}
-					if (acc.equals(end)) {
-						var enfant = acc;
-						while(!enfant.equals(start)) {
-							bestPath.add(enfant);
-							enfant = parents.get(enfant);
-						}
-						bestPath.add(enfant);
-						return List.copyOf(bestPath);
-					}
-				}
-			}
-			queue.remove(0);
-		}
-		return null;
+	    if (start.equals(end)) return List.of();
+
+	    List<XY> queue = new ArrayList<>();
+	    Set<XY> visited = new HashSet<>();
+	    Map<XY, XY> parents = new HashMap<>();
+	    List<XY> bestPath = new ArrayList<>();
+	    queue.add(start);
+
+	    while (!queue.isEmpty()) {
+	        List<XY> result = processNode(queue.get(0), queue, visited, parents, start, end, bestPath);
+	        if (result != null) return result;
+	        queue.remove(0);
+	    }
+	    return null;
 	}
-	
+
 	/**
-	 * Getter for grid
+	 * Process a single node in the queue for BFS.
+	 * Updates visited set, parents map, and checks if end is reached.
 	 * 
-	 * @return Room[][]
+	 * @param current current coordinate to process
+	 * @param queue queue of coordinates
+	 * @param visited set of already visited coordinates
+	 * @param parents map of child -> parent coordinates
+	 * @param start starting coordinate
+	 * @param end ending coordinate
+	 * @param bestPath list to store the path from start to end
+	 * @return list of coordinates if end is reached, otherwise null
+	 */
+	private List<XY> processNode(XY current, List<XY> queue, Set<XY> visited, Map<XY, XY> parents,
+	                             XY start, XY end, List<XY> bestPath) {
+	    for (var acc : grid[current.y()][current.x()].getAccessible()) {
+	        if (!visited.contains(acc) && (heroAccessible.contains(acc) || heroVisited.contains(acc))) {
+	            parents.put(acc, current);
+	            visited.add(acc);
+	            if (!heroAccessible.contains(acc)) queue.add(acc);
+	            if (acc.equals(end)) {
+	                var node = acc;
+	                while (!node.equals(start)) {
+	                    bestPath.add(node);
+	                    node = parents.get(node);
+	                }
+	                bestPath.add(start);
+	                Collections.reverse(bestPath);
+	                return List.copyOf(bestPath);
+	            }
+	        }
+	    }
+	    return null;
+	}
+
+
+	/**
+	 * Getter for grid of rooms.
+	 * 
+	 * @return 2D array of rooms
 	 */
 	public Room[][] getGrid() {
 		return grid;
 	}
 
 	/**
-	 * Getter for hero visited
+	 * Getter for visited rooms.
 	 * 
-	 * @return HashSet<XY>
+	 * @return set of visited coordinates
 	 */
 	public HashSet<XY> getHeroVisited() {
 		return heroVisited;
 	}
 
 	/**
-	 * Getter for hero visible
+	 * Getter for visible rooms.
 	 * 
-	 * @return HashSet<XY>
+	 * @return set of visible coordinates
 	 */
 	public HashSet<XY> getHeroVisible() {
 		return heroVisible;
 	}
 
 	/**
-	 * Getter for hero vsible line
+	 * Getter for visible rooms including line-of-sight.
 	 * 
-	 * @return HashSet<XY>
+	 * @return set of coordinates
 	 */
 	public HashSet<XY> getHeroVisibleLine() {
 		return heroVisibleForLine;
 	}
 
 	/**
-	 * Getter for hero accessible
+	 * Getter for accessible rooms.
 	 * 
-	 * @return HashSet<XY>
+	 * @return set of accessible coordinates
 	 */
 	public HashSet<XY> getHeroAccessible() {
 		return heroAccessible;
 	}
 
 	/**
-	 * Getter for hero position
+	 * Getter for hero position.
 	 * 
-	 * @return XY
+	 * @return coordinate of hero
 	 */
 	public XY getHeroPos() {
 		return heroPos;
 	}
-	
-	
+
+	/**
+	 * Getter for number of rows.
+	 * 
+	 * @return number of rows
+	 */
 	public int getRow() {
 		return ROW;
 	}
-	
+
+	/**
+	 * Getter for number of columns.
+	 * 
+	 * @return number of columns
+	 */
 	public int getCol() {
 		return COL;
 	}

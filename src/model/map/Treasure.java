@@ -13,97 +13,102 @@ import model.item.common.Gold;
 import model.item.common.KeyDoor;
 import model.map.eventManager.LinkedEvent;
 
+/**
+ * Represents a treasure room that contains rewards for the hero.
+ * The hero can open the treasure to get items.
+ */
 public final class Treasure implements Room {
-	private int floor;
-	final private List<XY> accessible = new ArrayList<>();
-	final private HashSet<Item> rewardList = new HashSet<>();
-	private boolean alreadyVisited = false;
-	private LinkedEvent event;
 
-	/**
-	 * Constructor for the trasure
-	 * 
-	 * @param floor2
-	 */
-	public Treasure(int floor2) {
-		floor = floor2;
-		createReward();
-		event = new LinkedEvent(floor, "treasure");
-	}
+    /** Current floor number */
+    private int floor;
 
-	/**
-	 * Getter for events
-	 * 
-	 * @return LinkedEvent
-	 */
-	public LinkedEvent getEvent() {
-		return event;
-	}
+    /** List of coordinates of rooms accessible from this room */
+    private final List<XY> accessible = new ArrayList<>();
 
-	/**
-	 * Getter for accessibles
-	 * 
-	 * @return List<XY>
-	 */
-	@Override
-	public List<XY> getAccessible() {
-		return accessible;
-	}
-	
-	/**
-	 * Adds rooms that is accessible from the others
-	 * @param coord
-	 */
-	@Override
-	public void addAccessible(XY coord){
-		accessible.add(coord);
-	}
+    /** Set of items that are the treasure rewards */
+    private final HashSet<Item> rewardList = new HashSet<>();
 
-	/**
-	 * Getter for rewardList
-	 * 
-	 * @return HashSet<Item>
-	 */
-	public HashSet<Item> getRewardList() {
-		return rewardList;
-	}
+    /** True if the treasure room has already been visited */
+    private boolean alreadyVisited = false;
 
-	/**
-	 * Getter for alreadyVisited
-	 * 
-	 * @return boolean
-	 */
-	public boolean getAlreadyVisited() {
-		return alreadyVisited;
-	}
+    /** Event associated with this room */
+    private LinkedEvent event;
 
-	/**
-	 * Now, alreadyVisited is "true"
-	 */
-	public void nowVisited() {
-		alreadyVisited = true;
-	}
+    /**
+     * Constructor for the treasure room
+     * 
+     * @param floor2 current floor number
+     */
+    public Treasure(int floor2) {
+        floor = floor2;
+        createReward();
+        event = new LinkedEvent(floor, "treasure");
+    }
 
-	/**
-	 * Open the treasure
-	 */
-	public void openReward() {
-		for (var item : rewardList) {
-			GameDataClick.addDragItem(item);
-		}
-	}
+    /**
+     * Getter for the event associated with the treasure
+     * 
+     * @return LinkedEvent
+     */
+    public LinkedEvent getEvent() {
+        return event;
+    }
 
-	/**
-	 * Create the rewards that will be in the treasure
-	 */
-	private void createReward() {
-		Random rand = new Random();
-		rewardList.add(new Gold(rand.nextInt(20) + 10)); // Gold between 10 and 30
-		rewardList.add(new KeyDoor()); // add a key
-		// add 3 random item (probability with Gauss)
-		for (int i = 1; i <= 3; i++) {
-			var item = RandomItem.generate(floor);
-			rewardList.add(item);
-		}
-	}
+    @Override
+    public List<XY> getAccessible() {
+        return accessible;
+    }
+
+    @Override
+    public void addAccessible(XY coord) {
+        accessible.add(coord);
+    }
+
+    /**
+     * Getter for the rewards in this treasure
+     * 
+     * @return set of items
+     */
+    public HashSet<Item> getRewardList() {
+        return rewardList;
+    }
+
+    /**
+     * Checks if the room has been visited
+     * 
+     * @return true if visited, false otherwise
+     */
+    public boolean getAlreadyVisited() {
+        return alreadyVisited;
+    }
+
+    /**
+     * Mark the treasure room as visited
+     */
+    public void nowVisited() {
+        alreadyVisited = true;
+    }
+
+    /**
+     * Gives all items in the treasure to the hero
+     */
+    public void openReward() {
+        for (var item : rewardList) {
+            GameDataClick.addDragItem(item);
+        }
+    }
+
+    /**
+     * Creates the rewards for this treasure room
+     */
+    private void createReward() {
+        Random rand = new Random();
+        rewardList.add(new Gold(rand.nextInt(20) + 10)); // Gold between 10 and 30
+        rewardList.add(new KeyDoor()); // add a key
+        // add 3 random items based on floor probability
+        for (int i = 1; i <= 3; i++) {
+            var item = RandomItem.generate(floor);
+            rewardList.add(item);
+        }
+    }
 }

@@ -3,68 +3,68 @@ package model.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.GameData;
-import model.Backpack;
 import model.XY;
 import model.map.eventManager.LinkedEvent;
 
+/**
+ * Represents a Locked Door room in the floor.
+ * The hero must unlock it to pass through.
+ */
 public final class LockedDoor implements Room {
-	private int floor;
-	final private List<XY> accessible = new ArrayList<>();
-	private boolean lock = true;
-	private LinkedEvent event;
+    /** Floor number where the room is located */
+    private int floor;
 
-	/**
-	 * Constructor for the LockedDoor
-	 * 
-	 * @param floor2
-	 */
-	public LockedDoor(int floor2) {
-		floor = floor2;
-		event = new LinkedEvent(floor, "lockedDoor");
-	}
+    /** List of coordinates of rooms that can be accessed from this room */
+    private final List<XY> accessible = new ArrayList<>();
 
-	/**
-	 * Getter for accessibles
-	 * 
-	 * @return List<XY>
-	 */
-	@Override
-	public List<XY> getAccessible() {
-		return accessible;
-	}
-	
-	/**
-	 * Adds rooms that is accessible from the others
-	 * @param coord
-	 */
-	@Override
-	public void addAccessible(XY coord){
-		accessible.add(coord);
-	}
+    /** Indicates whether the door is locked */
+    private boolean lock = true;
 
-	/**
-	 * Unlock the LockedDoor
-	 */
-	public void unlock() {
-		lock = false;
-	}
+    /** Event associated with this room */
+    private LinkedEvent event;
 
-	/**
-	 * Getter to know if the LockedDoor is lock
-	 * 
-	 * @return
-	 */
-	public boolean getLock() {
-		return lock;
-	}
+    /**
+     * Constructor for the LockedDoor
+     * 
+     * @param floor2 floor number of the room
+     */
+    public LockedDoor(int floor2) {
+        floor = floor2;
+        event = new LinkedEvent(floor, "lockedDoor");
+    }
 
-	/**
-	 * Getter for event
-	 * 
-	 * @return LinkedEvent
-	 */
-	public LinkedEvent getEvent() {
-		return event;
-	}
+    @Override
+    public List<XY> getAccessible() {
+        return accessible;
+    }
+
+    @Override
+    public void addAccessible(XY coord) {
+        accessible.add(coord);
+    }
+
+    /**
+     * Unlocks the door so the hero can pass
+     */
+    public void unlock() {
+        lock = false;
+    }
+
+    /**
+     * Check if the door is locked
+     * 
+     * @return true if the door is locked, false otherwise
+     */
+    public boolean getLock() {
+        return lock;
+    }
+
+    /**
+     * Get the event associated with this room
+     * 
+     * @return LinkedEvent object
+     */
+    public LinkedEvent getEvent() {
+        return event;
+    }
 }

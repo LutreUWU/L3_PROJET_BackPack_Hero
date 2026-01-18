@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="BackpackHero" default="jar" basedir=".">
+
+    <!-- 1. Compiler les sources -->
+    <target name="compile">
+        <mkdir dir="bin"/>
+        <javac srcdir="src" destdir="bin" includeantruntime="false">
+            <classpath>
+                <fileset dir="lib" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <!-- 2. Créer un JAR exécutable BackpackHero.jar (avec toutes les dépendances) -->
+    <target name="jar" depends="compile">
+        <mkdir dir="dist"/>
+        <jar destfile="BackpackHero.jar" basedir="bin">
+            <!-- fichier manifest pour indiquer la classe principale -->
+            <manifest>
+                <attribute name="Main-Class" value="game.GameController"/>
+            </manifest>
+            <!-- inclure toutes les classes des JAR de lib -->
+            <zipgroupfileset dir="lib" includes="*.jar"/>
+        </jar>
+    </target>
+
+    <!-- 3. Générer la Javadoc en anglais -->
+    <target name="javadoc">
+        <mkdir dir="docs/doc"/>
+        <javadoc sourcepath="src" destdir="docs/doc" use="true"
+                 windowtitle="BackpackHero Javadoc" docencoding="UTF-8" encoding="UTF-8" locale="en">
+            <classpath>
+                <fileset dir="lib" includes="*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+
+    <!-- 4. Nettoyer le projet -->
+    <target name="clean">
+        <delete dir="bin"/>
+        <delete dir="docs/doc"/>
+        <delete file="BackpackHero.jar"/>
+    </target>
+
+</project>
+

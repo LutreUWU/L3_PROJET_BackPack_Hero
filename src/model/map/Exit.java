@@ -6,46 +6,47 @@ import java.util.List;
 import model.XY;
 import model.map.eventManager.LinkedEvent;
 
+/**
+ * Represents a room that serves as an exit in the game.
+ * Each Exit room has a list of accessible coordinates and an associated LinkedEvent.
+ */
 public final class Exit implements Room {
-	private int floor;
-	final private List<XY> accessible = new ArrayList<>();
-	private LinkedEvent event;
 
-	/**
-	 * Constructor for Exits
-	 * 
-	 * @param floor2
-	 */
-	public Exit(int floor2) {
-		floor = floor2;
-		event = new LinkedEvent(floor, "exitRoom");
-	}
+    /** The floor where this exit is located. */
+    private int floor;
 
-	/**
-	 * Getter for accessibles
-	 * 
-	 * @return List<XY>
-	 */
-	@Override
-	public List<XY> getAccessible() {
-		return accessible;
-	}
-	
-	/**
-	 * Adds rooms that is accessible from the others
-	 * @param coord
-	 */
-	@Override
-	public void addAccessible(XY coord){
-		accessible.add(coord);
-	}
+    /** List of accessible coordinates within the exit room. */
+    private final List<XY> accessible = new ArrayList<>();
 
-	/**
-	 * Getter for events
-	 * 
-	 * @return LinkedEvent
-	 */
-	public LinkedEvent getEvent() {
-		return event;
-	}
+    /** The event associated with this exit room. */
+    private LinkedEvent event;
+
+    /**
+     * Constructs an Exit room for a given floor.
+     *
+     * @param floor2 the floor number where the exit is located
+     */
+    public Exit(int floor2) {
+        floor = floor2;
+        event = new LinkedEvent(floor, "exitRoom");
+    }
+
+    @Override
+    public List<XY> getAccessible() {
+        return accessible;
+    }
+
+    @Override
+    public void addAccessible(XY coord) {
+        accessible.add(coord);
+    }
+
+    /**
+     * Returns the event associated with this exit room.
+     *
+     * @return the LinkedEvent of this room
+     */
+    public LinkedEvent getEvent() {
+        return event;
+    }
 }

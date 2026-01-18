@@ -5,25 +5,22 @@ import java.util.List;
 
 import model.XY;
 
+/**
+ * Represents the starting room of the floor.
+ * The hero starts the game from this room.
+ */
 public final class Start implements Room {
-	final private List<XY> accessible = new ArrayList<>();
-	
-	/**
-	 * Getter for accessibles
-	 * 
-	 * @return List<XY>
-	 */
-	@Override
-	public List<XY> getAccessible(){
-		return accessible;
-	}
-	
-	/**
-	 * Adds rooms that is accessible from the others
-	 * @param coord
-	 */
-	@Override
-	public void addAccessible(XY coord){
-		accessible.add(coord);
-	}
+
+    /** List of coordinates of rooms that can be accessed from this room */
+    private final List<XY> accessible = new ArrayList<>();
+
+    @Override
+    public List<XY> getAccessible() {
+        return accessible;
+    }
+
+    @Override
+    public void addAccessible(XY coord) {
+        accessible.add(coord);
+    }
 }

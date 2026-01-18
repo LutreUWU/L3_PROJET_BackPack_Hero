@@ -3,68 +3,68 @@ package model.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Hero;
 import model.XY;
 import model.map.eventManager.LinkedEvent;
 
+/**
+ * Represents a Healer room in the floor. The hero can interact with this room
+ * for healing.
+ */
 public final class Healer implements Room {
+	/** Floor number where the room is located */
 	private int floor;
-	final private List<XY> accessible = new ArrayList<>();
+
+	/** List of coordinates of rooms that can be accessed from this room */
+	private final List<XY> accessible = new ArrayList<>();
+
+	/** Indicates whether the hero has already visited this room */
 	private boolean alreadyVisited = false;
+
+	/** Event associated with the room */
 	private LinkedEvent event;
 
 	/**
-	 * Constructor for the Healer
+	 * Constructor for the Healer room
 	 * 
-	 * @param floor2
+	 * @param floor2 floor number of the room
 	 */
 	public Healer(int floor2) {
 		floor = floor2;
 		event = new LinkedEvent(floor, "healerRoom");
 	}
 
-	/**
-	 * Getter for accessibles
-	 * 
-	 * @return List<XY>
-	 */
 	@Override
 	public List<XY> getAccessible() {
 		return accessible;
 	}
-	
-	/**
-	 * Adds rooms that is accessible from the others
-	 * @param coord
-	 */
+
 	@Override
-	public void addAccessible(XY coord){
+	public void addAccessible(XY coord) {
 		accessible.add(coord);
 	}
 
 	/**
-	 * Set alreadyVisited = "true"
+	 * Mark the room as visited
 	 */
 	public void nowVisited() {
 		alreadyVisited = true;
 	}
 
 	/**
-	 * Getter for alreadyVisited
+	 * Check if the room has already been visited
 	 * 
-	 * @return boolean
+	 * @return true if visited, false otherwise
 	 */
 	public boolean getAlreadyVisited() {
 		return alreadyVisited;
 	}
 
 	/**
-	 * Getter for events
+	 * Get the event associated with this room
 	 * 
-	 * @return LinkedEvent
+	 * @return LinkedEvent object
 	 */
 	public LinkedEvent getEvent() {
 		return event;
 	}
-
 }

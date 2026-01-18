@@ -29,7 +29,7 @@ public class Backpack {
 	 */
 	private int[][] backpack;
 	/** Number of rows in the backpack grid. */
-	final private int ROW = 7;
+	final private int ROW = 5;
 	/** Number of columns in the backpack grid. */
 	final private int COL = 7;
 	/** Pixel size of a single grid cell. */
@@ -64,7 +64,7 @@ public class Backpack {
     int[][] backpack = new int[ROW][COL];
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
-            if (i == 0 || (i == ROW - 1) || j == 0 || j == COL - 1) {
+            if (i == 0 || i == ROW  - 1 || j <= 0 || j == COL - 1) {
                 backpack[i][j] = -2;
             } else {
                 backpack[i][j] = -1;

@@ -1,65 +1,70 @@
 package model.map;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import game.GameData;
-import model.Hero;
 import model.XY;
-import model.map.eventManager.*;
+import model.map.eventManager.LinkedEvent;
 
+/**
+ * Represents a room containing an event in the game. Each EventRoom has a list
+ * of accessible coordinates, a LinkedEvent, and keeps track of whether it has
+ * already been visited.
+ */
 public final class EventRoom implements Room {
+
+	/** The floor where this room is located. */
 	private int floor;
-	final private List<XY> accessible = new ArrayList<>();
+
+	/** List of accessible coordinates within the room. */
+	private final List<XY> accessible = new ArrayList<>();
+
+	/** The event associated with this room. */
 	private LinkedEvent event;
+
+	/** Indicates whether the room has already been visited. */
 	private boolean alreadyVisited = false;
-	
+
 	/**
-	 * Constructor for EventRooms
-	 * @param floor2
+	 * Constructs an EventRoom for a given floor.
+	 *
+	 * @param floor2 the floor number where the room is located
 	 */
-  public EventRoom(int floor2) {
-      floor = floor2;	
-      event = new LinkedEvent(floor, "eventRoom");
-  }
-  
-  /**
-   * Getter for events
-   * @return LinkedEvent
-   */
-  public LinkedEvent getEvent() {
-  	return event;
-  }
-  
-  /**
-	 * Getter for accessibles
-	 * 
-	 * @return List<XY>
+	public EventRoom(int floor2) {
+		floor = floor2;
+		event = new LinkedEvent(floor, "eventRoom");
+	}
+
+	/**
+	 * Returns the event associated with this room.
+	 *
+	 * @return the LinkedEvent of this room
 	 */
+	public LinkedEvent getEvent() {
+		return event;
+	}
+
 	@Override
-  public List<XY> getAccessible(){
+	public List<XY> getAccessible() {
 		return accessible;
 	}
-	
-	/**
-	 * Adds rooms that is accessible from the others
-	 * @param coord
-	 */
+
 	@Override
-	public void addAccessible(XY coord){
+	public void addAccessible(XY coord) {
 		accessible.add(coord);
 	}
-  
-  /**
-   * Set alreadyVisited = true 
-   */
+
+	/**
+	 * Marks this room as visited.
+	 */
 	public void nowVisited() {
 		alreadyVisited = true;
 	}
-	
+
 	/**
-	 * Getter for alreadyVisited
-	 * 
-	 * @return boolean
+	 * Checks whether the room has already been visited.
+	 *
+	 * @return true if the room has been visited, false otherwise
 	 */
 	public boolean getAlreadyVisited() {
 		return alreadyVisited;
