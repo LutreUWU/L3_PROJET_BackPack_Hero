@@ -7,7 +7,7 @@ public class RandomItem {
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void randomItem() {}
+	public RandomItem() {}
 	
 	/**
 	 * Generate a random item with Gauss

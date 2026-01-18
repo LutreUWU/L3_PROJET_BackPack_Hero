@@ -14,7 +14,7 @@ public final class Start implements Room {
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void start() {}
+	public Start() {}
 	
   /** List of coordinates of rooms that can be accessed from this room */
   private final List<XY> accessible = new ArrayList<>();

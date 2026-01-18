@@ -29,7 +29,7 @@ public class Crabe implements Enemy{
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void crabe() {}
+	public Crabe() {}
 	
 	@Override
 	public void resetStats() {

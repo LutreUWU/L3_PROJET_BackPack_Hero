@@ -28,7 +28,7 @@ public class Robot implements Enemy{
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void robot() {}
+	public Robot() {}
 	
 	@Override
 	public void resetStats() {

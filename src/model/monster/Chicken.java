@@ -36,7 +36,7 @@ public class Chicken implements Enemy{
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void chicken() {}
+	public Chicken() {}
 	
 	@Override
 	public void resetStats() {

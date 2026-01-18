@@ -20,7 +20,7 @@ public class Synergy {
 	/**
 	 * default constructor that does nothing
 	 */
-	public void synergy(){}
+	public Synergy(){}
   /** Temporary storage for the calculated bonus damage */
 	private static int bonusDmg = 0;
 	

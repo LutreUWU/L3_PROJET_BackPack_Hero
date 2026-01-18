@@ -28,7 +28,7 @@ public class Soldat implements Enemy{
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void soldat() {}
+	public Soldat() {}
 	
 	@Override
 	public void resetStats() {

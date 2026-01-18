@@ -28,7 +28,7 @@ public class Gnome implements Enemy{
 	/**
 	 * Default constructor that does nothing
 	 */
-	public void gnome() {}
+	public Gnome() {}
 	
 	@Override
 	public void resetStats() {

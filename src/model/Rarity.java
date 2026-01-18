@@ -15,5 +15,16 @@ package model;
  * - MYTHIC: mythical items 
  */
 public enum Rarity {
-	COMMON, RARE, SUPERARE, EPIC, LEGENDARY, MYTHIC;
+	 /** Basic and common item */
+  COMMON,
+  /** Uncommon item with improved effects */
+  RARE,
+  /** Very rare item with strong effects */
+  SUPERARE,
+  /** Powerful item with unique abilities */
+  EPIC,
+  /** Extremely powerful and hard-to-find item */
+  LEGENDARY,
+  /** Unique and exceptional item */
+  MYTHIC;
 }
