@@ -52,7 +52,7 @@ public final class EventRoom implements Room {
   /**
    * Set alreadyVisited = true 
    */
-	public void visitedEvent() {
+	public void nowVisited() {
 		alreadyVisited = true;
 	}
 	

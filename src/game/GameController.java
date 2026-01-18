@@ -3,6 +3,7 @@ package game;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.forax.zen.Application;
 import com.github.forax.zen.ApplicationContext;
@@ -43,11 +44,13 @@ public class GameController {
 	private static GameData data;
 	private static GameView view;
 	private static boolean inLobby = true; // To know if we're in the lobby of the game or not
+
 	/**
 	 * Default constructor, which does basically nothing.
 	 */
-	public GameController() {}
-	
+	public GameController() {
+	}
+
 	/**
 	 * Goes once in the game loop, which consists in retrieving user actions,
 	 * transmitting it to the GameView and GameData, and dealing with time events.
@@ -55,24 +58,27 @@ public class GameController {
 	 * @param context {@code ApplicationContext} of the game.
 	 * @param data    {@code GameData} of the game.
 	 * @param view    {@code GameView} of the game.
-	 * @return True   if the game continue, False if we press the button to stop
+	 * @return True if the game continue, False if we press the button to stop
 	 */
 	private static boolean gameLoop(ApplicationContext context) {
+		Objects.requireNonNull(context);
 		if (data.getEndGame()) {
 			return false;
 		}
 		Event event = context.pollOrWaitEvent(10);
-		if (event != null) { 	
+		if (event != null) {
 			switch (event) {
-				case PointerEvent pointerEvent -> checkPointerEvent(data, pointerEvent);
-				case KeyboardEvent key -> {
-					if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
-						if (!checkKeyEvent(data, key.key())) {
-							return false;
-						};
+			case PointerEvent pointerEvent -> checkPointerEvent(data, pointerEvent);
+			case KeyboardEvent key -> {
+				if (key.action() == KeyboardEvent.Action.KEY_RELEASED) {
+					if (!checkKeyEvent(data, key.key())) {
+						return false;
 					}
+					;
 				}
-				default -> {}
+			}
+			default -> {
+			}
 			}
 			GameView.draw(context, data, view);
 		}
@@ -80,30 +86,36 @@ public class GameController {
 	}
 
 	/**
-	 * Method dealing with all events about the mouse in game.
-	 * It checks and apply all event, when we pressed, moved, released the mouse.
+	 * Method dealing with all events about the mouse in game. It checks and apply
+	 * all event, when we pressed, moved, released the mouse.
 	 * 
-	 * @param data					{@code GameData} of the game.
-	 * @param pointerEvent	{@code pointerEvent} to know which type of mouse event it is.
+	 * @param data         {@code GameData} of the game.
+	 * @param pointerEvent {@code pointerEvent} to know which type of mouse event it
+	 *                     is.
 	 */
 	private static void checkPointerEvent(GameData data, PointerEvent pointerEvent) {
-		switch(pointerEvent.action()) {
-			case POINTER_DOWN -> checkPointerDown(data, pointerEvent.location());
-			case POINTER_MOVE -> checkPointerMove(data, pointerEvent.location());
-			case POINTER_UP -> checkPointerUp(data, pointerEvent.location());
-			default ->{}
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(pointerEvent);
+		switch (pointerEvent.action()) {
+		case POINTER_DOWN -> checkPointerDown(data, pointerEvent.location());
+		case POINTER_MOVE -> checkPointerMove(data, pointerEvent.location());
+		case POINTER_UP -> checkPointerUp(data, pointerEvent.location());
+		default -> {
+		}
 		}
 		data.setMouseCoord(new XY(pointerEvent.location().x(), pointerEvent.location().y()));
 	}
-	
+
 	/**
-	 * Check where the mouse is when we click down,
-	 * and update the game in consequence.
+	 * Check where the mouse is when we click down, and update the game in
+	 * consequence.
 	 * 
-	 * @param data		{@code GameData} of the game.
-	 * @param mouse		{@code Location} containing the coordinate of the mouse.
+	 * @param data  {@code GameData} of the game.
+	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerDown(GameData data, Location mouse) {
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(mouse);
 		var res = GameDataClick.click(mouse.x(), mouse.y());
 		switch (res.type()) {
 		case ITEM -> newDragItem(data, (Item) res.value(), mouse.x(), mouse.y());
@@ -111,92 +123,169 @@ public class GameController {
 		case BAG -> actionBag(data, (XY) res.value());
 		case EVENT_CHOICE -> applyEvent(data, (int) res.value());
 		case MAP -> applyMap(data, (XY) res.value());
-		case NOTHING -> {}
+		case NOTHING -> {
+		}
 		default -> throw new IllegalArgumentException("Unexpected value: " + res.type());
 		}
 	}
-	
+
 	/**
-	 * On va vraiment faire une méthode pour chaque salle ????
+	 * Performs the necessary actions for each type of room
 	 * 
-	 * @param data		{@code GameData} of the game.
-	 * @param coord		{@code XY} containing the coordinate of the cell we clicks on the map.
+	 * @param data  {@code GameData} of the game.
+	 * @param coord {@code XY} containing the coordinate of the cell we clicks on
+	 *              the map.
 	 */
 	private static void applyMap(GameData data, XY coord) {
+		Objects.requireNonNull(data);
 		if (coord != null) {
 			if (data.map().getHeroAccessible().contains(coord) || data.map().getHeroVisited().contains(coord)) {
 				var shortestPath = data.map().heroShortestPath(data.map().getHeroPos(), coord);
 				data.setShortestPath(shortestPath);
 				data.map().setHeroPos(coord);
-		
 				var coordHero = new XY(data.map().getHeroPos().x(), data.map().getHeroPos().y());
 				switch (data.map().getGrid()[coordHero.y()][coordHero.x()]) {
-				case EnemyRoom enemyRoom -> {
-					if (!enemyRoom.getAlreadyVisited()) {
-						data.swapMapOrBag();
-						GameDataCombat.startCombat(enemyRoom.getLstEnemy(), data);
-						data.map().updateMap(coord);
-						enemyRoom.nowVisited();
-					}
+				case EnemyRoom enemyRoom -> applyMapEnemy(enemyRoom, coord);
+				case EventRoom eventRoom -> applyMapEvent(eventRoom, coord);
+				case LockedDoor roomDoor -> applyMapLock(roomDoor);
+				case Healer healerRoom -> applyMapHealer(healerRoom, coord);
+				case Treasure treasure -> applyMapTreasure(treasure, coord);
+				case Exit roomExit -> applyMapExit(roomExit, coord);
+				case Shop shop -> applyMapShop(shop, coord);
+				default -> {
 				}
-				case EventRoom eventRoom -> {
-					if (!eventRoom.getAlreadyVisited()) {
-						var linkedEvent = eventRoom.getEvent();
-						data.inEvent(linkedEvent);
-						data.map().updateMap(coord);
-						eventRoom.visitedEvent();
-					}
-				}
-				case LockedDoor roomDoor -> {
-					if (roomDoor.getLock()) {
-						var linkedEvent = roomDoor.getEvent();
-						data.inEvent(linkedEvent);
-					}
-				}
-				case Healer healerRoom -> {
-					if (!healerRoom.getAlreadyVisited()) {
-						var linkedEvent = healerRoom.getEvent();
-						data.inEvent(linkedEvent);
-						data.map().updateMap(coord);
-					}
-				}
-				case Treasure treasure -> {
-					if (!treasure.getAlreadyVisited()) {
-						var linkedEvent = treasure.getEvent();
-						data.inEvent(linkedEvent);
-						data.map().updateMap(coord);
-					}
-				}
-				case Exit roomExit -> {
-					var linkedEvent = roomExit.getEvent();
-					data.inEvent(linkedEvent);
-					data.map().updateMap(coord);
-				}
-				case Shop shop -> {
-					data.setShop(true, shop);
-					new GameDataShop(shop, true, data);
-					data.map().updateMap(coord);
-				}
-				default -> {}
 				}
 			}
-		}	
+		}
 	}
-	
+
 	/**
-	 * Methods dealing with event in dungeon.
-	 * All events in game has two choices (1 or 2) and a "end choice" (3) to end the event.
+	 * Performs the necessary actions for the Shop
 	 * 
-	 * @param data	{@code GameData} of the game.
-	 * @param int	  1 is choice1
-	 * 							2 is choice2
-	 * 							3 is end button event
+	 * @param shop  (room)
+	 * @param coord (location)
+	 */
+	private static void applyMapShop(Shop shop, XY coord) {
+		Objects.requireNonNull(shop);
+		Objects.requireNonNull(coord);
+		data.setShop(true, shop);
+		new GameDataShop(shop, true, data);
+		data.map().updateMap(coord);
+	}
+
+	/**
+	 * Performs the necessary actions for the Treasure
+	 * 
+	 * @param treasure (room)
+	 * @param coord    (location)
+	 */
+	private static void applyMapTreasure(Treasure treasure, XY coord) {
+		Objects.requireNonNull(treasure);
+		Objects.requireNonNull(coord);
+		if (!treasure.getAlreadyVisited()) {
+			var linkedEvent = treasure.getEvent();
+			data.inEvent(linkedEvent);
+			data.map().updateMap(coord);
+		}
+	}
+
+	/**
+	 * Performs the necessary actions to Exit
+	 * 
+	 * @param Exit  (room)
+	 * @param coord (location)
+	 */
+	private static void applyMapExit(Exit roomExit, XY coord) {
+		Objects.requireNonNull(roomExit);
+		Objects.requireNonNull(coord);
+		var linkedEvent = roomExit.getEvent();
+		data.inEvent(linkedEvent);
+		data.map().updateMap(coord);
+	}
+
+	/**
+	 * Performs the necessary actions for the Healer
+	 * 
+	 * @param Healer (room)
+	 * @param coord  (location)
+	 */
+	private static void applyMapHealer(Healer healerRoom, XY coord) {
+		Objects.requireNonNull(healerRoom);
+		Objects.requireNonNull(coord);
+		if (!healerRoom.getAlreadyVisited()) {
+			var linkedEvent = healerRoom.getEvent();
+			data.inEvent(linkedEvent);
+			data.map().updateMap(coord);
+		}
+	}
+
+	/**
+	 * Performs the necessary actions for the LockedDoor
+	 * 
+	 * @param roomDoor (LockedDoor)
+	 * @param coord    (location)
+	 */
+	private static void applyMapLock(LockedDoor roomDoor) {
+		Objects.requireNonNull(roomDoor);
+		if (roomDoor.getLock()) {
+			var linkedEvent = roomDoor.getEvent();
+			data.inEvent(linkedEvent);
+		}
+	}
+
+	/**
+	 * Performs the necessary actions for the Event
+	 * 
+	 * @param eventRoom (room)
+	 * @param coord     (location)
+	 */
+	private static void applyMapEvent(EventRoom eventRoom, XY coord) {
+		Objects.requireNonNull(eventRoom);
+		Objects.requireNonNull(coord);
+		if (!eventRoom.getAlreadyVisited()) {
+			var linkedEvent = eventRoom.getEvent();
+			data.inEvent(linkedEvent);
+			data.map().updateMap(coord);
+			eventRoom.nowVisited();
+		}
+	}
+
+	/**
+	 * Performs the necessary actions for the EnemyRoom (fight)
+	 * 
+	 * @param enemyRoom (room)
+	 * @param coord     (location)
+	 */
+	private static void applyMapEnemy(EnemyRoom enemyRoom, XY coord) {
+		Objects.requireNonNull(enemyRoom);
+		Objects.requireNonNull(coord);
+		if (!enemyRoom.getAlreadyVisited()) {
+			data.swapMapOrBag();
+			GameDataCombat.startCombat(enemyRoom.getLstEnemy(), data);
+			data.map().updateMap(coord);
+			enemyRoom.nowVisited();
+		}
+	}
+
+	/**
+	 * Methods dealing with event in dungeon. All events in game has two choices (1
+	 * or 2) and a "end choice" (3) to end the event.
+	 * 
+	 * @param data {@code GameData} of the game.
+	 * @param int  1 is choice1 2 is choice2 3 is end button event
 	 */
 	private static void applyEvent(GameData data, int choice) {
+		Objects.requireNonNull(data);
+		if (choice < 1) {
+			throw new IllegalArgumentException("! CHOICE < 1 !");
+		}
+		if (choice > 3) {
+			throw new IllegalArgumentException("! CHOICE > 1 !");
+		}
 		if (choice == 1) {
 			data.event().choose1(data);
 		}
-		if (choice== 2) {
+		if (choice == 2) {
 			data.event().choose2(data);
 		}
 		if (choice == 3) {
@@ -204,61 +293,65 @@ public class GameController {
 			data.outEvent();
 		}
 	}
-	
+
 	/**
-	 * Method adding a new item in the list of draggable item.
-	 * Since the item can be everywhere in the screen, we need the mouse coordinate
+	 * Method adding a new item in the list of draggable item. Since the item can be
+	 * everywhere in the screen, we need the mouse coordinate
 	 * 
-	 * @param data	 {@code GameData} of the game.
+	 * @param data   {@code GameData} of the game.
 	 * @param item   {@code Item} we wants to add.
 	 * @param mouseX coordX of the mouse.
 	 * @param mouseY coordY of the mouse.
 	 */
 	private static void newDragItem(GameData data, Item item, int mouseX, int mouseY) {
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(item);
 		data.bag().updateManaConnected();
 		if (data.bag().bagItemLst().contains(item)) {
-			switch(item) {
-			case Curse _ -> {}
+			switch (item) {
+			case Curse _ -> {
+			}
 			default -> {
 				data.setDragItem(item);
 				GameDataClick.setOldPosition(mouseX, mouseY);
-				GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
+				GameDataClick.updateBoundingBox(data.dragItem(), mouseX, mouseY);
 			}
 			}
 		} else {
 			data.setDragItem(item);
 			GameDataClick.setOldPosition(mouseX, mouseY);
-			GameDataClick.updateBoundingBox(data.dragItem(),mouseX, mouseY);
+			GameDataClick.updateBoundingBox(data.dragItem(), mouseX, mouseY);
 		}
 	}
-	
+
 	/**
 	 * Method that permits to switch between the bag and the map in game.
 	 * 
-	 * @param data	 {@code GameData} of the game.
+	 * @param data {@code GameData} of the game.
 	 */
 	private static void swapMapOrBag(GameData data) {
+		Objects.requireNonNull(data);
 		if (!data.getShop() && !GameDataCombat.combat() && data.dragItem() == null && data.event() == null) {
 			data.swapMapOrBag();
 		}
 	}
-	
+
 	/**
-	 * Method that treats all event when clicking in the bag.
-	 * Treating when using an item in combat.
-	 * Treating when unlocking a box in the bag.
+	 * Method that treats all event when clicking in the bag. Treating when using an
+	 * item in combat. Treating when unlocking a box in the bag.
 	 * 
-	 * @param data	 {@code GameData} of the game.
-	 * @param coord	 {@code XY} of the grid we click
+	 * @param data  {@code GameData} of the game.
+	 * @param coord {@code XY} of the grid we click
 	 */
 	private static void actionBag(GameData data, XY coord) {
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(coord);
 		if (GameDataCombat.combat()) {
 			var item = data.bag().getItem(coord.x(), coord.y());
 			if (item != null) {
 				if (GameDataCombat.getHoverItem() == null || item != GameDataCombat.getHoverItem()) {
 					GameDataCombat.setHoverItem(item);
-				}
-				else {
+				} else {
 					GameDataCombat.heroAction(data);
 					GameDataCombat.setHoverItem(null);
 				}
@@ -266,14 +359,16 @@ public class GameController {
 		}
 		data.bag().unlockCaseBackpack(coord);
 	}
-	
+
 	/**
 	 * Check and trigger all events when we're moving the mouse
 	 * 
-	 * @param data	{@code GameData} of the game.
-	 * @param mouse	{@code Location} containing the coordinate of the mouse.
+	 * @param data  {@code GameData} of the game.
+	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerMove(GameData data, Location mouse) {
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(mouse);
 		if (data.dragItem() != null) {
 			if (data.getShop()) {
 				GameDataClick.sellButtonHover(mouse.x(), mouse.y());
@@ -283,15 +378,17 @@ public class GameController {
 			GameDataClick.binHover(mouse.x(), mouse.y());
 		}
 	}
-	
+
 	/**
 	 * Check and trigger all event when we're releasing the mouse
 	 *
-	 * @param data	{@code GameData} of the game.
-	 * @param mouse	{@code Location} containing the coordinate of the mouse.
+	 * @param data  {@code GameData} of the game.
+	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static void checkPointerUp(GameData data, Location mouse) {
-		if(data.dragItem() != null) {
+		Objects.requireNonNull(data);
+		Objects.requireNonNull(mouse);
+		if (data.dragItem() != null) {
 			int x = mouse.x();
 			int y = mouse.y();
 			GameDataClick.clickUp(x, y);
@@ -299,24 +396,24 @@ public class GameController {
 			data.bag().updateManaConnected();
 		}
 	}
-	
+
 	/**
-	 * Methods dealing with all event regarding the keyboard.
-	 * We use the keyboard when rotating an item and if we wants to leave the game.
+	 * Methods dealing with all event regarding the keyboard. We use the keyboard
+	 * when rotating an item and if we wants to leave the game.
 	 * 
-	 * @param data	{@code GameData} of the game.
-	 * @param mouse	{@code Key} containing which key we pressed
+	 * @param data  {@code GameData} of the game.
+	 * @param mouse {@code Key} containing which key we pressed
 	 * 
-	 * @return false if we pressed E for leaving
-	 * 				 true otherwise
+	 * @return false if we pressed E for leaving true otherwise
 	 */
 	private static boolean checkKeyEvent(GameData data, Key key) {
+		Objects.requireNonNull(data);
 		switch (key) {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				 GameDataClick.addDragItem(new Mimicry());
-				 GameDataClick.addDragItem(new Gold(20));
+				GameDataClick.addDragItem(new Mimicry());
+				GameDataClick.addDragItem(new Gold(20));
 			}
 		}
 		case Key.I -> {
@@ -337,11 +434,12 @@ public class GameController {
 		case Key.E -> {
 			data.endGame();
 		}
-		default -> {}
+		default -> {
+		}
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Goes once in the game lobby loop, which consists in retrieving user actions,
 	 * transmitting it to the GameView and GameData, and dealing with time events.
@@ -350,41 +448,44 @@ public class GameController {
 	 * @param data    {@code GameData} of the game.
 	 * @param view    {@code GameView} of the game.
 	 * 
-	 * @return True   if the game continue, False if we press the button to stop
+	 * @return True if the game continue, False if we press the button to stop
 	 */
 	private static int gameLoopLobby(ApplicationContext context) {
+		Objects.requireNonNull(context);
 		Event event = context.pollOrWaitEvent(10);
 		if (event != null) {
 			switch (event) {
-				case PointerEvent pointerEvent -> { // Mouse event
-					switch(pointerEvent.action()) {
-					case POINTER_UP -> {
-						int res = checkPointerUpLobby(context, pointerEvent.location());
-						applyResEffect(res, context);
-						return res;
-					}
-					default -> {}
-					}
+			case PointerEvent pointerEvent -> { // Mouse event
+				switch (pointerEvent.action()) {
+				case POINTER_UP -> {
+					int res = checkPointerUpLobby(context, pointerEvent.location());
+					applyResEffect(res, context);
+					return res;
 				}
-				default -> {}
+				default -> {
+				}
+				}
+			}
+			default -> {
+			}
 			}
 		}
 		return 1;
 	}
-	
+
 	/**
-	 * Check the res of the pointerEvent and depending of the result,
-	 * apply the consequence.
+	 * Check the res of the pointerEvent and depending of the result, apply the
+	 * consequence.
 	 * 
-	 * 0 : We display the scoreboard
-	 * 1 : We start the game and leave the lobby
+	 * 0 : We display the scoreboard 1 : We start the game and leave the lobby
 	 * 
 	 * @param context {@code ApplicationContext} of the game.
 	 * @param data    {@code GameData} of the game.
 	 * @param view    {@code GameView} of the game.
 	 */
 	private static void applyResEffect(int res, ApplicationContext context) {
-		switch(res) {
+		Objects.requireNonNull(context);
+		switch (res) {
 		case 0 -> {
 			data.setScore(true);
 			GameView.drawLobby(context, data, view);
@@ -395,48 +496,48 @@ public class GameController {
 		}
 		}
 	}
-	
+
 	/**
 	 * Check and trigger all event when we're releasing the mouse
 	 *
-	 * @param data	{@code GameData} of the game.
-	 * @param mouse	{@code Location} containing the coordinate of the mouse.
+	 * @param data  {@code GameData} of the game.
+	 * @param mouse {@code Location} containing the coordinate of the mouse.
 	 */
 	private static int checkPointerUpLobby(ApplicationContext context, Location mouse) {
+		Objects.requireNonNull(context);
+		Objects.requireNonNull(mouse);
 		var boundingBoxStart = MathLoader.getMapEvent().get("START_GAME").box();
-		var boundingBoxHOF = MathLoader.getMapEvent().get("HOF_BUTTON").box(); // TO DO
-		var boundingBoxLeave = MathLoader.getMapEvent().get("LEAVE_BUTTON").box(); // TO DO
+		var boundingBoxHOF = MathLoader.getMapEvent().get("HOF_BUTTON").box();
+		var boundingBoxLeave = MathLoader.getMapEvent().get("LEAVE_BUTTON").box();
 		int x = mouse.x();
 		int y = mouse.y();
-		if (boundingBoxStart.northWest().x() <= x && boundingBoxStart.southEast().x() >= x &&
-				boundingBoxStart.northWest().y() <= y && boundingBoxStart.southEast().y() >= y) {
+		if (boundingBoxStart.northWest().x() <= x && boundingBoxStart.southEast().x() >= x
+				&& boundingBoxStart.northWest().y() <= y && boundingBoxStart.southEast().y() >= y) {
 			return 1;
-		}
-		if (boundingBoxHOF.northWest().x() <= x && boundingBoxHOF.southEast().x() >= x &&
-				boundingBoxHOF.northWest().y() <= y && boundingBoxHOF.southEast().y() >= y) {
+		} else if (boundingBoxHOF.northWest().x() <= x && boundingBoxHOF.southEast().x() >= x
+				&& boundingBoxHOF.northWest().y() <= y && boundingBoxHOF.southEast().y() >= y) {
 			return 0;
-		}
-		if (boundingBoxLeave.northWest().x() <= x && boundingBoxLeave.southEast().x() >= x &&
-				boundingBoxLeave.northWest().y() <= y && boundingBoxLeave.southEast().y() >= y) {
+		} else if (boundingBoxLeave.northWest().x() <= x && boundingBoxLeave.southEast().x() >= x
+				&& boundingBoxLeave.northWest().y() <= y && boundingBoxLeave.southEast().y() >= y) {
 			return -1;
 		}
 		return -2;
 	}
-	
+
 	/**
 	 * Sets up the game, then launches the game loop.
 	 * 
 	 * @param context {@code ApplicationContext} of the game.
 	 */
 	public static void memoryGame(ApplicationContext context) {
+		Objects.requireNonNull(context);
 		initGame(context);
 		GameView.drawLobby(context, data, view);
-		int n = 1; 
+		int n = 1;
 		while (true) {
 			if (inLobby) {
 				n = gameLoopLobby(context);
-			}
-			else {
+			} else {
 				if (!gameLoop(context)) {
 					GameView.drawLobby(context, data, view);
 					inLobby = true;
@@ -449,13 +550,14 @@ public class GameController {
 			}
 		}
 	}
-	
+
 	/**
 	 * Inits all elements when launching the game.
 	 * 
 	 * @param context {@code ApplicationContext} of the game.
 	 */
 	private static void initGame(ApplicationContext context) {
+		Objects.requireNonNull(context);
 		screenInfo = context.getScreenInfo();
 		data = new GameData(screenInfo);
 		var imageLoader = new ImageLoader();
@@ -463,7 +565,7 @@ public class GameController {
 		new MathLoader(data, imageLoader, screenInfo);
 		view = GameView.initGameGraphics(screenInfo.width(), screenInfo.height(), data.bag().getGridSize(), imageLoader);
 	}
-	
+
 	/**
 	 * Executable program.
 	 * 

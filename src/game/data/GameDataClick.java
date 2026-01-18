@@ -657,13 +657,13 @@ public class GameDataClick {
    */
   public static ClickResult click(int x, int y) {
     return firstNonNull(x, y,
+    		GameDataClick::clickShop,
         GameDataClick::clickItem,
         GameDataClick::clickBag,
         GameDataClick::clickMap,
         GameDataClick::clickMapOrBag,
         GameDataClick::clickEvent,
         GameDataClick::clickCombat,
-        GameDataClick::clickShop,
         GameDataClick::clickFF
     );
   }
