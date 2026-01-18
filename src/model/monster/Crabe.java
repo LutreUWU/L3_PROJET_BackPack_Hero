@@ -26,6 +26,11 @@ public class Crabe implements Enemy{
   /** Static information about the enemy (damage, attacks, sizeX, sizeY, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Vomissement", "Pince"), 1.7, 1, "crabe");
 
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void crabe() {}
+	
 	@Override
 	public void resetStats() {
 		HP = info.maxHP();

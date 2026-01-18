@@ -17,6 +17,10 @@ import model.item.superrare.Bomb;
  * current game state, and computes the associated bonus damage.
  */
 public class Synergy {
+	/**
+	 * default constructor that does nothing
+	 */
+	public void synergy(){}
   /** Temporary storage for the calculated bonus damage */
 	private static int bonusDmg = 0;
 	

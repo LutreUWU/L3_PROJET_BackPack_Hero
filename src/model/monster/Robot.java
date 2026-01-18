@@ -25,6 +25,11 @@ public class Robot implements Enemy{
   /** Static information about the enemy (damage, attacks, sizeX, sizeY, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Hoo...", "HOHOHOH", "HEHEHEH"), 1.2, 1.2, "robot");
 
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void robot() {}
+	
 	@Override
 	public void resetStats() {
 		HP = info.maxHP();

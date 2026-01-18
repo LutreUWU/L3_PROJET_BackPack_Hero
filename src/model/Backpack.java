@@ -35,7 +35,7 @@ public class Backpack {
 	/** Pixel size of a single grid cell. */
 	final private int gridSize;
 	/** List of all items currently stored in the backpack. */
-	final private ArrayList<Item> bagItemLst = new ArrayList<>();
+	final private List<Item> bagItemLst = new ArrayList<>();
 	/** Number of locked cells that can currently be unlocked. */
 	private int caseUnlock = 0;
 	/** Coordinates connected to mana sources. */
@@ -73,67 +73,24 @@ public class Backpack {
     }
     return backpack;
 	}
-	
-	/**
-	 * Returns the item occupying the given grid coordinate.
-	 *
-	 * @param x column index
-	 * @param y row index
-	 * @return the item at the given position, or null if none exists
-	 */
-	public Item getItem(int x, int y) {
-		var itemFromBag = bagItemLst.stream()
-				.filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
-		return itemFromBag;
-	}
 
 	/**
-	 * Return the grid of the backpack.
+	 * Attempts to merge a specified amount of gold into the gold items in the backpack.
 	 * 
-	 * @return integer[][]
-	 */
-	public int[][] grid() {
-		return backpack;
-	}
-
-	/**
-	 * Return an List of all item in the backpack
+	 * It iterates over all gold items (ID = 2) in the backpack. If an item's value
+	 * is greater than the remaining amount to merge, it adds the value to that gold item.
+	 * Otherwise, it consumes the gold item and continues with the remaining amount.
 	 * 
-	 * @return List<Item_Object>
-	 */
-	public List<Item> bagItemLst() {
-		return List.copyOf(bagItemLst);
-	}
+	 * @param value the amount of gold to merge
+	 * @return true if the full value was merged, false if there was not enough gold
+	 * 
+   * @throws IllegalArgumentException if nb is not positive
 
-	/**
-	 * Returns the pixel size of a single grid cell.
-	 *
-	 * @return grid cell size
 	 */
-	public int getGridSize() {
-		return gridSize;
-	}
-
-	/**
-	 * Computes the total amount of mana stored in the backpack.
-	 *
-	 * @return total mana value
-	 */
-	public int getManaInBag() {
-		return bagItemLst.stream().filter(item -> item instanceof ManaStone).mapToInt(item -> ((ManaStone) item).value())
-				.sum();
-	}
-
-	/**
-	 * Computes the total amount of gold stored in the backpack.
-	 *
-	 * @return total gold value
-	 */
-	public int getGoldInBag() {
-		return bagItemLst.stream().filter(item -> item instanceof Gold).mapToInt(item -> ((Gold) item).value()).sum();
-	}
-
 	public boolean fuseGoldInBag(int value) {
+		if (value < 0) {
+      throw new IllegalArgumentException("maxHP must be > 0");
+    }
 		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.info().ID() == 2).map(item -> (Gold) item).toList();
 		for (Gold gold : goldItems) {
 			if (gold.value() > value) {
@@ -149,7 +106,21 @@ public class Backpack {
 		return false;
 	}
 
+	/**
+	 * Subtracts a specified amount of gold from the gold items in the backpack.
+	 * 
+	 * It iterates over all gold items (ID = 2) in the backpack. If an item's value
+	 * is greater than the remaining amount to subtract, it decreases the item's value.
+	 * Otherwise, it removes the gold item completely and continues with the remaining amount.
+	 * 
+	 * @param value the amount of gold to subtract
+	 * 
+   * @throws IllegalArgumentException if nb is not positive
+	 */
 	public void subGoldInBag(int value) {
+		if (value < 0) {
+      throw new IllegalArgumentException("maxHP must be > 0");
+    }
 		List<Gold> goldItems = bagItemLst.stream().filter(item -> item.info().ID() == 2).map(item -> (Gold) item).toList();
 		for (Gold gold : goldItems) {
 			if (gold.value() > value) {
@@ -199,7 +170,18 @@ public class Backpack {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Checks whether a given coordinate is outside the backpack grid.
+	 * 
+	 * The backpack is represented as a 2D array, where (0,0) is the top-left corner.
+	 * This method returns true if the coordinates are invalid (outside the grid),
+	 * and false if they are within bounds.
+	 * 
+	 * @param x the column index to check
+	 * @param y the row index to check
+	 * @return true if the coordinate is outside the backpack, false otherwise
+	 */
 	public boolean inBackpack(int x, int y) {
 		return (y < 0 || y >= backpack.length || x < 0 || x >= backpack[0].length);
 	}
@@ -327,7 +309,7 @@ public class Backpack {
 	 * Remove an item from the backpack
 	 * 
 	 * @param item Item we wants to remove
-	 * @throws Objects.requireNonNull if item is null
+	 * @throws NullPointerException if item is null
 	 */
 	public void removeItemFromBackpack(Item item) {
 		Objects.requireNonNull(item);
@@ -342,7 +324,7 @@ public class Backpack {
 	 * Unlock an item from the backpack
 	 * 
 	 * @param coord 	coord of the case we wants to unlock
-	 * @throws Objects.requireNonNull if coord is null
+	 * @throws NullPointerException if coord is null
 	 */
 	public void unlockCaseBackpack(XY coord) {
 		Objects.requireNonNull(coord);
@@ -395,5 +377,67 @@ public class Backpack {
 	 */
 	public int getCol() {
 		return COL;
+	}
+	
+	/**
+	 * Returns the item occupying the given grid coordinate.
+	 *
+	 * @param x column index
+	 * @param y row index
+	 * @return the item at the given position, or null if none exists
+	 */
+	public Item getItem(int x, int y) {
+		var itemFromBag = bagItemLst.stream()
+				.filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
+		return itemFromBag;
+	}
+
+	/**
+	 * Return the grid of the backpack.
+	 * 
+	 * @return integer[][]
+	 */
+	public int[][] grid() {
+		return backpack;
+	}
+
+	/**
+	 * Returns an immutable list of all items currently stored in the backpack.
+	 * 
+	 * Modifications to the returned list are not allowed; to add or remove items,
+	 * use the appropriate Backpack methods.
+	 * 
+	 * @return an unmodifiable List of Item objects contained in the backpack
+	 */
+	public List<Item> bagItemLst() {
+		return List.copyOf(bagItemLst);
+	}
+
+	/**
+	 * Returns the pixel size of a single grid cell.
+	 *
+	 * @return grid cell size
+	 */
+	public int getGridSize() {
+		return gridSize;
+	}
+
+	/**
+	 * Computes the total amount of mana stored in the backpack.
+	 *
+	 * @return total mana value
+	 */
+	public int getManaInBag() {
+		return bagItemLst.stream().filter(item -> item instanceof ManaStone).mapToInt(item -> ((ManaStone) item).value())
+				.sum();
+	}
+
+	/**
+	 * Computes the total amount of gold stored in the backpack.
+	 *
+	 * @return total gold value
+	 */
+	public int getGoldInBag() {
+		return bagItemLst.stream().filter(item -> item instanceof Gold).mapToInt(item -> ((Gold) item).value()).sum();
 	}
 }

@@ -11,6 +11,22 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a KeyDoor item in the game.
+ * 
+ * A KeyDoor item has a position (defined by its shape and coordinates),
+ * a facing direction, and associated item statistics.
+ * 
+ * Implements the Item interface, so it can be placed in the backpack,
+ * rotated, and interact with other game mechanics.
+ * 
+ * This item is typically used to unlock doors or trigger events
+ * within the game.
+ * 
+ * @param shape the array of XY coordinates that define the item's shape in the grid
+ * @param direction the current facing direction of the item
+ * @param info the item statistics (ID, rarity, score, AP, mana, etc.)
+ */
 public record KeyDoor(XY[] shape, Direction direction, ItemStats info) implements Item{		
 	private static final Rarity RARITY_VALUE = Rarity.COMMON;
 	private static final int ID_VALUE = 1;

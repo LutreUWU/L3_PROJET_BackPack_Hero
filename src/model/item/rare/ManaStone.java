@@ -12,6 +12,22 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a ManaStone item in the game.
+ * 
+ * A ManaStone provides mana to the hero or to items connected to it.
+ * It has a position (defined by its shape and coordinates), a facing direction,
+ * item statistics, and a mana value.
+ * 
+ * Implements the Item interface, so it can be placed in the backpack,
+ * rotated, and interact with other game mechanics.
+ * 
+ * @param shape array of XY coordinates defining the item's shape in the grid
+ * @param direction the current facing direction of the item
+ * @param info item statistics (ID, rarity, score, AP, mana, etc.)
+ * @param value the amount of mana provided by this ManaStone
+ */
+
 public record ManaStone(XY[] shape, Direction direction, ItemStats info, int value) implements Item {
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
 	private static final int ID_VALUE = 16;
@@ -21,6 +37,8 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int val
 	/**
 	 * Creates a default item positioned at (0, 0),
 	 * oriented upwards, with its default durability and item stats.
+	 * 
+	 * @param value the amount of mana provided by this ManaStone
 	 */
 	public ManaStone(int value) {
 		this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, value);
@@ -32,10 +50,11 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int val
 	 *
 	 * @param shape 		  The grid cells occupied by the item
 	 * @param direction 	The orientation of the item
+	 * @param value the amount of mana provided by this ManaStone
 	 */
 	public ManaStone(XY[] shape, Direction direction, int value) {
 		Objects.requireNonNull(shape);
-  	if (value <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (value < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(shape, direction, ITEM_STATS, value);
 	}
 	
@@ -45,10 +64,11 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int val
 	 *
 	 * @param coord 		 The pivot coordinate of the item
 	 * @param direction  The orientation of the item
+	 * @param value the amount of mana provided by this ManaStone
 	 */
 	public ManaStone(XY coord, Direction direction, int value) {
 		Objects.requireNonNull(coord);
-  	if (value <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (value < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(initShape(coord, direction), direction, ITEM_STATS, value);
   }
 

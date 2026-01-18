@@ -13,6 +13,22 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a Bomb item in the game.
+ * 
+ * A Bomb is an explosive item that can damage enemies in AOE.
+ * It has a position (defined by its shape and coordinates), a facing direction,
+ * item statistics, and a durability indicating how many times it can be used.
+ * 
+ * Implements the Item interface, so it can be placed in the backpack,
+ * rotated, used actively or passively, and interact with other game mechanics.
+ * 
+ * @param shape array of XY coordinates defining the item's shape in the grid
+ * @param direction the current facing direction of the item
+ * @param info item statistics (ID, rarity, score, AP, mana, etc.)
+ * @param durability number of uses before the Bomb is consumed
+ */
+
 public record Bomb(XY[] shape, Direction direction, ItemStats info, int durability) implements Item {
 	private static final int DURABILITY = 1;
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
@@ -39,7 +55,7 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 	 */
 	public Bomb(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(shape, direction, ITEM_STATS, durability);
 	}
 	
@@ -52,7 +68,7 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 	 */
 	public Bomb(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(initShape(coord, direction), direction, ITEM_STATS, durability);
 	}
 

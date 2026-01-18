@@ -15,6 +15,23 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a PoisonArrow item in the game.
+ * 
+ * A PoisonArrow is an offensive item that can inflict a poison effect on enemies.
+ * It has a position (defined by its shape and coordinates), a facing direction,
+ * item statistics, durability, and an associated effect.
+ * 
+ * Implements the Item interface, so it can be placed in the backpack,
+ * rotated, used actively or passively, and interact with other game mechanics.
+ * 
+ * @param shape array of XY coordinates defining the item's shape in the grid
+ * @param direction the current facing direction of the item
+ * @param info item statistics (ID, rarity, score, AP, mana, etc.)
+ * @param durability number of uses before the item breaks
+ * @param effect the effect applied by the PoisonArrow (e.g., POISON)
+ */
+
 public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int durability, Effect effect) implements Item{
 	private static final int DURABILITY = 5;
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
@@ -38,8 +55,12 @@ public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int d
 	 *
 	 * @param shape 		  The grid cells occupied by the item
 	 * @param direction 	The orientation of the item
+	 * @param durability number of uses before the item breaks
+	 * @param effect the effect applied by the PoisonArrow (e.g., POISON)
 	 */
 	public PoisonArrow(XY[] shape, Direction direction, int durability, Effect effect) {
+		Objects.requireNonNull(shape);
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(shape, direction, ITEM_STATS, durability, effect);
   }
 	
@@ -49,8 +70,12 @@ public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int d
 	 *
 	 * @param coord 		 The pivot coordinate of the item
 	 * @param direction  The orientation of the item
+	 * @param durability number of uses before the item breaks
+	 * @param effect the effect applied by the PoisonArrow (e.g., POISON)
 	 */
 	public PoisonArrow(XY coord, Direction direction, int durability, Effect effect) {
+		Objects.requireNonNull(coord);
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(initShape(coord, direction), direction, ITEM_STATS, durability, effect);
   }
 

@@ -16,6 +16,11 @@ import com.github.forax.zen.ScreenInfo;
  * heading levels (h1–h4) and spacing.
  */
 public class FontLoader {		
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void fontLoader() {}
+	
 	private static int h1;
 	private static int h2;
 	private static int h3;
@@ -75,26 +80,46 @@ public class FontLoader {
 		span = (int) (screenInfo.width() * 0.008);
 	}
 	
-	/** @return the calculated h1 font size based on screen width */
+	/** 
+	 * Return the H1 size for the text
+	 * 
+	 * @return the calculated h1 font size based on screen width 
+	 * */
 	public static int getH1() {
 		return h1;
 	}
-	/** @return the calculated h2 font size based on screen width */
+	/** 
+	 * Return the H2 size for the text
+	 * 
+	 * @return the calculated h2 font size based on screen width 
+	 * */
 	public static int getH2() { 
 		return h2; 
 	}
 	
-	/** @return the calculated h3 font size based on screen width */
+	/** 
+	 * Return the H3 size for the text
+	 * 
+	 * @return the calculated h3 font size based on screen width 
+	 * */
 	public static int getH3() { 
 		return h3; 
 	}
 	
-	/** @return the calculated h4 font size based on screen width */
+	/**
+	 * Return the H4 size for the text
+	 * 
+	 * @return the calculated h4 font size based on screen width 
+	 **/
 	public static int getH4() { 
 		return h4;
 	}
 	
-	/** @return the calculated standard span size based on screen width */
+	/** 
+	 * Return the span size for the text
+	 * 
+	 * @return the calculated standard span size based on screen width 
+	 * */
 	public static int getSpan() { 
 		return span; 
 	}

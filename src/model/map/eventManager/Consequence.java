@@ -1,6 +1,5 @@
 package model.map.eventManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import game.GameData;
@@ -12,7 +11,6 @@ import model.RandomItem;
 import model.item.common.Gold;
 import model.item.common.KeyDoor;
 import model.item.rare.Cookie;
-import model.item.superrare.Massue;
 import model.map.Exit;
 import model.map.Healer;
 import model.map.LockedDoor;

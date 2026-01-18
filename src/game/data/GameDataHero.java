@@ -12,10 +12,12 @@ import model.Hero;
  */
 public class GameDataHero {  
   private static Hero hero;
+  
   /**
    * Link the hero with the one in GameData
-   * @param heroData Hero's data from GameData
-   * @throws Objects.requireNonNull if no hero is initialize
+   * @param  heroData Hero's data from GameData
+   * 
+   * @throws NullPointerException if heroData is null
    */
   public GameDataHero(Hero heroData) {
   	Objects.requireNonNull(heroData);
@@ -52,7 +54,8 @@ public class GameDataHero {
 	   
   /**
    * Return the current hero's statue from data
-   * @return
+   * 
+   * @return {@code Hero} and all informations about him
    */
   public static Hero hero() {
     return hero;

@@ -11,6 +11,25 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a Gold item in the game.
+ * 
+ * A Gold item has a position (defined by its shape and coordinates),
+ * a facing direction, item statistics, and a numeric value representing
+ * the amount of gold it contains.
+ * 
+ * Implements the Item interface, allowing it to be placed in the backpack,
+ * used in combat, rotated, and interact with other game mechanics.
+ * 
+ * Each Gold instance is immutable (as it is a record), so any modification
+ * (like adding or subtracting gold) returns a new instance rather than
+ * modifying the original.
+ * 
+ * @param shape the array of XY coordinates that define the item's shape in the grid
+ * @param direction the current facing direction of the item
+ * @param info the item statistics (ID, rarity, score, AP, mana, etc.)
+ * @param value the amount of gold contained in this item
+ */
 public record Gold(XY[] shape, Direction direction, ItemStats info, int value) implements Item {
 	private static final Rarity RARITY_VALUE = Rarity.COMMON;
 	private static final int ID_VALUE = 2;
@@ -24,6 +43,7 @@ public record Gold(XY[] shape, Direction direction, ItemStats info, int value) i
 	 * oriented upwards, with its default durability and item stats.
 	 */
 	public Gold(int value) {
+  	if (value < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(initShape(new XY(0, 0), Direction.UP), Direction.UP, ITEM_STATS, value);
   }
 
@@ -36,6 +56,7 @@ public record Gold(XY[] shape, Direction direction, ItemStats info, int value) i
 	 * @param value			  The current value of the item
 	 */
 	public Gold(XY[] shape, Direction direction, int value) {
+  	if (value < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(shape, direction, ITEM_STATS,value);
 	}
 	

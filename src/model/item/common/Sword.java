@@ -12,6 +12,20 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a Sword item in the game.
+ * 
+ * A Sword has a position (shape and coordinates), a direction, 
+ * and item statistics. It implements the Item interface, allowing
+ * it to be placed, rotated, and interact with game mechanics.
+ * 
+ * Item starter when launching the game
+ * 
+ * @param shape array of XY coordinates defining the item's shape
+ * @param direction the current facing direction of the item
+ * @param durability the current durability of the item
+ * @param info item statistics (ID, rarity, score, AP, mana, etc.)
+ */
 public record Sword(XY[] shape, Direction direction, int durability, ItemStats info) implements Item{
 	private static final int DURABILITY = 99;
 	private static final Rarity RARITY_VALUE = Rarity.COMMON;
@@ -35,10 +49,11 @@ public record Sword(XY[] shape, Direction direction, int durability, ItemStats i
 	 *
 	 * @param shape 		  The grid cells occupied by the item
 	 * @param direction 	The orientation of the item
+	 * @param durability the current durability of the item
 	 */
 	public Sword(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(shape, direction, durability, ITEM_STATS);
   }
 
@@ -48,10 +63,11 @@ public record Sword(XY[] shape, Direction direction, int durability, ItemStats i
 	 *
 	 * @param coord 		 The pivot coordinate of the item
 	 * @param direction  The orientation of the item
+	 * @param durability the current durability of the item
 	 */
 	public Sword(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
 

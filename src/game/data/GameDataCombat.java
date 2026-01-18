@@ -25,6 +25,11 @@ import model.monster.Robot;
  * All methods here are used when we initiate a combat.
  */
 public class GameDataCombat {
+	/*
+	 * Constructor that does nothing
+	 */
+	public GameDataCombat() {}
+	
 	private static boolean combat = false; // To know if we're currently fighting or not
 	private static boolean curseEvent = false; // To know if we're currently in a curse event or no
 	private static Item hoverItem = null; // If in curse event, To know if we're holding an item
@@ -96,7 +101,8 @@ public class GameDataCombat {
 		while (it.hasNext()) {
 			var item = it.next();
 			var newItem = item.usePassive(target, lstEnemy, data);
-			it.set(newItem);
+			data.bag().removeItemFromBackpack(item);
+			data.bag().addItemToBackpack(newItem);
 		}
 	}
 	

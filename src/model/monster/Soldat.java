@@ -25,6 +25,11 @@ public class Soldat implements Enemy{
   /** Static information about the enemy (damage, attacks, sizeX, sizeY, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(25, 6, List.of("Coup", "Bouclier"), 1, 1, "soldat");
 
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void soldat() {}
+	
 	@Override
 	public void resetStats() {
 		HP = info.maxHP();

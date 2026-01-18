@@ -13,6 +13,24 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a FireBall item in the game.
+ * 
+ * A FireBall has a position (defined by its shape and coordinates),
+ * a facing direction, a durability value, item statistics, and an associated effect.
+ * 
+ * Implements the Item interface, so it can be placed in the backpack,
+ * used in combat, rotated, and interact with other game mechanics.
+ * 
+ * Each FireBall instance is immutable (as it is a record), so using or rotating
+ * it will return a new instance rather than modifying the original.
+ * 
+ * @param shape 			the array of XY coordinates that define the item's shape in the grid
+ * @param direction 	the current facing direction of the item
+ * @param durability	the current durability of the item
+ * @param info 				the item statistics (ID, rarity, score, AP, mana, etc.)
+ * @param effect 			the effect applied by this item (e.g., FIRE)
+ */
 public record FireBall(XY[] shape, Direction direction, int durability, ItemStats info, Effect effect) implements Item{
 	private static final int DURABILITY = 2;
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
@@ -39,7 +57,7 @@ public record FireBall(XY[] shape, Direction direction, int durability, ItemStat
 	 */
 	public FireBall(XY[] shape, Direction direction, int durability, Effect effect) {
 		Objects.requireNonNull(shape);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(shape, direction, durability, ITEM_STATS, effect);
   }
 	
@@ -52,7 +70,7 @@ public record FireBall(XY[] shape, Direction direction, int durability, ItemStat
 	 */
 	public FireBall(XY coord, Direction direction, int durability, Effect effect) {
 		Objects.requireNonNull(coord);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(initShape(coord, direction), direction, durability, ITEM_STATS, effect);
   }
 

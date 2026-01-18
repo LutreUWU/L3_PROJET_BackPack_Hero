@@ -221,7 +221,8 @@ public class GameData {
 	/**
 	 * Enters an event and forces bag view.
 	 *
-	 * @param new_event event to enter
+	 * @param newEvent event to enter
+	 * @throws NullPointerException if newEvent is null
 	 */
 	public void inEvent(LinkedEvent newEvent) {
 		Objects.requireNonNull(newEvent);

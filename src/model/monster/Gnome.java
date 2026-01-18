@@ -25,6 +25,11 @@ public class Gnome implements Enemy{
   /** Static information about the enemy (damage, attacks, sizeX, sizeY, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(15, 4, List.of("Slash", "Abattage"), 1, 0.8, "gnome");
 
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void gnome() {}
+	
 	@Override
 	public void resetStats() {
 		HP = info.maxHP();

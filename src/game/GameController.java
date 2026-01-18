@@ -23,7 +23,7 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.common.Gold;
+import model.item.epic.Shield;
 import model.item.mythic.Mimicry;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
@@ -377,7 +377,7 @@ public class GameController {
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 				GameDataClick.addDragItem(new Mimicry());
-				GameDataClick.addDragItem(new Gold(20));
+				GameDataClick.addDragItem(new Shield());
 			}
 		}
 		case Key.I -> {

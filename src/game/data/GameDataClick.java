@@ -16,6 +16,14 @@ import model.XY;
 import model.item.common.Gold;
 import model.map.Floor;
 
+/**
+ * Represents the click handling and drag-and-drop logic for the game's interface.
+ * 
+ * This class links the game data, the backpack, and screen information,
+ * and keeps track of currently dragged items in the interface.
+ * It manages user interactions with items, including dragging, dropping,
+ * and item-specific click actions.
+ */
 public class GameDataClick {
 	private static GameData data;
 	private static Backpack backpack;
@@ -23,6 +31,13 @@ public class GameDataClick {
   private static XY oldPosition; // contains the mouse coordinate before moving the cursor.
   private static LinkedHashMap<Item, BoundingBox> dragItemMap; // Contains all movable items on the screen.
 	
+  /**
+   * Constructs a new GameDataClick object, linking it to the given game data and screen information.
+   * 
+   * @param dataGame 		The game data to associate with this click handler
+   * @param screenInfo_ The screen information (size, resolution, etc.)
+   * @throws NullPointerException if dataGame is null
+   */
 	public GameDataClick(GameData dataGame, ScreenInfo screenInfo_) {
 		Objects.requireNonNull(dataGame);
 		data = dataGame;
@@ -41,7 +56,6 @@ public class GameDataClick {
    */
   public static XY bagClick(int x, int y) {
   	int size = backpack.getGridSize();
-  	;
   	double coordLeftGrid = MathLoader.getMapEvent().get("BG_BACKPACK").box().northWest().x();
   	double coordTopGrid = MathLoader.getMapEvent().get("BG_BACKPACK").box().northWest().y();
   	if (data.mapOrBag() == false) {
@@ -902,7 +916,12 @@ public class GameDataClick {
   	}
   }
   
-  public static LinkedHashMap<Item, BoundingBox> getDragItemMap() {
-  	return dragItemMap;
+  /**
+   * Return a map of all draggable Item
+   * 
+   * @return Map where for each item, his bounding box
+   */
+  public static Map<Item, BoundingBox> getDragItemMap() {
+  	return Map.copyOf(dragItemMap);
   }
 }

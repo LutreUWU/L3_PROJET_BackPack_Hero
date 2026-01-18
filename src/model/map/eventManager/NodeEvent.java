@@ -2,6 +2,12 @@ package model.map.eventManager;
 
 import java.util.Objects;
 
+/**
+ * Represents a node in an event system or game logic.
+ * 
+ * The exact behavior and properties depend on the implementation and usage
+ * within the game engine.
+ */
 public class NodeEvent {
 	final private String question;
 	final private String answer;
@@ -12,8 +18,8 @@ public class NodeEvent {
 	/**
 	 * Constructor
 	 * 
-	 * @param answer
-	 * @param question
+	 * @param answer 	 String with the correct answer 
+	 * @param question String with the question
 	 */
 	public NodeEvent(String answer, String question) {
 		this.question = question;
@@ -23,7 +29,7 @@ public class NodeEvent {
 	/**
 	 * Setter choice1
 	 * 
-	 * @param newChoice1
+	 * @param newChoice1	The first choise
 	 */
 	public void setChoice1(NodeEvent newChoice1) {
 		Objects.requireNonNull(newChoice1);
@@ -33,7 +39,7 @@ public class NodeEvent {
 	/**
 	 * Setter choice2
 	 * 
-	 * @param newChoice2
+	 * @param newChoice2  The second choise
 	 */
 	public void setChoice2(NodeEvent newChoice2) {
 		Objects.requireNonNull(newChoice2);

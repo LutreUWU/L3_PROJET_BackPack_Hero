@@ -12,12 +12,26 @@ import model.XY;
 import model.item.ItemStats;
 import model.monster.Enemy;
 
+/**
+ * Represents a Bow item in the game.
+ * 
+ * A Bow has a position (defined by its shape and coordinates), a direction,
+ * a durability value, and item statistics. It implements the Item interface,
+ * allowing it to be placed, rotated, and interact with game mechanics.
+ * 
+ * Typically used to increase attack capabilities or synergize with other items.
+ * 
+ * @param shape array of XY coordinates defining the item's shape in the grid
+ * @param direction the current facing direction of the item
+ * @param durability the current durability of the item
+ * @param info item statistics (ID, rarity, score, AP, mana, etc.)
+ */
 public record Bow(XY[] shape, Direction direction, int durability, ItemStats info) implements Item{
 	private static final int DURABILITY = 3;
 	private static final Rarity RARITY_VALUE = Rarity.EPIC;
 	private static final int ID_VALUE = 10;
 	private static final int SCORE_VALUE = 15;
-	private static final int AP_VALUE = 1;
+	private static final int AP_VALUE = 0;
 	private static final int MANA_VALUE = 0;
 	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);
 	
@@ -38,7 +52,7 @@ public record Bow(XY[] shape, Direction direction, int durability, ItemStats inf
 	 */
 	public Bow(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(shape, direction, durability, ITEM_STATS);
   }
 	
@@ -51,7 +65,7 @@ public record Bow(XY[] shape, Direction direction, int durability, ItemStats inf
 	 */
 	public Bow(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
 

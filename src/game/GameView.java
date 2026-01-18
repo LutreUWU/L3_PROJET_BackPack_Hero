@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,10 +62,10 @@ import model.monster.Enemy;
  * The SimpleGameView class deals with the display of the game the screen, and
  * with the interpretation of which zones were clicked on by the user.
  * 
- * @param width    Width of the windows screen
- * @param height   Height of the windows screen
- * @param tileSize Size of a grid in the bag
- *
+ * @param width     Width of the windows screen
+ * @param height    Height of the windows screen
+ * @param tileSize  Size of a grid in the bag
+ * @param imgLoader List of all image in the game
  */
 public record GameView(int width, int height, int tileSize, ImageLoader imgLoader) {
 	/**
@@ -72,7 +73,9 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * 
 	 * @param width     Width of the windows screen
 	 * @param height    Height of the windows screen
-	 * @param grid_size Size of a grid in the bag
+	 * @param gridSize Size of a grid in the bag
+	 * @param imgLoader Class containing all image for the game
+	 * 
 	 * @return SimpleGameView
 	 */
 	public static GameView initGameGraphics(int width, int height, int gridSize, ImageLoader imgLoader) {
@@ -967,7 +970,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     GameData containing the game data.
 	 */
 	private void updateDragItem(Graphics2D graphics, GameData data) {
-		var dragItem = GameDataClick.getDragItemMap();
+		var dragItem = new LinkedHashMap<Item, BoundingBox>(GameDataClick.getDragItemMap());
 		if (!dragItem.isEmpty()) {
 			Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
 			graphics.setFont(font);

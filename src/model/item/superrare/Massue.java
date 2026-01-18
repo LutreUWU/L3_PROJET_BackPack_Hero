@@ -1,21 +1,31 @@
 package model.item.superrare;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import game.GameData;
 import game.data.GameDataCombat;
-import game.data.GameDataHero;
-import model.Curse;
 import model.Direction;
 import model.Item;
 import model.Rarity;
 import model.XY;
 import model.item.ItemStats;
-import model.item.legendary.Axe;
 import model.monster.Enemy;
 
+/**
+ * Represents a Massue item in the game.
+ * 
+ * A Massue has a position (shape and coordinates), a direction, 
+ * and item statistics. It implements the Item interface, allowing
+ * it to be placed, rotated, and interact with game mechanics.
+ * 
+ * Item starter when launching the game
+ * 
+ * @param shape array of XY coordinates defining the item's shape
+ * @param direction the current facing direction of the item
+ * @param durability the current durability of the item
+ * @param info item statistics (ID, rarity, score, AP, mana, etc.)
+ */
 public record Massue(XY[] shape, Direction direction, ItemStats info, int durability) implements Item{
 	private static final int DURABILITY = 4;
 	private static final Rarity RARITY_VALUE = Rarity.RARE;
@@ -39,10 +49,11 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
 	 *
 	 * @param shape 		  The grid cells occupied by the item
 	 * @param direction 	The orientation of the item
+	 * @param durability the current durability of the item
 	 */
 	public Massue(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
     this(shape, direction, ITEM_STATS, DURABILITY);
   }
 	
@@ -52,10 +63,11 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
 	 *
 	 * @param coord 		 The pivot coordinate of the item
 	 * @param direction  The orientation of the item
+	 * @param durability the current durability of the item
 	 */
 	public Massue(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
 		this(initShape(coord, direction), direction, ITEM_STATS, DURABILITY);
   }
 	

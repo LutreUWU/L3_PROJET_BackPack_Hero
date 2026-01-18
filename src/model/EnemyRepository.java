@@ -22,6 +22,11 @@ import model.monster.Soldat;
  * generate enemy lists for a given floor level.
  */
 public class EnemyRepository {
+	
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void enemyRepository() {}
   /** List of all normal enemies, sorted by HP */
   private static List<Enemy> enemyLst = new ArrayList<>();
   /** List of all bosses, sorted by HP */
@@ -105,9 +110,9 @@ public class EnemyRepository {
    * Creates a list of unique enemies for a given floor.
    * The number of enemies equals the floor number.
    * 
-   * @param floor Current floor (must be <= 3)
+   * @param  floor Current floor (must be below or equal 3)
    * @return list of enemies for this floor
-   * @throws IllegalArgumentException if floor > 3
+   * @throws IllegalArgumentException if floor above 3
    */
 	public static List<Enemy> createEnemyLst(int floor) {
 		if (floor > 3) throw new IllegalArgumentException("FLOOR > 3 !");
@@ -128,9 +133,9 @@ public class EnemyRepository {
 	/**
    * Returns a single boss for a given floor using Gaussian selection.
    * 
-   * @param floor Current floor (must be <= 3)
+   * @param floor Current floor (must be below or equal 3)
    * @return a boss enemy
-   * @throws IllegalArgumentException if floor > 3
+   * @throws IllegalArgumentException if floor above 3
    */
   public static Enemy getOneBossLst(int floor) {
   	if (floor > 3) throw new IllegalArgumentException("FLOOR > 3 !");

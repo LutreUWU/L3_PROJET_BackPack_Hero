@@ -5,8 +5,13 @@ import java.util.Random;
 public class RandomItem {
 	
 	/**
+	 * Default constructor that does nothing
+	 */
+	public void randomItem() {}
+	
+	/**
 	 * Generate a random item with Gauss
-	 * @param current floor
+	 * @param floor Current floor
 	 * @return the random item
 	 */
 	public static Item generate(int floor) {

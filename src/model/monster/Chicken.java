@@ -33,6 +33,11 @@ public class Chicken implements Enemy{
   /** Static information about the enemy (damage, attacks, drop chance, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(20, 4, List.of("Morsure", "Protection"), 0.8, 0.4, "chicken");
 	
+	/**
+	 * Default constructor that does nothing
+	 */
+	public void chicken() {}
+	
 	@Override
 	public void resetStats() {
 		HP = info.maxHP();

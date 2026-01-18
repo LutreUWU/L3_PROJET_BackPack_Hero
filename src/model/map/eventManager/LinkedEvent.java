@@ -6,13 +6,17 @@ import java.util.Random;
 
 import game.GameData;
 import model.EnemyRepository;
-import model.map.EnemyRoom;
 import model.monster.Chicken;
 import model.monster.Enemy;
 import model.monster.Robot;
-import model.monster.Soldat;
 
 
+/**
+ * Represents a sequence or chain of game events.
+ * 
+ * LinkedEvent manages a collection of NodeEvent objects in a linked structure,
+ * allowing the game to track and trigger a series of events in order.
+ */
 public class LinkedEvent {
 
 	private NodeEvent root;
@@ -22,9 +26,8 @@ public class LinkedEvent {
 	/**
 	 * Constructor to create all linkedEvent
 	 * 
-	 * @param floor
-	 * @param whatEvent
-	 * @param data
+	 * @param floor			Current event
+	 * @param whatEvent Which type of event
 	 */
 	public LinkedEvent(int floor, String whatEvent) {
 		switch (whatEvent) {
@@ -39,10 +42,9 @@ public class LinkedEvent {
 	}
 	
 	/**
-	 * create event the a room
+	 * Create event for a room
 	 * 
-	 * @param floor
-	 * @param hero
+	 * @param floor	Current floor
 	 */
 	private void createEventForEventRoom(int floor) {
 		Random rand = new Random();
@@ -57,6 +59,20 @@ public class LinkedEvent {
 		;
 	}
 	
+	/**
+	 * Initializes the event sequence for a curse scenario in the game.
+	 * 
+	 * This method creates the root NodeEvent with a prompt asking the player 
+	 * whether they want to place the curse in their backpack. 
+	 * It then sets up two choices for the player:
+	 *  - Choice 1: Accept the curse and trigger the "curseInBag" consequence.
+	 *  - Choice 2: Decline the curse and trigger the "curseNotInBag" consequence.
+	 * 
+	 * Each choice node may contain additional messages or effects for the game logic.
+	 * 
+	 * This method is private because it is only meant to initialize the internal 
+	 * event chain for curse-related interactions.
+	 */
 	private void createEventForCurse() {
 		root = new NodeEvent(null, "Souhaitez vous mettre la malédiction dans le sac ?");
 		var choiceOne = createNodeWithConsequence("Oui !", 0, 1, "curseInBag",
@@ -70,7 +86,7 @@ public class LinkedEvent {
 	/**
 	 * Create event for ExitRoom
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	private void createEventForExitRoom(int floor) {
 		var question = floor == 3 ? "sortir du labyrinthe ?" : "monter à l'étage ?";
@@ -87,7 +103,7 @@ public class LinkedEvent {
 	/**
 	 * Create event for LockedDoor
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	public void createEventForLockedRoom(int floor) {
 		root = new NodeEvent(null, "Souhaitez vous utiliser la clef ?\n*Si vous en avez une*");
@@ -103,7 +119,7 @@ public class LinkedEvent {
 	/**
 	 * Create event to open the Treasure
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	public void createEventForTreasure(int floor) {
 		root = new NodeEvent(null, "Souhaitez vous ouvrir le coffre ?");
@@ -118,7 +134,7 @@ public class LinkedEvent {
 	/**
 	 * Create event for LockedDoor
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	public void createEventForHealerRoom(int floor) {
 		root = new NodeEvent(null, "Souhaitez échanger " + floor * 5 + " pièces d'or contre " + floor * 15 + "HP ?");
@@ -132,9 +148,9 @@ public class LinkedEvent {
 	}
 
 	/**
-	 * Create an event with Revuz
+	 * Create an event with professor Revuz
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	private void event1(int floor) {
 		root = new NodeEvent(null, "Vous rencontrez M. Revuz. \"Tu penses quoi du C?\"");
@@ -164,7 +180,7 @@ public class LinkedEvent {
 	/**
 	 * Create an event at the Crous
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	private void event2(int floor) {
 		root = new NodeEvent(null, "Vous arrivez au Crous. \"T'es boursier?\"");
@@ -180,7 +196,7 @@ public class LinkedEvent {
 	/**
 	 * Create an event with a goblin
 	 * 
-	 * @param current floor
+	 * @param floor Current floor
 	 */
 	private void event3(int floor) {
 		root = new NodeEvent(null, "Vous trouvez un goblin, que voulez vous faire ?");
