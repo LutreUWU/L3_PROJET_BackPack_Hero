@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="BackpackHero" default="jar" basedir=".">
 
+    <!-- Compilation -->
     <target name="compile">
-        <mkdir dir="bin"/>
+        <mkdir dir="classes"/>
         <javac srcdir="src" destdir="classes" includeantruntime="false">
             <classpath>
                 <fileset dir="lib" includes="*.jar"/>
@@ -10,9 +11,9 @@
         </javac>
     </target>
 
+    <!-- JAR exécutable -->
     <target name="jar" depends="compile">
-        <mkdir dir="dist"/>
-        <jar destfile="BackpackHero.jar" basedir="bin">
+        <jar destfile="BackpackHero.jar" basedir="classes">
             <manifest>
                 <attribute name="Main-Class" value="game.GameController"/>
             </manifest>
@@ -20,6 +21,7 @@
         </jar>
     </target>
 
+    <!-- Javadoc -->
     <target name="javadoc">
         <mkdir dir="docs/doc"/>
         <javadoc sourcepath="src" destdir="docs/doc" use="true"
@@ -30,11 +32,11 @@
         </javadoc>
     </target>
 
+    <!-- Nettoyage -->
     <target name="clean">
-        <delete dir="bin"/>
-        <delete dir="docs/doc"/>
+        <delete dir="classes"/>
         <delete file="BackpackHero.jar"/>
+        <delete dir="docs/doc"/>
     </target>
 
 </project>
-
