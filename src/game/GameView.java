@@ -832,7 +832,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	 * @param data     game data containing score information
 	 */
 	private void drawScoreLevel(Graphics2D graphics, GameData data) {
-		int score = (int) (data.getScore() * (1.2 * data.floor() + (data.hero().getLevel() / 2.0)));
+		int score = (int) ((data.getScore() + + data.hero().getHP()) * (data.bag().backpackPrice() * 1.1) * (1.2 * data.floor() + (data.hero().getLevel() / 2.0)));
 		int size = (int) (height * 0.03);
 		Font font = new Font("Mikodacs", Font.PLAIN, size);
 		graphics.setFont(font);
@@ -854,6 +854,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		graphics.fill(new Rectangle2D.Double(width - tileSize / 2, height / 3.5 - 2.5 * tileSize, tileSize / 2, tileSize / 2));
 		BufferedImage img = imgLoader.bgImages().get("ICON_ABANDON");
 		graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_ABANDON").transform(), null);
+		
+		if (!GameDataClick.getDragItemMap().isEmpty()) {
+			Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
+			graphics.setFont(font);
+			graphics.setColor(Color.RED);
+			drawText(graphics, "Debarassez vous de vos items pour continuer", width / 2, (int) (height * 0.98), 100);
+
+		}
 
 	}
 
@@ -972,10 +980,6 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	private void updateDragItem(Graphics2D graphics, GameData data) {
 		var dragItem = new LinkedHashMap<Item, BoundingBox>(GameDataClick.getDragItemMap());
 		if (!dragItem.isEmpty()) {
-			Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
-			graphics.setFont(font);
-			graphics.setColor(Color.RED);
-			drawText(graphics, "Debarassez vous de vos items pour continuer", width / 2, (int) (height * 0.98), 100);
 			dragItem.reversed().forEach((item, box) -> drawDrag(graphics, data, item, box));
 		}
 

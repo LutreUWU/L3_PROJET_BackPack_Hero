@@ -53,7 +53,9 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
 	 */
 	public Massue(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(shape, direction, ITEM_STATS, DURABILITY);
   }
 	
@@ -67,7 +69,9 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
 	 */
 	public Massue(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(initShape(coord, direction), direction, ITEM_STATS, DURABILITY);
   }
 	
@@ -116,13 +120,17 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Massue(shape, direction, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Massue(shape, direction, durability - nb); 
   }
   

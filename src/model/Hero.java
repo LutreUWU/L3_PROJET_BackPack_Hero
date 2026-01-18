@@ -42,6 +42,7 @@ public class Hero {
   /** Hero's height for graphical display */
   private int sizeY = (int) (sizeX * 1.2);
 	
+  public Hero() {}
   /**
    * Computes the maximum XP required for the next level.
    * 

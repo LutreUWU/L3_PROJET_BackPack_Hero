@@ -52,7 +52,9 @@ public record EnchantedDiamondSword(XY[] shape, Direction direction, int durabil
 	 */
 	public EnchantedDiamondSword(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(shape, direction, durability, ITEM_STATS);
   }
 
@@ -65,7 +67,9 @@ public record EnchantedDiamondSword(XY[] shape, Direction direction, int durabil
 	 */
 	public EnchantedDiamondSword(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
 
@@ -108,7 +112,9 @@ public record EnchantedDiamondSword(XY[] shape, Direction direction, int durabil
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new EnchantedDiamondSword(shape, direction, durability + nb); 
   }
   
@@ -119,7 +125,9 @@ public record EnchantedDiamondSword(XY[] shape, Direction direction, int durabil
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new EnchantedDiamondSword(shape, direction, durability - nb); 
   }
   

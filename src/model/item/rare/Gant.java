@@ -116,13 +116,17 @@ public record Gant(XY[] shape, Direction direction, int durability, ItemStats in
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Gant(shape, direction, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Gant(shape, direction, durability - nb); 
   }
   

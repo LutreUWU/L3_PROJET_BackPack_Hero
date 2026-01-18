@@ -60,7 +60,9 @@ public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int d
 	 */
 	public PoisonArrow(XY[] shape, Direction direction, int durability, Effect effect) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(shape, direction, ITEM_STATS, durability, effect);
   }
 	
@@ -75,7 +77,9 @@ public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int d
 	 */
 	public PoisonArrow(XY coord, Direction direction, int durability, Effect effect) {
 		Objects.requireNonNull(coord);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(initShape(coord, direction), direction, ITEM_STATS, durability, effect);
   }
 
@@ -122,13 +126,17 @@ public record PoisonArrow(XY[] shape, Direction direction, ItemStats info, int d
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new PoisonArrow(shape, direction, durability + nb, effect); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new PoisonArrow(shape, direction, durability - nb, effect); 
   }
   

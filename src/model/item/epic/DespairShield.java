@@ -117,15 +117,17 @@ public record DespairShield(XY[] shape, Direction direction, int durability, Ite
 
 	@Override
 	public Item addDurability(int nb) {
-		if (nb <= 0)
+		if (nb < 0) {
 			throw new IllegalArgumentException("! Not Negative value !");
+			}
 		return new DespairShield(shape, direction, durability + nb);
 	}
 
 	@Override
 	public Item subDurability(int nb) {
-		if (nb <= 0)
+		if (nb < 0) {
 			throw new IllegalArgumentException("! Not Negative value !");
+		}
 		return new DespairShield(shape, direction, durability - nb);
 	}
 

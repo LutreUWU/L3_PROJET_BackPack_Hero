@@ -54,7 +54,9 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int val
 	 */
 	public ManaStone(XY[] shape, Direction direction, int value) {
 		Objects.requireNonNull(shape);
-  	if (value < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (value < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(shape, direction, ITEM_STATS, value);
 	}
 	
@@ -68,7 +70,9 @@ public record ManaStone(XY[] shape, Direction direction, ItemStats info, int val
 	 */
 	public ManaStone(XY coord, Direction direction, int value) {
 		Objects.requireNonNull(coord);
-  	if (value < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (value < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(initShape(coord, direction), direction, ITEM_STATS, value);
   }
 

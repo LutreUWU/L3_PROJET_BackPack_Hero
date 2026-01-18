@@ -34,6 +34,10 @@ public class ItemRepository {
   private static List<Item> itemRankLst;
 
   /**
+   * Default constructor that does nothing
+   */
+  public ItemRepository(){}
+  /**
    * Initializes the item repository.
    * 
    * Registers all items in the game, including common, rare, super rare,

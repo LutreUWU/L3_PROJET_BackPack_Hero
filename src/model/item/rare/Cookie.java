@@ -56,7 +56,9 @@ public record Cookie(XY[] shape, Direction direction, int durability, ItemStats 
 	 */
 	public Cookie(XY[] shape, Direction direction, int durability, Effect effect) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(shape, direction, durability, ITEM_STATS, effect);
   }
 	
@@ -69,7 +71,9 @@ public record Cookie(XY[] shape, Direction direction, int durability, ItemStats 
 	 */
 	public Cookie(XY coord, Direction direction, int durability, Effect effect) {
 		Objects.requireNonNull(coord);
-  	if (durability <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(initShape(coord, direction), direction, durability, ITEM_STATS, effect);
   }
 
@@ -108,13 +112,17 @@ public record Cookie(XY[] shape, Direction direction, int durability, ItemStats 
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Cookie(shape, direction, durability + nb, effect); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Cookie(shape, direction, durability - nb, effect); 
   }
   

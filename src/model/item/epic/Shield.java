@@ -56,7 +56,9 @@ public record Shield(XY[] shape, Direction direction, int durability, ItemStats 
 	 */
 	public Shield(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(shape, direction, durability, ITEM_STATS);
 	}
 	
@@ -70,7 +72,9 @@ public record Shield(XY[] shape, Direction direction, int durability, ItemStats 
 	 */
 	public Shield(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
 
@@ -109,13 +113,17 @@ public record Shield(XY[] shape, Direction direction, int durability, ItemStats 
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Shield(shape, direction, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Shield(shape, direction, durability - nb); 
   }
   

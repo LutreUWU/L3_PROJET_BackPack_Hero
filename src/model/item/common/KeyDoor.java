@@ -30,7 +30,7 @@ import model.monster.Enemy;
 public record KeyDoor(XY[] shape, Direction direction, ItemStats info) implements Item{		
 	private static final Rarity RARITY_VALUE = Rarity.COMMON;
 	private static final int ID_VALUE = 1;
-	private static final int SCORE_VALUE = -1;
+	private static final int SCORE_VALUE = 1;
 	private static final int MANA_VALUE = 0;
 	private static final int AP_VALUE = 0;
 	private static final ItemStats ITEM_STATS = new ItemStats(RARITY_VALUE, ID_VALUE, SCORE_VALUE, AP_VALUE, MANA_VALUE);

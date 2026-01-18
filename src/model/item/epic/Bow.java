@@ -115,13 +115,13 @@ public record Bow(XY[] shape, Direction direction, int durability, ItemStats inf
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new Bow(shape, direction, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new Bow(shape, direction, durability - nb); 
   }
   

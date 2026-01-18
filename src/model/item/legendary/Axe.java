@@ -54,7 +54,9 @@ public record Axe(XY[] shape, Direction direction, int durability, ItemStats inf
 	 */
 	public Axe(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(shape, direction, durability, ITEM_STATS);
   }
 	
@@ -68,7 +70,9 @@ public record Axe(XY[] shape, Direction direction, int durability, ItemStats inf
 	 */
 	public Axe(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
     this(initShape(coord, direction), direction, durability, ITEM_STATS);
   }
 	
@@ -118,13 +122,17 @@ public record Axe(XY[] shape, Direction direction, int durability, ItemStats inf
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Axe(shape, direction, durability + nb); 
   }
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
   	return new Axe(shape, direction, durability - nb); 
   }
   

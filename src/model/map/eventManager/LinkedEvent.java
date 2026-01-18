@@ -18,7 +18,6 @@ import model.monster.Robot;
  * allowing the game to track and trigger a series of events in order.
  */
 public class LinkedEvent {
-
 	private NodeEvent root;
 	private NodeEvent initialRoot;
 	private final int TOTAL_EVENT = 3;
@@ -212,14 +211,17 @@ public class LinkedEvent {
 	
 
 	/**
-	 * Create the node with the consequences
-	 * 
-	 * @param answer
-	 * @param floor
-	 * @param bonus
-	 * @param conseq
-	 * @param lastAnswer
-	 * @return a node
+	 * Creates an event node associated with a consequence.
+	 *
+	 * The created node represents a player choice. Selecting this choice
+	 * will apply the given consequence and then end the event.
+	 *
+	 * @param answer the text displayed as the player's choice
+	 * @param floor the floor level associated with the consequence
+	 * @param bonus the bonus modifier applied to the consequence
+	 * @param conseq the identifier of the consequence to apply
+	 * @param lastAnswer the text displayed after the choice is selected
+	 * @return a NodeEvent representing this choice and its consequence
 	 */
 	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, String conseq, String lastAnswer) {
 		var endNode = new NodeEvent("Mettre fin à l'évenement", null);
@@ -232,12 +234,12 @@ public class LinkedEvent {
 	/**
 	 * Create the node with the consequences for fight
 	 * 
-	 * @param answer
-	 * @param floor
-	 * @param bonus
+	 * @param answer the text displayed as the player's choice
+	 * @param floor the floor level associated with the consequence
+	 * @param bonus the bonus modifier applied to the consequence
 	 * @param conseqEnemy (List of enemies)
-	 * @param lastAnswer
-	 * @return a node
+	 * @param lastAnswer the text displayed after the choice is selected
+	 * @return a NodeEvent representing this choice and its consequence
 	 */
 	private NodeEvent createNodeWithConsequence(String answer, int floor, double bonus, List<Enemy> conseqEnemy, String lastAnswer) {
 		var endNode = new NodeEvent("Mettre fin à l'évenement", null);
@@ -266,7 +268,7 @@ public class LinkedEvent {
 	/**
 	 * Choose the choice1
 	 * 
-	 * @param data
+	 * @param data {@code GameData} of the game
 	 */
 	public void choose1(GameData data) {
 		root = root.getChoice1();
@@ -278,7 +280,7 @@ public class LinkedEvent {
 	/**
 	 * Choose the choice2
 	 * 
-	 * @param data
+	 * @param data {@code GameData} of the game
 	 */
 	public void choose2(GameData data) {
 		root = root.getChoice2();

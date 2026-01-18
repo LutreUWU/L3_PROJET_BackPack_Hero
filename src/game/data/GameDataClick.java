@@ -249,13 +249,12 @@ public class GameDataClick {
   /**
    * Register the position of the mouse before moving the cursor
    * 
+   * the boundingBox can overpass the screen, so we don't check if the value is negative or not
+   * 
    * @param x	Old coordinate x before we move
    * @param y Old coordinate y before we move
    */
   public static void setOldPosition(int x, int y) {
-    if (x < 0 || y < 0) {
-        throw new IllegalArgumentException("x and y are negatives");
-    }
     oldPosition = new XY(x, y);
   }
   

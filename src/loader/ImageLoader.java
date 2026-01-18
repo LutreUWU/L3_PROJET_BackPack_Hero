@@ -18,7 +18,8 @@ import javax.imageio.ImageIO;
  * - itemImagesByID: item images indexed by their unique identifier
  */
 public record ImageLoader(Map<String, BufferedImage> bgImages, Map<Integer, BufferedImage> itemImagesByID) {
-	/*
+	
+	/**
 	 * Creates an ImageLoader and loads all images from predefined folders
 	 */
 	public ImageLoader() {

@@ -142,10 +142,11 @@ public class GameData {
 		endGame = true;
 		GameDataCombat.setCombatEvent(false);
 		setShop(false, null);
+		updateBG();
 		mapOrBag = true;
 		scoreLobby = false;
 		Path scoreFile = Path.of("data", "score");
-		int newScore = (int) (score * (1.2 * floor + (hero().getLevel() / 2.0)));
+		int newScore = (int) (score + hero.getHP() * (backpack.backpackPrice() * 1.1) * (1.2 * floor + (hero().getLevel() / 2.0)));
 		try {
 			submitScore(scoreFile, newScore);
 		} catch (IOException e) {

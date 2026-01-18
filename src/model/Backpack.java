@@ -258,41 +258,71 @@ public class Backpack {
 	}
 
 	/**
+	 * Initializes the sets and queue for tracking mana connectivity.
+	 * 
+	 * This method finds all ManaStone items in the backpack, adds their coordinates
+	 * to the processing queue, marks them as visited, and adds them to the connected
+	 * set. It effectively sets up the starting points for a breadth-first search
+	 * to determine which items are connected to mana sources.
+	 * 
+	 * @param queue  the list of coordinates to process for mana connectivity
+	 * @param visited the set of coordinates already visited
+	 */
+	private void initManaConnected(List<XY> queue, Set<XY> visited) {
+    var manaStones = getManaStone();
+    connected.clear();
+    connectedItem.clear();
+    for (Item mana : manaStones) {
+        for (XY coord : mana.shape()) {
+            queue.add(coord);
+            visited.add(coord);
+            connected.add(coord);
+        }
+    }
+	}
+	/**
+	 * Processes one step of the breadth-first search for mana connectivity.
+	 * 
+	 * This method takes the first coordinate from the queue, checks all surrounding
+	 * coordinates (using {@code getArround}), and if the coordinate is not yet visited
+	 * and within the backpack, it checks for an item. If an item exists, it is added
+	 * to the set of connected items. If the item is conductive, its coordinates are
+	 * added to the queue and connected set for further processing.
+	 * 
+	 * @param queue   the list of coordinates to process for mana connectivity
+	 * @param visited the set of coordinates already visited
+	 */
+	private void whileManaConnected(List<XY> queue, Set<XY> visited) {
+	    var first = queue.get(0);
+	    for (var acc : getArround(first)) {
+	        if (!visited.contains(acc)) {
+	            visited.add(acc);
+	            if (!inBackpack(acc.x(), acc.y())) {
+	                Item item = getItem(acc.x(), acc.y());
+	                if (item != null) {
+	                    connectedItem.add(item); // An item can use mana even if it is not conductive
+	                    if (item.isConductive()) {
+	                        queue.add(acc);
+	                        connected.add(acc);
+	                    }
+	                }
+	            }
+	
+	        }
+	    }
+	    queue.remove(0);
+	}
+
+	/**
 	 * Update all coord where mana can be found. Update all Item that can use mana.
 	 */
 	public void updateManaConnected() {
-		connected.clear();
-		connectedItem.clear();
-		var manaStones = getManaStone();
-		List<XY> queue = new ArrayList<>();
-		Set<XY> visited = new HashSet<>();
-		for (Item mana : manaStones) {
-			for (XY coord : mana.shape()) {
-				queue.add(coord);
-				visited.add(coord);
-				connected.add(coord);
-			}
-		}
-		while (!queue.isEmpty()) {
-			var first = queue.get(0);
-			for (var acc : getArround(first)) {
-				if (!visited.contains(acc)) {
-					visited.add(acc);
-					if (!inBackpack(acc.x(), acc.y())) {
-						Item item = getItem(acc.x(), acc.y());
-						if (item != null) {
-							connectedItem.add(item); // An item can use mana even if it is not conductive
-							if (item.isConductive()) {
-								queue.add(acc);
-								connected.add(acc);
-							}
-						}
-					}
-
-				}
-			}
-			queue.remove(0);
-		}
+	    List<XY> queue = new ArrayList<>();
+	    Set<XY> visited = new HashSet<>();
+	    initManaConnected(queue, visited);
+	    while (!queue.isEmpty()) {
+	        whileManaConnected(queue, visited);
+	    }
 	}
 
 	/**
@@ -440,4 +470,13 @@ public class Backpack {
 	public int getGoldInBag() {
 		return bagItemLst.stream().filter(item -> item instanceof Gold).mapToInt(item -> ((Gold) item).value()).sum();
 	}
+	
+	/**
+   * Get the price the backpack (Sum all price of each item)
+   * 
+   * @return The price of the backpack
+   */
+  public int backpackPrice() {
+      return bagItemLst.stream().mapToInt(item -> item.info().score()).sum();
+  }
 }

@@ -111,7 +111,7 @@ public record Sword(XY[] shape, Direction direction, int durability, ItemStats i
   
   @Override
   public Item addDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new Sword(shape, direction, durability + nb); 
   }
   
@@ -122,7 +122,7 @@ public record Sword(XY[] shape, Direction direction, int durability, ItemStats i
   
   @Override
   public Item subDurability(int nb) {
-  	if (nb <= 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (nb < 0) throw new IllegalArgumentException("! Not Negative value !");
   	return new Sword(shape, direction, durability - nb); 
   }
   

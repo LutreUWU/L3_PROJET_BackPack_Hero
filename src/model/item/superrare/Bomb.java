@@ -55,7 +55,9 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 	 */
 	public Bomb(XY[] shape, Direction direction, int durability) {
 		Objects.requireNonNull(shape);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(shape, direction, ITEM_STATS, durability);
 	}
 	
@@ -68,7 +70,9 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 	 */
 	public Bomb(XY coord, Direction direction, int durability) {
 		Objects.requireNonNull(coord);
-  	if (durability < 0) throw new IllegalArgumentException("! Not Negative value !");
+  	if (durability < 0) {
+  		throw new IllegalArgumentException("! Not Negative value !");
+  	}
 		this(initShape(coord, direction), direction, ITEM_STATS, durability);
 	}
 
@@ -107,15 +111,17 @@ public record Bomb(XY[] shape, Direction direction, ItemStats info, int durabili
 
 	@Override
 	public Item addDurability(int nb) {
-		if (nb <= 0)
+		if (nb < 0) {
 			throw new IllegalArgumentException("! Not Negative value !");
+		}
 		return new Bomb(shape, direction, durability + nb);
 	}
 
 	@Override
 	public Item subDurability(int nb) {
-		if (nb <= 0)
+		if (nb < 0) {
 			throw new IllegalArgumentException("! Not Negative value !");
+		}
 		return new Bomb(shape, direction, durability - nb);
 	}
 

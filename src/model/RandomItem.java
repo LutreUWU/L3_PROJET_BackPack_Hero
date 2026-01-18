@@ -2,6 +2,17 @@ package model;
 
 import java.util.Random;
 
+
+/**
+ * Utility class responsible for generating random items.
+ *
+ * This class is typically used to select or create items randomly
+ * based on game rules such as rarity, floor level, probability,
+ * or predefined item pools.
+ *
+ * It may be used for loot generation, shop inventory creation,
+ * or rewards after combat or events.
+ */
 public class RandomItem {
 	
 	/**
