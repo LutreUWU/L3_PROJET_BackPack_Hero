@@ -22,9 +22,8 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.legendary.Axe;
+import model.item.common.Gold;
 import model.item.mythic.Mimicry;
-import model.item.superrare.Bomb;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -33,7 +32,6 @@ import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
 import model.monster.Chicken;
-import model.monster.Crabe;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
@@ -318,6 +316,7 @@ public class GameController {
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
 				 GameDataClick.addDragItem(new Mimicry());
+				 GameDataClick.addDragItem(new Gold(20));
 			}
 		}
 		case Key.I -> {

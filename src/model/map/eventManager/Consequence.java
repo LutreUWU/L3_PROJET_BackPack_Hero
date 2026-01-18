@@ -120,7 +120,7 @@ public class Consequence {
 	private void consequenceHealer(GameData data) {
 		var hero = data.hero();
 		if (data.bag().getGoldInBag() >= floor * 5) {
-			data.bag().fuseGoldInBag(floor * 5);
+			data.bag().subGoldInBag(floor * 5);
 			hero.add("hp", floor * 15);
 			if (hero.getHP() > hero.getMaxHP())
 				hero.setHP(hero.getMaxHP());

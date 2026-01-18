@@ -21,7 +21,6 @@ import model.Hero;
 import model.Item;
 import model.ItemRepository;
 import model.XY;
-import model.item.legendary.Axe;
 import model.item.superrare.Bomb;
 import model.map.Floor;
 import model.map.Shop;
@@ -37,7 +36,7 @@ import model.map.eventManager.LinkedEvent;
  */
 public class GameData {
 	/** Current background identifier */
-	private String BGName = "BG1";
+	private static String BGName = "BG1";
 	/** Indicates whether the game has ended */
 	private boolean endGame = false;
 	/** Indicates whether the score lobby screen is displayed */
@@ -52,23 +51,23 @@ public class GameData {
   private static int floor;
   /** Screen size information */
 	/** Item currently dragged by the player */
-  private Item dragItem = null; 
+  private static Item dragItem = null; 
 	/** Indicates whether the dragged item is over the trash bin */
-  private boolean onBin = false;
+  private static boolean onBin = false;
 	/** True if bag is displayed, false if map is displayed */
-  private boolean mapOrBag = true;
+  private static boolean mapOrBag = true;
 	/** Indicates whether the player is currently in a shop */
-  private boolean shop = false;
+  private static boolean shop = false;
 	/** Current shop instance */
-  private Shop shopLst;
+  private static Shop shopLst;
 	/** Current active event */
-  private LinkedEvent event;
+  private static LinkedEvent event;
 	/** Current mouse position */
-  private XY mouseCoord;
+  private static XY mouseCoord;
 	/** Player score */
-  private double score = 0.0;
+  private static double score;
 	/** Shortest path displayed on the map */
-  private List<XY> shortestPath = new ArrayList<>();
+  private static List<XY> shortestPath = new ArrayList<>();
   
   /**
 	 * Initializes all game data at the start of a new game.
@@ -81,6 +80,7 @@ public class GameData {
 	  backpack = new Backpack(screenInfo_.height());
 	  hero = new Hero(); 
 	  floor = 1;
+	  score = 0.0;
 	  ItemRepository.createItemRepository();
 	  EnemyRepository.createEnemyRepository();
 	  map = new Floor(floor);
@@ -139,10 +139,9 @@ public class GameData {
 		GameDataCombat.setCombatEvent(false);
   	scoreLobby = false;
   	Path scoreFile = Path.of("data", "score");
-  	// Score = ExpTotal * (1.2 * floor + heroLevel / 2.0)
-  	var newScore = score * (1.2 * floor + (hero().getLevel() / 2.0));
+  	int newScore = (int) (score * (1.2 * floor + (hero().getLevel() / 2.0)));
   	try {
-			submitScore(scoreFile, (int) newScore);
+			submitScore(scoreFile, newScore);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -241,7 +240,7 @@ public class GameData {
 	 * @param mouse_coord mouse coordinates
 	 */
 	public void setMouseCoord(XY mouse_coord) {
-		this.mouseCoord = mouse_coord;
+		GameData.mouseCoord = mouse_coord;
 	}
   
 	/**
@@ -250,7 +249,7 @@ public class GameData {
 	 * @param statut bin state
 	 */
 	public void setBin(boolean statut) {
-		this.onBin = statut;
+		GameData.onBin = statut;
 	}
 	
 	/**
@@ -261,8 +260,8 @@ public class GameData {
 	 */
 	public void setShop(boolean statut, Shop shop) {
 		if (statut) swapMapOrBag();
-		this.shop = statut;
-		this.shopLst = shop;
+		GameData.shop = statut;
+		GameData.shopLst = shop;
 	}
 	
 	/**
@@ -296,7 +295,7 @@ public class GameData {
 	 * @param item dragged item
 	 */
   public void setDragItem(Item item) {
-    this.dragItem = item;
+    GameData.dragItem = item;
   }
   
   /**

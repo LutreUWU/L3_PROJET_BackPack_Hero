@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 
 import com.github.forax.zen.ApplicationContext;
 
@@ -28,7 +28,6 @@ import model.BoundingBox;
 import model.Curse;
 import model.Direction;
 import model.Effect;
-import model.Hero;
 import model.Item;
 import model.XY;
 import model.item.common.Arrow;
@@ -51,10 +50,8 @@ import model.item.superrare.Massue;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
-import model.map.Floor;
 import model.map.Healer;
 import model.map.LockedDoor;
-import model.map.Room;
 import model.map.Shop;
 import model.map.Start;
 import model.map.Treasure;
@@ -200,6 +197,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	
   /** 
    * Draw the grid of the Backpack
+   * 
    * @param context Which window to draw
    * @param data	  Data of the game
    */	
@@ -374,25 +372,54 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		if (GameDataCombat.combat()) {
 			item = GameDataCombat.getHoverItem();
 		}
-		int height = SE.y() - NW.y();
 		if (item != null) {
-	    drawTextInfoName(graphics, item, NW);
-	    Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH4());
-	    graphics.setFont(font);
-	    FontMetrics fm = graphics.getFontMetrics();
-	    graphics.setColor(Color.WHITE);
-		  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 25);
-		  graphics.setColor(Color.GREEN);
-		  drawTextInfo(graphics, "AP : " + item.info().AP(), NW.x(), NW.y() + height / 4, 20);
-		  drawTextInfo(graphics, "MANA : " + item.info().mana(), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 1.5), 20);
-		  var durabilityText = item.durability() == -1 ? "Infiny" : item.durability();
-		  drawTextInfo(graphics, "Durability : " + durabilityText, NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 3), 20);
-		  graphics.setColor(Color.WHITE);
-		  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 5), 23);
+			writeItemInfo(graphics, data, item, NW, SE);
 		}
   }
   
-  private void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
+  /**
+   * Renders all textual information related to an item.
+   * This includes the item name, description, action point cost,
+   * mana cost, durability and special effects.
+   *
+   * Text is positioned relative to the given bounding box coordinates
+   * and uses different colors to highlight specific attributes.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data current game data
+   * @param item item whose information is displayed
+   * @param NW north-west coordinate of the display area
+   * @param SE south-east coordinate of the display area
+   */
+  private void writeItemInfo(Graphics2D graphics, GameData data, Item item, XY NW, XY SE) {
+		int height = SE.y() - NW.y();
+    drawTextInfoName(graphics, item, NW);
+		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH4());
+    graphics.setFont(font);
+    FontMetrics fm = graphics.getFontMetrics();
+    graphics.setColor(Color.WHITE);
+	  drawTextInfo(graphics, getDescriptionItem(item), NW.x(), NW.y() + (int) (NW.y() * 0.30), 25);
+	  graphics.setColor(Color.GREEN);
+	  drawTextInfo(graphics, "AP : " + item.info().AP(), NW.x(), NW.y() + height / 4, 20);
+	  drawTextInfo(graphics, "MANA : " + item.info().mana(), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 1.5), 20);
+	  var durabilityText = item.durability() == -1 ? "Infiny" : item.durability();
+	  drawTextInfo(graphics, "Durability : " + durabilityText, NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 3), 20);
+	  graphics.setColor(Color.WHITE);
+	  drawTextInfo(graphics, getEffectItem(item), NW.x(), NW.y() + height / 4 + (int) (fm.getAscent() * 5), 23);
+	}
+
+  /**
+   * Draws the item name on screen using a font size and color
+   * based on the item's rarity.
+   *
+   * The item name is displayed in uppercase and positioned
+   * relative to the given north-west coordinate.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param item item whose name is displayed
+   * @param NW north-west coordinate of the display area
+   */
+	private void drawTextInfoName(Graphics2D graphics, Item item, XY NW) {
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setFont(font);
     graphics.setColor(switch(item.info().rarity()) {
@@ -406,6 +433,19 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(item.toString().toUpperCase(), NW.x(),	NW.y() + (int) (NW.y() * 0.10));
   }
   
+	/**
+	 * Draws multi-line text with automatic word wrapping.
+	 * The text is split into multiple lines so that each line
+	 * does not exceed the specified maximum number of characters.
+	 *
+	 * Lines are rendered vertically using the current font metrics.
+	 *
+	 * @param graphics Graphics2D context used for rendering
+	 * @param content text content to display
+	 * @param x horizontal position of the text
+	 * @param y vertical starting position of the text
+	 * @param maxChar maximum number of characters per line
+	 */
   private void drawTextInfo(Graphics2D graphics, String content, int x, int y, int maxChar) {
     FontMetrics fm = graphics.getFontMetrics();
     int maxCharsPerLine = maxChar;
@@ -508,6 +548,16 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     }
   }
   
+  /**
+   * Draws the hero health bar with its icon, background bar,
+   * filled health amount, and numerical HP value.
+   *
+   * The bar width is proportional to the hero's current HP
+   * relative to the maximum HP.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero health information
+   */
   private void drawHeroHP(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_HEALTH");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -526,6 +576,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(data.hero().getHP() + "/" + data.hero().getMaxHP(), (int) (logoWidth + width * 0.205), logoHeight / 2 + size / 2);
   }
   
+  /**
+   * Draws the hero shield (protection) bar with its icon,
+   * background bar, filled protection amount, and numerical value.
+   *
+   * The shield amount is displayed relative to the hero's maximum HP.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero protection information
+   */
   private void drawHeroShield(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_SHIELD");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -544,6 +603,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(data.hero().getCurrentProtection() + "/" + data.hero().getMaxHP(), (int) (logoWidth + width * 0.205), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
+  /**
+   * Displays the hero mana information with its icon.
+   *
+   * During combat, the mana value is taken from combat data;
+   * otherwise, it is taken from the hero's inventory.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing mana information
+   */
   private void drawHeroMana(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_MANA");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -557,6 +625,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString((GameDataCombat.combat() ? GameDataCombat.getNbMana()  : data.bag().getManaInBag()) + " MANA" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
+  /**
+   * Draws the hero damage boost indicator with its icon.
+   *
+   * The boost value is displayed as a percentage:
+   * positive values are shown in green, negative values in red.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero boost information
+   */
   private void drawHeroBoost(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_BOOST");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -579,6 +656,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(boostText + " BOOST DMG" , (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
+  /**
+   * Renders all active status effects applied to the hero.
+   *
+   * Effects are displayed symmetrically around the hero,
+   * each with its icon and associated stack value.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero effects
+   */
   private void drawHeroEffect(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("Roland");
   	var boundingBox = render.box();
@@ -597,8 +683,18 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	}
   }
   
-  
-  
+  /**
+   * Draws a single hero effect icon along with its numeric value.
+   *
+   * The value represents the number of stacks for the given effect.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero effects
+   * @param effect the effect to render
+   * @param x horizontal position of the effect
+   * @param y vertical position of the effect
+   * @param size size of the effect icon
+   */
   private void drawHeroEffectImageAndValue(Graphics2D graphics, GameData data, Effect effect, int x, int y, int size) {
 		var img = switch(effect) {
 		case POISON -> imgLoader.bgImages().get("ICON_POISON");
@@ -616,6 +712,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, y + size);
 	}
 
+  /**
+   * Displays the hero action points (AP) with its icon.
+   *
+   * The text color changes depending on whether the hero
+   * has enough action points available.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero action points
+   */
 	private void drawHeroAction(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_ACTION");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -629,6 +734,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(data.hero().getEnergyPoint() + " AP", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
+	/**
+	 * Displays the number of unlockable cases available to the hero.
+	 *
+	 * The text color indicates whether at least one case can be unlocked.
+	 *
+	 * @param graphics Graphics2D context used for rendering
+	 * @param data game data containing unlock information
+	 */
   private void drawHeroUnlock(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("ICON_UNLOCK");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -642,6 +755,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(data.bag().getCaseUnlock() + " CASE DEBLOQUABLE", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
+  /**
+   * Draws the hero gold amount with its associated icon.
+   *
+   * The gold value is displayed in green if greater than zero,
+   * otherwise in red.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing gold information
+   */
   private void drawHeroGold(Graphics2D graphics, GameData data) {
   	var render = MathLoader.getMapEvent().get("gold");
   	int logoWidth = render.box().southEast().x() - render.box().northWest().x(); 	
@@ -655,6 +777,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  graphics.drawString(data.bag().getGoldInBag() + " gold", (int) (logoWidth + width * 0.005), (int) (render.box().northWest().y() + logoHeight / 2 + size / 2));
   }
   
+  /**
+   * Displays the hero level and experience progress bar.
+   *
+   * The experience bar visually represents the current XP
+   * relative to the maximum XP required for the next level.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing hero level and XP
+   */
   private void drawHeroLevel(Graphics2D graphics, GameData data) {
   	int size = (int) (height * 0.03);
     Font font = new Font("Mikodacs", Font.PLAIN, size);
@@ -669,6 +800,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.fill(new Rectangle2D.Double(width / 2 - textWidth / 2, (int) (height * 0.03)  , textWidth * data.hero().getXp() / data.hero().maxXP(), size * 0.25));
   }
   
+  /**
+   * Displays the current floor level reached by the player.
+   *
+   * This method also triggers the rendering of the score display.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing floor information
+   */
   private void drawFloorLevel(Graphics2D graphics, GameData data) {
   	int size = (int) (height * 0.03);
   	Font font = new Font("Mikodacs", Font.PLAIN, size);
@@ -680,8 +819,17 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  drawScoreLevel(graphics, data);
   }
   
+  /**
+   * Calculates and displays the current score.
+   *
+   * The score is computed using the base score, current floor,
+   * and hero level to reflect progression difficulty.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing score information
+   */
   private void drawScoreLevel(Graphics2D graphics, GameData data) {
-  	var score = data.getScore() * (1.2 * data.floor()  + (data.hero().getLevel() / 2.0));
+  	int score = (int) (data.getScore() * (1.2 * data.floor() + (data.hero().getLevel() / 2.0)));
   	int size = (int) (height * 0.03);
   	Font font = new Font("Mikodacs", Font.PLAIN, size);
     graphics.setFont(font);
@@ -720,33 +868,65 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	graphics.drawImage(imgMap, MathLoader.getMapEvent().get("BG_MAP").transform(), null);
 		for (int i = 0; i < data.map().getRow(); i++) {
       for (int j = 0; j < data.map().getCol(); j++) {
-	    	final int fi = i;
-	    	final int fj = j;
-		  	var coordXY = new XY(fj, fi);
-		  	int newX = (int) (gap * fj) + leftGrid.northWest().x() + (tileSize * fj);
-		  	int newY = (int) (gap * fi) + leftGrid.northWest().y() + (tileSize * fi);
+		  	var coordXY = new XY(j, i);
+		  	int newX = (int) (gap * j) + leftGrid.northWest().x() + (tileSize * j);
+		  	int newY = (int) (gap * i) + leftGrid.northWest().y() + (tileSize * i);
 		  	if (data.map().getHeroVisible().contains(coordXY)) {
-		  		graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE"), newX, newY, tileSize, tileSize, null);
-			    if (data.map().getHeroAccessible().contains(coordXY)) {
-			    	graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE_ACCES"), newX, newY, tileSize, tileSize, null);
-			    }
-			  	switch(data.map().getGrid()[fi][fj]) {
-			  		case Shop _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_SHOP"), newX, newY, tileSize, tileSize, null);
-			  		case EnemyRoom _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_COMBAT"), newX, newY, tileSize, tileSize, null);
-			  		case EventRoom _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_EVENT"), newX, newY, tileSize, tileSize, null);
-			  		case Healer _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_HEAL"), newX, newY, tileSize, tileSize, null);
-			  		case Start _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_START"), newX, newY, tileSize, tileSize, null);
-			  		case Exit _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_EXIT"), newX, newY, tileSize, tileSize, null);
-			  		case LockedDoor _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_LOCK_DOOR"), newX, newY, tileSize, tileSize, null);
-			  		case Treasure _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_TREASURE"), newX, newY, tileSize, tileSize, null);
-			  		default ->  {}
-			  	}
+		  		checkAndDrawTileMap(graphics, data, coordXY, newX, newY);
 		  	} else graphics.drawImage(imgLoader.bgImages().get("BG_MAP_SHADOW"), newX - (int) gap, newY - (int) gap, tileSize + (int) gap*2, tileSize + (int) gap*2, null);
       }
 		}
-		
-		// A RETIRER QUAND ON AURA FINIT DE CRER LES MAPS
-  	graphics.setColor(Color.ORANGE);
+		drawPathMap(graphics, data, leftGrid, gap);
+		drawShortestPath(graphics, data, leftGrid, gap);
+		var coord = data.map().getHeroPos();
+		graphics.drawImage(imgLoader.bgImages().get("ICON_HERO"), (int) (gap * coord.x()) + leftGrid.northWest().x() + (coord.x() * tileSize), (int) (gap * coord.y()) + leftGrid.northWest().y() + (coord.y() * tileSize), tileSize, tileSize, null);
+  }
+  
+  /**
+   * Draws a single map tile at the given screen position and overlays
+   * additional visual information depending on its state.
+   *
+   * The base tile is always rendered first, followed by:
+   * - an accessibility overlay if the hero can reach this tile
+   * - a specific icon depending on the room type (shop, enemy, event, etc.)
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing map and accessibility information
+   * @param coordXY grid coordinates of the tile
+   * @param newX screen X position where the tile is drawn
+   * @param newY screen Y position where the tile is drawn
+   */
+  private void checkAndDrawTileMap(Graphics2D graphics, GameData data, XY coordXY, int newX, int newY) {
+		graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE"), newX, newY, tileSize, tileSize, null);
+    if (data.map().getHeroAccessible().contains(coordXY)) {
+    	graphics.drawImage(imgLoader.bgImages().get("BG_MAP_TILE_ACCES"), newX, newY, tileSize, tileSize, null);
+    }
+  	switch(data.map().getGrid()[coordXY.y()][coordXY.x()]) {
+  		case Shop _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_SHOP"), newX, newY, tileSize, tileSize, null);
+  		case EnemyRoom _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_COMBAT"), newX, newY, tileSize, tileSize, null);
+  		case EventRoom _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_EVENT"), newX, newY, tileSize, tileSize, null);
+  		case Healer _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_HEAL"), newX, newY, tileSize, tileSize, null);
+  		case Start _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_START"), newX, newY, tileSize, tileSize, null);
+  		case Exit _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_EXIT"), newX, newY, tileSize, tileSize, null);
+  		case LockedDoor _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_LOCK_DOOR"), newX, newY, tileSize, tileSize, null);
+  		case Treasure _ -> graphics.drawImage(imgLoader.bgImages().get("ICON_TREASURE"), newX, newY, tileSize, tileSize, null);
+  		default ->  {}
+  	}
+  }
+  
+  /**
+   * Draws all visible paths between accessible map tiles.
+   *
+   * Paths are rendered as orange lines connecting the center of each tile
+   * to the center of its accessible neighboring tiles.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing visible path information
+   * @param leftGrid bounding box of the map grid on screen
+   * @param gap spacing between tiles on screen
+   */
+  private void drawPathMap(Graphics2D graphics, GameData data, BoundingBox leftGrid, double gap) {
+		graphics.setColor(Color.ORANGE);
   	graphics.setStroke(new BasicStroke(5));
   	for (var coord : data.map().getHeroVisibleLine()) {
   		for (var coord_acc : data.map().getGrid()[coord.y()][coord.x()].getAccessible()) {
@@ -756,7 +936,20 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 													(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (tileSize * coord_acc.y()) + tileSize/2)));
   		}
   	}
-		
+  }
+  
+  /**
+   * Draws the shortest path from the hero position to the target destination.
+   *
+   * The shortest path is rendered as a red line connecting successive tiles
+   * in the computed path, if such a path exists.
+   *
+   * @param graphics Graphics2D context used for rendering
+   * @param data game data containing the shortest path
+   * @param leftGrid bounding box of the map grid on screen
+   * @param gap spacing between tiles on screen
+   */
+  private void drawShortestPath(Graphics2D graphics, GameData data, BoundingBox leftGrid, double gap) {
   	var shortestPath = data.getShortestPath();
   	if (shortestPath != null) {
   		graphics.setColor(Color.RED);
@@ -769,13 +962,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 						(int) ((gap * coord_acc.y()) + (leftGrid.northWest().y() + (tileSize * coord_acc.y()) + tileSize/2)));
   		}
   	}
-  	
-		graphics.setColor(Color.WHITE);
-		var coord = data.map().getHeroPos();
-		graphics.drawImage(imgLoader.bgImages().get("ICON_HERO"), (int) (gap * coord.x()) + leftGrid.northWest().x() + (coord.x() * tileSize), (int) (gap * coord.y()) + leftGrid.northWest().y() + (coord.y() * tileSize), tileSize, tileSize, null);
-		///////////////////////////////////
   }
-
+  
 	
   /**
    * Update the position of each weapons we can move in the screen.
@@ -788,7 +976,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	if (!dragItem.isEmpty()) {
   		Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
   	  graphics.setFont(font);
-  	  graphics.setColor(Color.WHITE);
+  	  graphics.setColor(Color.RED);
     	drawText(graphics, "Debarassez vous de vos items pour continuer", width / 2, (int) (height * 0.98), 100);	
   		dragItem.reversed().forEach((item, box) -> drawDrag(graphics, data, item, box));
   	}
@@ -826,12 +1014,35 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  }
 	}
   
+  /**
+   * Determines the visual size category for a gold value.
+   *
+   * The returned size is used to adjust rendering or scaling
+   * depending on the amount of gold:
+   * - small for low values
+   * - medium for moderate values
+   * - large for high values
+   *
+   * @param value the amount of gold
+   * @return an integer representing the size category
+   */
   private int getSizeGold(int value) {
   	if (value <= 15) return 1;
   	else if (value <= 50) return 2;
   	else return 3;
   }
   
+  /**
+   * Draws a dragged gold item with a visual size adapted to its value.
+   *
+   * The gold amount is converted into a size category using {@link #getSizeGold(int)},
+   * which determines which gold sprite is rendered (small, medium, or large).
+   *
+   * @param graphics 	The graphics context used for rendering
+   * @param data 			The current game data (not directly used but kept for consistency)
+   * @param item 			The dragged item, expected to be an instance of {@code Gold}
+   * @param box 			The bounding box defining the drawing area
+   */
   private void drawDragGold(Graphics2D graphics, GameData data, Item item, BoundingBox box) {
   	var itemGold = (Gold) item;
   	switch (getSizeGold(itemGold.value())) {
@@ -867,20 +1078,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	}
   
   /**
-   * <p>
-   * Draw the current item we're dragging but with a specifity.<br>
+   * Draw the current item we're dragging but with a specifity.
    * Initially, the other method {@code drawDragItem} draw the item base of the center of the image.
-   * </p>
    * 
-   * <p>
-   * But since we're using .png image, it can happens that the center of the image is empty.<br>
+   * But since we're using .png image, it can happens that the center of the image is empty.
    * In consequence, we need to change the "center" of the image to draw properly the image.
-   * </p>
    * 
-   * <p>
-   * We're adding two new parameters marginX and marginY to help drawing this item.<br>
+   * We're adding two new parameters marginX and marginY to help drawing this item.
    * For example, if we wants the center to be at the left center of the image, marginX = 0 and marginY = 0.5
-   * </p>
    * 
    * @param graphics  {@code ApplicationContext} of the game.
    * @param coord		  {@code XY} containing the coordinate NorthWest (x, y) of image on the screen.
@@ -917,7 +1122,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	if (GameDataCombat.getHoverItem() != null) {
   		drawSelectedItem(graphics, GameDataCombat.getHoverItem());
   	}
-  	drawLog(graphics, data, GameDataCombat.getLog());
+  	drawLog(graphics, data, GameDataCombat.getLog().reversed().iterator());
   }
   
   /**
@@ -941,7 +1146,7 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	}
 
 	/**
-   * Draws the enemy in the windows
+   * Draws an enemy in the windows
    * 
    * @param graphics {@code graphics} of the game.
    * @param data     GameData containing the game data. 
@@ -957,20 +1162,38 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		drawEnemyInfo(graphics, enemy, boundingBox, sizeX, sizeY);
   }
   
-  private void drawLog(Graphics2D graphics, GameData data, List<String> log) {
+  /**
+   * Renders the game log on screen.
+   *
+   * Log entries are displayed from the most recent to the oldest,
+   * starting from the bottom of the screen and going upward.
+   *
+   * @param graphics 		The graphics context used for rendering
+   * @param data 				The current game data (not directly used here)
+   * @param log 				The list of log messages to display
+   */
+  private void drawLog(Graphics2D graphics, GameData data, Iterator<String> log) {
   	int i = 0;
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
     graphics.setColor(Color.WHITE);
     FontMetrics fm = graphics.getFontMetrics();
   	double gap = fm.getAscent() * 1.5;
-    var iterator = log.reversed().iterator();
-    while (iterator.hasNext()) {
-    	var text = iterator.next();
+    while (log.hasNext()) {
+    	var text = log.next();
   	  graphics.drawString("-> " + text, (int) gap ,	(int) (height - gap - gap * i++));
     }
   }
   
+  /**
+   * Draws the "End Turn" button using its predefined layout.
+   *
+   * The button position and size are defined by the associated
+   * map event transform.
+   *
+   * @param graphics 	The graphics context used for rendering
+   * @param img 			The image used to represent the end turn button
+   */
   private void drawEndTurnButton(Graphics2D graphics, BufferedImage img) {
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_ENDTURN").transform(), null);
   }
@@ -991,6 +1214,16 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		drawEnemyEffect(graphics, enemy, boundingBox);
   }
   
+  /**
+   * Draws all active status effects applied to an enemy.
+   *
+   * Effects are displayed symmetrically around the horizontal center
+   * of the enemy bounding box, each with its icon and remaining value.
+   *
+   * @param graphics 		The graphics context used for rendering
+   * @param enemy 			The enemy whose effects are displayed
+   * @param boundingBox The bounding box of the enemy sprite
+   */
   private void drawEnemyEffect(Graphics2D graphics, Enemy enemy, BoundingBox boundingBox) {
 		var width = boundingBox.southEast().x() - boundingBox.northWest().x();
 		var centerX = boundingBox.northWest().x() + width / 2;
@@ -1007,6 +1240,21 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	}
 	}
 
+  /**
+   * Draws a single enemy effect icon and its associated value.
+   *
+   * The icon depends on the effect type, and the numeric value
+   * represents the remaining duration or intensity.
+   *
+   * @param graphics 	The graphics context used for rendering
+   * @param enemy 		The enemy affected by the effect
+   * @param effect 		The effect to render
+   * @param x 				The x-coordinate where the effect is drawn
+   * @param y 				The y-coordinate where the effect is drawn
+   * @param size 			The size of the effect icon
+   *
+   * @throws IllegalArgumentException if the effect type is unsupported
+   */
 	private void drawEnemyEffectImageAndValue(Graphics2D graphics, Enemy enemy, Effect effect, int x, int y, int size) {
 		var img = switch(effect) {
 		case POISON -> imgLoader.bgImages().get("ICON_POISON");
@@ -1022,9 +1270,18 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, (int) (y + size * 1.05));
  		graphics.setColor(Color.WHITE);
     graphics.drawString(charNumber, x + fm.stringWidth(charNumber)/2, y + size);
-
 	}
 
+	/**
+	 * Draws enemy textual combat information.
+	 *
+	 * Displays the enemy name and its next action above the enemy,
+	 * with visual emphasis when the enemy is the current combat target.
+	 *
+	 * @param graphics 		The graphics context used for rendering
+	 * @param boundingBox The bounding box of the enemy sprite
+	 * @param enemy 			The enemy to display information for
+	 */
 	private void drawEnemyAction(Graphics2D graphics, BoundingBox boundingBox, Enemy enemy) {
 		var width = boundingBox.southEast().x() - boundingBox.northWest().x();
 		Font font = new Font("Mikodacs", Font.ITALIC, FontLoader.getH3());
@@ -1046,6 +1303,19 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	drawText(graphics, enemy.toString(), centerX, centerY, 20);	
 	}
 
+	/**
+	 * Draws the enemy's current health points as centered text.
+	 *
+	 * A shadow is rendered first to improve readability.
+	 *
+	 * @param graphics 	The graphics context used for rendering
+	 * @param x 				The center x-coordinate of the text
+	 * @param y 				The base y-coordinate of the text
+	 * @param width 		The width of the enemy area
+	 * @param height 		The height of the enemy area
+	 * @param enemy 		The enemy whose HP is displayed
+	 * @param size 			The font size used for rendering
+	 */
 	private void drawEnemyPV(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy, int size) {
   	// Text shadow
   	Font font = new Font("Mikodacs", Font.PLAIN, size + 4);
@@ -1061,6 +1331,19 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
  	  graphics.drawString(Integer.toString(enemy.getHP()), (int) (x - fm.stringWidth(Integer.toString(enemy.getHP()))/ 2),	(int) (y - height/4));
   }
   
+	/**
+	 * Draws the enemy's current shield value as centered text.
+	 *
+	 * A shadow is rendered first to improve readability.
+	 *
+	 * @param graphics 	The graphics context used for rendering
+	 * @param x 				The center x-coordinate of the text
+	 * @param y 				The base y-coordinate of the text
+	 * @param width			The width of the enemy area
+	 * @param height 		The height of the enemy area
+	 * @param enemy			The enemy whose shield is displayed
+	 * @param size			The font size used for rendering
+	 */
   private void drawEnemyShield(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy, int size) {
   	// Text shadow
   	Font font = new Font("Mikodacs", Font.PLAIN, size + 4);
@@ -1076,6 +1359,19 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
  	  graphics.drawString(Integer.toString(enemy.getShield()), (int) (x - fm.stringWidth(Integer.toString(enemy.getShield()))/ 2 - 1),	(int) (y - height/4));
   }
   
+  /**
+   * Draws a curved health bar above the enemy.
+   *
+   * The arc represents the enemy's remaining HP as a percentage
+   * of its maximum health.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param x 			 The x-coordinate of the arc
+   * @param y 			 The y-coordinate of the arc
+   * @param width 	 The width of the arc
+   * @param height 	 The height of the arc
+   * @param enemy 	 The enemy whose health is represented
+   */
   private void drawEnemyArc(Graphics2D graphics, int x, int y, int width, int height, Enemy enemy) {  
   	graphics.setStroke(new BasicStroke(38));
   	graphics.setColor(Color.BLACK);
@@ -1132,41 +1428,84 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   }
   
   /**
-   * Draw the background image of a choice<br>
+   * Draw all elements regarding an event.
    * Also called the fonction to write the choice inside.
    * 
    * @param graphics {@code Graphics2D} of the game.
    * @param data		 {@code GameData} containing all informations about the game
    */
   private void drawChoiceEvent(Graphics2D graphics, GameData data) {
-  	var img1 = imgLoader.bgImages().get("BG_CHOICE1");
-  	var img2 = imgLoader.bgImages().get("BG_CHOICE2");
-  	var event1 = MathLoader.getMapEvent().get("BG_CHOICE1");
-  	var event2 = MathLoader.getMapEvent().get("BG_CHOICE2");
-  	int width = event1.box().southEast().x() - event1.box().northWest().x();
-  	int height = event1.box().southEast().y() - event1.box().northWest().y();
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
   	if (data.event().getRoot().getChoice2() == null){
-  		var img3 = imgLoader.bgImages().get("BG_CHOICE_END");
-  		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
-  		graphics.drawImage(img3, event3.transform(), null);
-		  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
-		  															(int) event3.box().northWest().x() + width / 2, 
-		  															(int) (event3.box().northWest().y() + height * 0.5), 30);
+  		drawEndChoiceButtonEvent(graphics, data);
   	}
   	else {
-  		graphics.drawImage(img1, event1.transform(), null);
-  	  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
-  	  															(int) event1.box().northWest().x() + width / 2, 
-  	  															(int) (event1.box().northWest().y() + height * 0.5), 30);
-  		graphics.drawImage(img2, event2.transform(), null);
-  	  drawText(graphics, data.event().getRoot().getChoice2().getAnswer(), 
-  	  															(int) event2.box().northWest().x() + width / 2, 
-  	  															(int) (event2.box().northWest().y() + height * 0.5), 30);
+  		drawFirstChoiceButtonEvent(graphics, data);
+  		drawSecondChoiceButtonEvent(graphics, data);	
   	}
   }
   
+  /**
+   * Draws the final event choice button.
+   *
+   * This button is displayed when the event reaches its end state
+   * and shows the associated answer text.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data containing the active event
+   */
+  private void drawEndChoiceButtonEvent(Graphics2D graphics, GameData data) {
+		var img3 = imgLoader.bgImages().get("BG_CHOICE_END");
+		var event3 = MathLoader.getMapEvent().get("BG_CHOICE_END");
+  	int width = event3.box().southEast().x() - event3.box().northWest().x();
+  	int height = event3.box().southEast().y() - event3.box().northWest().y();
+		graphics.drawImage(img3, event3.transform(), null);
+	  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
+	  															(int) event3.box().northWest().x() + width / 2, 
+	  															(int) (event3.box().northWest().y() + height * 0.5), 30);
+  }
+  
+  /**
+   * Draws the first choice button of an event.
+   *
+   * The button displays the text associated with the first available
+   * choice in the event decision tree.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data containing the active event
+   */
+  private void drawFirstChoiceButtonEvent(Graphics2D graphics, GameData data) {
+  	var img1 = imgLoader.bgImages().get("BG_CHOICE1");
+  	var event1 = MathLoader.getMapEvent().get("BG_CHOICE1");
+  	int width = event1.box().southEast().x() - event1.box().northWest().x();
+  	int height = event1.box().southEast().y() - event1.box().northWest().y();
+  	graphics.drawImage(img1, event1.transform(), null);
+	  drawText(graphics, data.event().getRoot().getChoice1().getAnswer(), 
+	  															(int) event1.box().northWest().x() + width / 2, 
+	  															(int) (event1.box().northWest().y() + height * 0.5), 30);
+  }
+  
+  /**
+   * Draws the second choice button of an event.
+   *
+   * The button displays the text associated with the second available
+   * choice in the event decision tree.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data containing the active event
+   */
+  private void drawSecondChoiceButtonEvent(Graphics2D graphics, GameData data) {
+  	var img2 = imgLoader.bgImages().get("BG_CHOICE2");
+  	var event2 = MathLoader.getMapEvent().get("BG_CHOICE2");
+  	int width = event2.box().southEast().x() - event2.box().northWest().x();
+  	int height = event2.box().southEast().y() - event2.box().northWest().y();
+  	graphics.drawImage(img2, event2.transform(), null);
+	  drawText(graphics, data.event().getRoot().getChoice2().getAnswer(), 
+	  															(int) event2.box().northWest().x() + width / 2, 
+	  															(int) (event2.box().northWest().y() + height * 0.5), 30);
+  }
+    
   /**
    * Draw the text inside each choice. <br>
    * The text is draw at the center of the box choice.
@@ -1177,76 +1516,47 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    * @param y				 The y coordinate center of the text
    * @param maxChar  Number of char max per line
    */
-  private void drawText(Graphics2D g, String content, int x, int y, int maxCharsPerLine) {
+  private void drawText(Graphics2D g, String content, int x, int y, int max) {
     FontMetrics fm = g.getFontMetrics();
-    String[] words = content.split(" ");
-    List<String> lines = new ArrayList<>();
-    StringBuilder currentLine = new StringBuilder();
-    for (String word : words) {
-        if (currentLine.length() + word.length() + 1 > maxCharsPerLine) {
-            lines.add(currentLine.toString());
-            currentLine = new StringBuilder(word);
-        } else {
-            if (currentLine.length() > 0) currentLine.append(" ");
-            currentLine.append(word);
-        }
+    var words = content.split(" ");
+    var lines = new ArrayList<String>();
+    var line = new StringBuilder();
+    for (var w : words)
+      if (line.length() + w.length() + 1 > max) {
+        lines.add(line.toString());
+        line = new StringBuilder(w);
+      } else {
+      	line.append(line.isEmpty() ? w : " " + w);
+      }
+
+    if (!line.isEmpty()) {
+    	lines.add(line.toString());
     }
-    if (currentLine.length() > 0) {
-        lines.add(currentLine.toString());
-    }
-    int totalHeight = lines.size() * fm.getAscent();
-    int startY = y + totalHeight / 2;
-    // Dessin centré
+    int y0 = y + lines.size() * fm.getAscent() / 2;
     for (int i = 0; i < lines.size(); i++) {
-        String line = lines.get(lines.size() - 1 - i );
-        int lineWidth = fm.stringWidth(line);
-        g.drawString(line, x - lineWidth / 2, startY - i * fm.getAscent());
+      var l = lines.get(lines.size() - 1 - i);
+      g.drawString(l, x - fm.stringWidth(l) / 2, y0 - i * fm.getAscent());
     }
-}
-  
-  public void heroMove(GameData data, XY coordFinal, ApplicationContext context, GameView view) {
-  	var bestWay = new ArrayList<XY>();
-//  	IO.println("On va de : " + data.map().getHeroPos() + " dans " + coordFinal);
-  	heroMove(data.map().getGrid(), data.map().getHeroPos(), coordFinal, new ArrayList<XY>(), bestWay, data.map());
-//  	IO.println(bestWay.stream()
-//  										.map(XY::toString)
-//  										.collect(Collectors.joining(" -> ")));
-  	for (var coord : bestWay) {
-  		data.map().setHeroPos(coord);
-  		GameView.draw(context, data, view);
-  		try {
-				TimeUnit.MILLISECONDS.sleep(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-  	}
   }
   
-  private void heroMove(Room[][] grid, XY coordCurrent, XY coordFinal, List<XY> bestWay, List<XY> currentWay, Floor floor) {
-//  	IO.println("Meilleur : " + bestWay);
-  	if (coordCurrent.equals(coordFinal)) {
-  		if (currentWay.size() <= bestWay.size() || bestWay.isEmpty()) {
-  			bestWay.clear();
-  			bestWay.addAll(currentWay);
-  		}
-  	} else {
-  		for (var room : grid[coordCurrent.y()][coordCurrent.x()].getAccessible()) {
-  			if (floor.getHeroAccessible().contains(room) || floor.getHeroVisited().contains(room)) {
-  				if (!currentWay.contains(room)) {
-      			var newCurrentWay = new ArrayList<>(currentWay);
-      			newCurrentWay.add(room);
-      			heroMove(grid, room, coordFinal, bestWay, newCurrentWay, floor);
-      		}
-  			}
-    	}
-  	}
-  }
-  
+  /**
+   * Draws the bin button in either open or closed state.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data indicating bin state
+   */
   private void drawBinButton(Graphics2D graphics, GameData data) {
   	BufferedImage img = imgLoader.bgImages().get(data.getBin() ? "BG_BIN_OPEN" : "BG_BIN_CLOSE");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_BIN_CLOSE").transform(), null);
   }
   
+  /**
+   * Draws the shop interface, including the shop background, NPC, exit icon,
+   * item display, buttons, and logs.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data including the shop information
+   */
   private void drawShop(Graphics2D graphics, GameData data) {
   	BufferedImage img = imgLoader.bgImages().get("BG_SHOP");
     graphics.drawImage(img, MathLoader.getMapEvent().get("BG_SHOP").transform(), null);
@@ -1254,18 +1564,24 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.drawImage(img, MathLoader.getMapEvent().get("RolandBody").transform(), null);
     img = imgLoader.bgImages().get("ICON_EXIT_SHOP");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_EXIT_SHOP").transform(), null);
-    drawTextBubble(graphics, data);
+    drawTextBubble(graphics, data.getShopLst());
     if (data.getShopLst().getCurrentShop().isEmpty()) {
-    	drawNoItemShop(graphics, data);
+    	drawNoItemShop(graphics);
     }
     else {
-      drawArticle(graphics, data);
+      drawArticle(graphics, data.getShopLst());
     }  	
-    drawButtonShop(graphics, data);
-    drawSellArticle(graphics, data);
+    drawButtonShop(graphics);
+    drawSellArticle(graphics);
   }
   
-  private void drawTextBubble(Graphics2D graphics, GameData data) {
+  /**
+   * Draws the dialogue bubble for the shop, showing the latest shop log messages.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data containing the shop log
+   */
+  private void drawTextBubble(Graphics2D graphics, Shop shop) {
     var bubbleBox = MathLoader.getMapEvent().get("BG_SHOP_BUBBLE").box();
     int centerX = (bubbleBox.southEast().x() - bubbleBox.northWest().x()) / 2 ;
     int centerY = (bubbleBox.southEast().y() - bubbleBox.northWest().y()) / 2;
@@ -1274,10 +1590,15 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.setColor(Color.WHITE);
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
     graphics.setFont(font);
-    drawText(graphics, data.getShopLst().getLogShop(), x, y, 30);
+    drawText(graphics, shop.getLogShop(), x, y, 30);
   }
   
-  private void drawNoItemShop(Graphics2D graphics, GameData data) {
+  /**
+   * Draws a "no items available" indicator in the shop.
+   *
+   * @param graphics The graphics context used for rendering
+   */
+  private void drawNoItemShop(Graphics2D graphics) {
   	var img = imgLoader.bgImages().get("ICON_SOLDOUT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SOLDOUT").transform(), null);
     Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
@@ -1289,7 +1610,12 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     drawText(graphics, "Y A PLUS RIEN", titleBubbleBox.northWest().x() + centerX, titleBubbleBox.northWest().y() + centerY, 15);
   }
   
-  private void drawButtonShop(Graphics2D graphics, GameData data) {
+  /**
+   * Draws the left, right, and buy buttons in the shop interface.
+   *
+   * @param graphics The graphics context used for rendering
+   */
+  private void drawButtonShop(Graphics2D graphics) {
   	var img = imgLoader.bgImages().get("ICON_SHOP_LEFT");
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_LEFT").transform(), null);
     img = imgLoader.bgImages().get("ICON_SHOP_RIGHT");
@@ -1298,13 +1624,24 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.drawImage(img, MathLoader.getMapEvent().get("ICON_SHOP_BUY").transform(), null);
   }
   
-  private void drawSellArticle(Graphics2D graphics, GameData data) {
+  /**
+   * Draws the sell button for selling items in the shop.
+   *
+   * @param graphics The graphics context used for rendering
+   */
+  private void drawSellArticle(Graphics2D graphics) {
     var img = imgLoader.bgImages().get("ICON_SELL_BUTTON");
     graphics.drawImage(img, MathLoader.getMapEvent().get("SHOP_SELL_ARTICLE").transform(), null);
   }
   
-  private void drawArticle(Graphics2D graphics, GameData data) {
-  	Iterator<Map.Entry<Item, Integer>> it = data.getShopLst().getCurrentShop().entrySet().iterator();
+  /**
+   * Draws a shop item including its image, name, and pricing information.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param shop		 The current Shop data
+   */
+  private void drawArticle(Graphics2D graphics, Shop shop) {
+  	Iterator<Map.Entry<Item, Integer>> it = shop.getCurrentShop().entrySet().iterator();
   	Map.Entry<Item, Integer> entry = it.next();
   	Item item = entry.getKey();
   	int price = entry.getValue();
@@ -1312,13 +1649,20 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		if (imgLoader.itemImagesByID().get(item.info().ID()) == null) {
 			throw new IllegalArgumentException("Can't fint img : " + item.toString());
 		}
-    drawItemShopImage(graphics, data, imgLoader.itemImagesByID().get(item.info().ID()), imageBubbleBox);
+    drawItemShopImage(graphics, imgLoader.itemImagesByID().get(item.info().ID()), imageBubbleBox);
     var titleBubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_NAME_HOLDER").box();
     drawItemShopName(graphics, item, titleBubbleBox);
-    drawItemShopInfo(graphics, item, price, data.getShopLst().getCurrentShop().size());    
+    drawItemShopInfo(graphics, item, price, shop.getCurrentShop().size());    
   }
   
-  private void drawItemShopImage(Graphics2D graphics, GameData data, BufferedImage img, BoundingBox bubbleBox) {
+  /**
+   * Draws an item image in its designated shop bubble.
+   *
+   * @param graphics 	The graphics context used for rendering
+   * @param img 			The image of the item
+   * @param bubbleBox The bounding box where the item is drawn
+   */
+  private void drawItemShopImage(Graphics2D graphics, BufferedImage img, BoundingBox bubbleBox) {
   	XY northWest = bubbleBox.northWest();
   	XY southEast = bubbleBox.southEast();
   	double width = southEast.x() - northWest.x();
@@ -1326,6 +1670,13 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		drawElement(graphics, img, northWest.x(), northWest.y(), width, height, Direction.UP);
 	}
   
+  /**
+   * Draws the item name in the shop with color based on its rarity.
+   *
+   * @param graphics 			 The graphics context used for rendering
+   * @param item 					 The item whose name is drawn
+   * @param titleBubbleBox The bounding box for the item name display
+   */
   private void drawItemShopName(Graphics2D graphics, Item item, BoundingBox titleBubbleBox) {
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
     graphics.setFont(font);
@@ -1342,6 +1693,14 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     drawText(graphics, item.toString().toUpperCase(), titleBubbleBox.northWest().x() + centerX, titleBubbleBox.northWest().y() + centerY, 10);
   }
   
+  /**
+   * Draws the item pricing and remaining quantity in the shop.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param item 		 The item being displayed
+   * @param price 	 The price of the item in gold
+   * @param nbItem 	 Number of remaining items in the shop
+   */
   private void drawItemShopInfo(Graphics2D graphics, Item item, int price, int nbItem) {
   	var bubbleBox = MathLoader.getMapEvent().get("SHOP_ARTICLE_IMAGE_HOLDER").box();
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH3());
@@ -1361,6 +1720,26 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   }
   
   /**
+   * Draws the main elements of the hero's backpack interface in the game.
+   *
+   * This includes:
+   * - The backpack UI frame and background
+   * - The grid representing inventory slots
+   * - All items currently in the backpack
+   * - The detailed item information panel
+   * - The bin button for discarding items
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data containing the backpack and hero information
+   */
+  private void drawBackpackElementGame(Graphics2D graphics, GameData data) {
+		drawGrid(graphics, data);
+		drawItemBag(graphics, data);
+		drawItemInfo(graphics, data);
+		drawBinButton(graphics, data);
+  }
+  
+  /**
    * Methods for drawing the game 
    * 
    * @param context		{@code ApplicationContext} of the game.
@@ -1368,12 +1747,8 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
    */
   private void draw(Graphics2D graphics, GameData data) {
 		drawBG(graphics, data);
-		// Draw enemy if we're in combat
 		if (data.mapOrBag()) {
-			drawGrid(graphics, data);
-			drawItemBag(graphics, data);
-			drawItemInfo(graphics, data);
-			drawBinButton(graphics, data);
+			drawBackpackElementGame(graphics, data);
 			if (data.getShop()) {
 				drawShop(graphics, data);
 			}
@@ -1388,15 +1763,10 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		}
 		drawHero(graphics, data);
 		drawButton(graphics, data);
-
 		if (data.event() != null) {
 			drawEvent(graphics, data);	
 		}
   }
-  
-  public static void draw(ApplicationContext context, GameData data, GameView view) {
-		context.renderFrame(graphics -> view.draw(graphics, data));
-	}
   
   /**
    * Methods for drawing the game 
@@ -1409,18 +1779,30 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 		graphics.drawImage(img, MathLoader.getMapEvent().get("BG_LOBBY").transform(), null);
 		drawButtonLobby(graphics);
 		if (data.getScore() != 0) {
+			var scoreFinal = (int) (data.getScore() * (1.2 * data.floor() + (data.hero().getLevel() / 2.0)));
 			Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
 	  	graphics.setFont(font);
 	  	graphics.setColor(Color.WHITE);
 	  	FontMetrics fm = graphics.getFontMetrics();
-    	graphics.drawString("SCORE FINAL : " + data.getScore(), width / 2 - (fm.stringWidth("SCORE FINAL : " + data.getScore())) / 2, height / 2);
+    	graphics.drawString("SCORE FINAL : " + scoreFinal, width / 2 - (fm.stringWidth("SCORE FINAL : " + scoreFinal)) / 2, height / 2);
 		}
 		if (data.getScoreLobby()) {
 			drawScore(graphics, data);
 		}
   }
   
+  /**
+   * Draws the Hall of Fame / Score screen.
+   *
+   * It renders the score background and reads the scores from the
+   * "data/score" file, displaying them in the graphics context.
+   *
+   * @param graphics The graphics context used for rendering
+   * @param data		 The current game data containing player information
+   */
   public void drawScore(Graphics2D graphics, GameData data) {
+  	Objects.requireNonNull(graphics);
+  	Objects.requireNonNull(data);
   	BufferedImage img = imgLoader.bgImages().get("BG_SCORE");
 		graphics.drawImage(img, MathLoader.getMapEvent().get("HOF").transform(), null);
   	Path scoreFile = Path.of("data", "score");
@@ -1431,6 +1813,17 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
 	  }
   }
   
+  /**
+   * Reads all lines from the given score file and draws them.
+   *
+   * Only up to 9 lines are drawn. If the file is empty, "Aucun score"
+   * is displayed.
+   *
+   * @param path 		 The path to the score file
+   * @param graphics The graphics context used for rendering
+   * @param data 		 The current game data (used for layout)
+   * @throws IOException if reading the file fails
+   */
   private void printAllLines(Path path, Graphics2D graphics, GameData data) throws IOException {
   	int nbScore = 0;
   	var boundingBox = MathLoader.getMapEvent().get("HOF").box();
@@ -1451,8 +1844,18 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
   	if (nbScore == 0) {
       graphics.drawString("Aucun score", boundingBox.northWest().x(), boundingBox.northWest().y() + size);
   	}
-}
+  }
   
+  /**
+   * Draws the lobby buttons on the screen.
+   *
+   * Buttons include:
+   * - START_GAME: 	 "DEBUTER"
+   * - HOF_BUTTON: 	 "HALL OF FAME"
+   * - LEAVE_BUTTON: "QUITTER"
+   *
+   * @param graphics The graphics context used for rendering
+   */
   private void drawButtonLobby(Graphics2D graphics) {
   	Font font = new Font("Mikodacs", Font.PLAIN, FontLoader.getH1());
   	graphics.setFont(font);
@@ -1465,7 +1868,31 @@ public record GameView(int width, int height, int tileSize, ImageLoader imgLoade
     graphics.drawString("QUITTER", boundingBox.northWest().x(), boundingBox.southEast().y());
   }
   
+  /**
+   * Renders the game frame by calling the view's draw method.
+   *
+   * @param context The application context used for rendering
+   * @param data 		The current game data
+   * @param view 		The view responsible for drawing the game
+   */
+  public static void draw(ApplicationContext context, GameData data, GameView view) {
+  	Objects.requireNonNull(context);
+  	Objects.requireNonNull(data);
+  	Objects.requireNonNull(view);
+		context.renderFrame(graphics -> view.draw(graphics, data));
+	}
+  
+  /**
+   * Renders the lobby frame by calling the view's drawLobby method.
+   *
+   * @param context The application context used for rendering
+   * @param data 		The current game data
+   * @param view 		The view responsible for drawing the game
+   */
   public static void drawLobby(ApplicationContext context, GameData data, GameView view) {
+  	Objects.requireNonNull(context);
+  	Objects.requireNonNull(data);
+  	Objects.requireNonNull(view);
   	context.renderFrame(graphics -> view.drawLobby(graphics, data));
   }
   

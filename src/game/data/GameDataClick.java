@@ -42,8 +42,8 @@ public class GameDataClick {
   public static XY bagClick(int x, int y) {
   	int size = backpack.getGridSize();
   	;
-  	double coordLeftGrid = (screenInfo.width() / 2) - backpack.getCol() / 2.0 * size;
-  	double coordTopGrid = (screenInfo.height() / 4.5) - backpack.getRow() / 2.0 * size;
+  	double coordLeftGrid = MathLoader.getMapEvent().get("BG_BACKPACK").box().northWest().x();
+  	double coordTopGrid = MathLoader.getMapEvent().get("BG_BACKPACK").box().northWest().y();
   	if (data.mapOrBag() == false) {
   	  return null;
   	}

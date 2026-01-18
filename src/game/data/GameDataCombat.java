@@ -8,8 +8,6 @@ import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Random;
 
-import com.github.forax.zen.ScreenInfo;
-
 import game.GameData;
 import loader.MathLoader;
 import model.BoundingBox;
@@ -34,7 +32,7 @@ public class GameDataCombat {
   private static List<Enemy> lstEnemy; // List of all ennemies
   private static LinkedHashMap<Enemy, BoundingBox> enemyBox = new LinkedHashMap<>(); // The box of all current ennemies on the screen
   private static ArrayList<String> log = new ArrayList<>(); // History of all actions
-  private static int totalExp = 0; // Exp we get after finishing the combat
+  private static int totalExp; // Exp we get after finishing the combat
   private static int levelBeforeCombat; // Level before starting combat
   private static int nbMana; // Mana before starting combat
   
@@ -52,6 +50,7 @@ public class GameDataCombat {
 		}
 		Objects.requireNonNull(monsters);
 		Objects.requireNonNull(data);
+		totalExp = 0;
 		GameDataClick.resetDragItemLst();
 		checkBackgroundChange(monsters.iterator(), data);
 		nbMana = data.bag().getManaInBag();
@@ -99,7 +98,6 @@ public class GameDataCombat {
 			var newItem = item.usePassive(target, lstEnemy, data);
 			it.set(newItem);
 		}
-		
 	}
 	
 	/**
@@ -147,6 +145,9 @@ public class GameDataCombat {
 		if (item != null) {
 			if (checkItemCond(item, data)) {
 				useItemOnEnemies(data, item);
+				if(data.hero().getHP() <= 0) {
+					data.endGame();
+				}
 				killMonster(data);
 				if(data.hero().getEnergyPoint() <= 0) {
 					endTour(data);
@@ -261,6 +262,7 @@ public class GameDataCombat {
 			applyEffectsToHero(data);
 			killMonster(data);
 			enemyAction(data);
+			killMonster(data);
 			if(data.hero().getHP() <= 0) {
 				data.endGame();
 			}

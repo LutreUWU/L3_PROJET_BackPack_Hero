@@ -11,20 +11,37 @@ import model.BoundingBox;
 import model.XY;
 
 /**
- * The GameDataMath class is where all coordinate, size ... depending of the screen are stored.
+ * The MathLoader class calculates and stores all the screen-dependent coordinates,
+ * sizes, and transformations needed to render game elements.
+ * 
+ * All coordinates and scaling factors are based on the screen dimensions and
+ * assets loaded in ImageLoader. It provides static access to calculated
+ * positions via the renderDataGame map.
  */
 public class MathLoader {
+	// Screen dimensions
 	private static int screenWidth;
 	private static int screenHeight;
+  // Reference to game data and image loader
 	private static GameData data;
 	private static ImageLoader imgLoader;
+  // Map containing pre-calculated render information for all game elements
 	private static LinkedHashMap<String, RenderData> renderDataGame = new LinkedHashMap<>();
 	
+	/**
+   * Initializes the MathLoader, calculates positions, scales, and bounding boxes
+   * for all UI elements based on the screen dimensions.
+   *
+   * @param dataGame 		The current game data
+   * @param imageLoader The image loader with all game assets
+   * @param screenInfo  The screen information (resolution)
+   */
 	public MathLoader(GameData dataGame, ImageLoader imageLoader, ScreenInfo screenInfo) {
 		data = dataGame;
 		imgLoader = imageLoader;
 		screenWidth = screenInfo.width();
 		screenHeight = screenInfo.height();
+    // Initialize positions and scales for all game UI elements
 		getBGValue();
 		getBGLobbyValue();
 		getHeroValue();
@@ -38,7 +55,13 @@ public class MathLoader {
 		getShopValue();
 		getFFButtonValue();
 	}
+
+  // ========================= LOBBY / BACKGROUND =========================
 	
+	 /**
+   * Computes positions and sizes for all lobby elements, including background,
+   * start button, HOF button, leave button, and Hall of Fame panel.
+   */
 	private static void getBGLobbyValue() {
 		getBGImgLobbyValue();
 		getStartButtonLobbyValue();
@@ -47,6 +70,9 @@ public class MathLoader {
 		getHOFLobbyValue();
 	}
 
+	/**
+   * Calculates the position, size, and bounding box for the "START_GAME" button in the lobby.
+   */
 	private static void getStartButtonLobbyValue() {
 		int height = FontLoader.getH1();
 		int width = FontLoader.getH1() * 10;
@@ -55,6 +81,9 @@ public class MathLoader {
 		renderDataGame.put("START_GAME", new RenderData(null, new BoundingBox(NW, SE)));	
 	}
 	
+	/**
+   * Calculates the position, size, and bounding box for the "HOF_BUTTON" in the lobby.
+   */
 	private static void getHOFButtonLobbyValue() {
 		int height = FontLoader.getH1();
 		int width = FontLoader.getH1() * 10;
@@ -63,6 +92,9 @@ public class MathLoader {
 		renderDataGame.put("HOF_BUTTON", new RenderData(null, new BoundingBox(NW, SE)));	
 	}
 
+	/**
+   * Calculates the position, size, and bounding box for the "LEAVE_BUTTON" in the lobby.
+   */
 	private static void getLeaveButtonLobbyValue() {
 		int height = FontLoader.getH1();
 		int width = FontLoader.getH1() * 10;
@@ -71,6 +103,9 @@ public class MathLoader {
 		renderDataGame.put("LEAVE_BUTTON", new RenderData(null, new BoundingBox(NW, SE)));	
 	}
 	
+	/**
+   * Calculates the position, size, and bounding box of the Hall of Fame panel (HOF) in the lobby.
+   */
 	private static void getHOFLobbyValue() {
 		int height = (int) (FontLoader.getH2() * 10);
 		int width = (int) (screenWidth * 0.15);
@@ -85,6 +120,9 @@ public class MathLoader {
 		renderDataGame.put("HOF", new RenderData(transform, new BoundingBox(NW, SE)));	
 	}
 	
+	 /**
+   * Calculates the position and scale of the lobby background image.
+   */
 	private static void getBGImgLobbyValue() {
 		BufferedImage img = imgLoader.bgImages().get("BG_LOBBY");
 		double scale =  (double) (screenWidth) / img.getWidth();
@@ -93,76 +131,156 @@ public class MathLoader {
 		XY NW = new XY(0, 0);
 		XY SE = new XY(screenWidth, screenHeight);
 		renderDataGame.put("BG_LOBBY", new RenderData(transform, new BoundingBox(NW, SE)));
+	
 	}
-// ================= ICON =====================
+  // ========================= ICONS =========================
+	
+	/**
+   * Calculates positions, scales, and bounding boxes for all hero icons:
+   * Health, Shield, Mana, Action, Unlock, Gold, and Boost.
+   */
 	private static void getIconHeroValue() {
   	double sizeY =  screenHeight * 0.04;
-  	// ICON HEALTH
-		BufferedImage img = imgLoader.bgImages().get("ICON_HEALTH");
-		var width = img.getWidth();
-		var height = img.getHeight();
-		double scale = sizeY / height;
-		var transform = new AffineTransform();
-    transform.scale(scale, scale);
-		XY NW = new XY(0, 0);
-		XY SE = new XY((int) (width * scale), (int) (height * scale));
-		renderDataGame.put("ICON_HEALTH", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON SHIELD
-		img = imgLoader.bgImages().get("ICON_SHIELD");
-		transform = new AffineTransform();
-    transform.translate(0, height * scale);
-    transform.scale(scale, scale);
-		NW = new XY(0, (int) (height * scale));
-		SE = new XY((int) (width * scale), (int) (height * scale * 2));
-		renderDataGame.put("ICON_SHIELD", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON MANA
-		img = imgLoader.bgImages().get("ICON_MANA");
-		transform = new AffineTransform();
-    transform.translate(0, height * scale * 2);
-    transform.scale(scale, scale);
-		NW = new XY(0, (int) (height * scale * 2));
-		SE = new XY((int) (width * scale), (int) (height * scale * 3));
-		renderDataGame.put("ICON_MANA", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON ACTION
-		img = imgLoader.bgImages().get("ICON_ACTION");
-		transform = new AffineTransform();
-    transform.translate(0, height * scale * 3);
-    transform.scale(scale, scale);
-		NW = new XY(0, (int) (height * scale * 3));
-		SE = new XY((int) (width * scale), (int) (height * scale * 4));
-		renderDataGame.put("ICON_ACTION", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON UNLOCK
-		img = imgLoader.bgImages().get("ICON_UNLOCK");
-		transform = new AffineTransform();
-    transform.translate(0, height * scale * 4);
-    transform.scale(scale, scale);
-		NW = new XY(0, (int) (height * scale * 4));
-		SE = new XY((int) (width * scale), (int) (height * scale * 5));
-		renderDataGame.put("ICON_UNLOCK", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON GOLD
-		img = imgLoader.bgImages().get("gold");
-		transform = new AffineTransform();
-    transform.translate(0, height * scale * 5);
-    transform.scale(scale, scale);
-		NW = new XY(0, (int) (height * scale * 5));
-		SE = new XY((int) (width * scale), (int) (height * scale * 6));
-		renderDataGame.put("gold", new RenderData(transform, new BoundingBox(NW, SE)));
-		// ICON BOOST
-		img = imgLoader.bgImages().get("ICON_BOOST");
-		width = img.getWidth();
-		height = img.getHeight();
-		scale = sizeY / height;
-		transform = new AffineTransform();
-    transform.translate(0, height * scale * 6);
-    transform.scale(scale, scale);
-		NW = new XY(0, (int) (height * scale * 6));
-		SE = new XY((int) (width * scale), (int) (height * scale * 7));
-		renderDataGame.put("ICON_BOOST", new RenderData(transform, new BoundingBox(NW, SE)));
+  	getHealthValue(sizeY);
+		getShieldValue(sizeY);
+		getManaValue(sizeY);
+		getActionValue(sizeY);
+		getUnlockValue(sizeY);
+		getGoldValue(sizeY);
+		getBoostValue(sizeY);
 	}
 	
-//============================================	
+	/**
+	 * Calculates positions, scales, and bounding boxes for health icon.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getHealthValue(double sizeY) {
+		var img = imgLoader.bgImages().get("ICON_HEALTH");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, 0);
+    transform.scale(scale, scale);
+		var NW = new XY(0, 0);
+		var SE = new XY((int) (width * scale), (int) (height * scale));
+		renderDataGame.put("ICON_HEALTH", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
 	
-// ================== BG ======================
+	/**
+	 * Calculates positions, scales, and bounding boxes for shield icon.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getShieldValue(double sizeY) {
+		var img = imgLoader.bgImages().get("ICON_SHIELD");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, height * scale);
+    transform.scale(scale, scale);
+		var NW = new XY(0, (int) (height * scale));
+		var SE = new XY((int) (width * scale), (int) (height * scale * 2));
+		renderDataGame.put("ICON_SHIELD", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
+	
+	/**
+	 * Calculates positions, scales, and bounding boxes for mana icons.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getManaValue(double sizeY) {
+		var img = imgLoader.bgImages().get("ICON_MANA");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, height * scale * 2);
+    transform.scale(scale, scale);
+		var NW = new XY(0, (int) (height * scale * 2));
+		var SE = new XY((int) (width * scale), (int) (height * scale * 3));
+		renderDataGame.put("ICON_MANA", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
+	
+	/**
+	 * Calculates positions, scales, and bounding boxes for AP icons.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getActionValue(double sizeY) {
+		var img = imgLoader.bgImages().get("ICON_ACTION");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, height * scale * 3);
+    transform.scale(scale, scale);
+		var NW = new XY(0, (int) (height * scale * 3));
+		var SE = new XY((int) (width * scale), (int) (height * scale * 4));
+		renderDataGame.put("ICON_ACTION", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
+	
+	/**
+	 * Calculates positions, scales, and bounding boxes for unlock icons.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getUnlockValue(double sizeY) {
+		var img = imgLoader.bgImages().get("ICON_UNLOCK");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, height * scale * 4);
+    transform.scale(scale, scale);
+		var NW = new XY(0, (int) (height * scale * 4));
+		var SE = new XY((int) (width * scale), (int) (height * scale * 5));
+		renderDataGame.put("ICON_UNLOCK", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
+	
+	/**
+	 * Calculates positions, scales, and bounding boxes for gold icons.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getGoldValue(double sizeY) {
+		var img = imgLoader.bgImages().get("gold1");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, height * scale * 5);
+    transform.scale(scale, scale);
+		var NW = new XY(0, (int) (height * scale * 5));
+		var SE = new XY((int) (width * scale), (int) (height * scale * 6));
+		renderDataGame.put("gold", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
+	
+	/**
+	 * Calculates positions, scales, and bounding boxes for boost icons.
+	 * 
+	 * @param sizeY Size of the icon
+	 */
+	private static void getBoostValue(double sizeY) {
+		var img = imgLoader.bgImages().get("ICON_BOOST");
+		var width = img.getWidth();
+		var height = img.getHeight();
+		var scale = sizeY / height;
+		var transform = new AffineTransform();
+    transform.translate(0, height * scale * 6);
+    transform.scale(scale, scale);
+		var NW = new XY(0, (int) (height * scale * 6));
+		var SE = new XY((int) (width * scale), (int) (height * scale * 7));
+		renderDataGame.put("ICON_BOOST", new RenderData(transform, new BoundingBox(NW, SE)));
+	}
+		
+	// ================== BG ======================
+	
+	/**
+   * Calculates positions and scales for all game background images.
+   */
 	private static void getBGValue() {
 		var allBg = imgLoader.bgImages().keySet().stream().filter(key -> key.contains("BG")).toList();
 		for (String bgName : allBg) {
@@ -170,6 +288,11 @@ public class MathLoader {
 		}
 	}
 	
+	/**
+   * Calculates the position and scale for a single background image.
+   *
+   * @param BG_name The name of the background image
+   */
 	private static void getBGimgValue(String BG_name) {
 		BufferedImage img = imgLoader.bgImages().get(BG_name);
 		double width = img.getWidth();
@@ -180,17 +303,18 @@ public class MathLoader {
 		XY SE = new XY(screenWidth, screenHeight);
 		renderDataGame.put(BG_name, new RenderData(transform, new BoundingBox(NW, SE)));
 	}
-
-// ============================================	
-
 	
-// =============== Backpack ===================
+	// =============== Backpack ===================
+	
+	/**
+   * Calculates the position, scale, and bounding box for the backpack background.
+   */
 	private static void getBackpackValue() {
 		var size = data.bag().getGridSize();
 		int nbCol = data.bag().getCol();
 		int nbRow =  data.bag().getRow();
-		var dimX = (nbCol + 2) * size;
-		var dimY = (nbRow + 2) * size;
+		var dimX = (nbCol + 2.0) * size;
+		var dimY = (nbRow + 2.0) * size;
 		XY NW = new XY((int) (screenWidth / 2.0 - (nbCol / 2.0) * size), (int) (screenHeight * 0.02 + size * 0.8));
 		XY SE = new XY((int) (NW.x() + nbCol * size), (int) (NW.y() + nbRow * size));
 		BufferedImage img = imgLoader.bgImages().get("BG_BACKPACK");
@@ -203,10 +327,13 @@ public class MathLoader {
 	  transform.scale(scaleX, scaleY);
 		renderDataGame.put("BG_BACKPACK", new RenderData(transform, new BoundingBox(NW, SE)));
 	}
+		
+	//================== INFO ITEM ================
 	
-// ============================================
-	
-//================== INFO ITEM ================
+	/**
+   * Calculates positions, scales, and bounding boxes for the item info panel
+   * displayed next to the backpack.
+   */
 	private static  void getInfoItemValue() {
 		var size = data.bag().getGridSize();
 		var dimX = size * 5.0;
@@ -225,10 +352,12 @@ public class MathLoader {
 	  var realSE = new XY((int) (SE.x() + size * 0.9), SE.y() + size/2);
 		renderDataGame.put("BG_INFO_ITEM", new RenderData(transform, new BoundingBox(realNW, realSE)));
 	}
-		
-//============================================
-	
-// ================== Map =====================
+
+	// ================== Map =====================
+
+	/**
+   * Calculates the position, scale, and bounding box of the main map background.
+   */
 	private static void getMapValue() {
 		var size = data.bag().getGridSize();
   	var gap = size * 0.1;
@@ -248,10 +377,11 @@ public class MathLoader {
 	  transform.scale(scaleX, scaleY);
 		renderDataGame.put("BG_MAP", new RenderData(transform, new BoundingBox(NW, SE)));
 	}
-// ============================================
+	// ================= Hero =====================
 	
-	
-// ================= Hero =====================
+	/**
+  * Calculates the position, scale, and bounding box for the hero image on the map.
+  */
 	private static void getHeroValue() {
 		BufferedImage img = imgLoader.bgImages().get("Roland");
     int imgW = img.getWidth();
@@ -265,22 +395,21 @@ public class MathLoader {
     renderDataGame.put("Roland", new RenderData(transform, boundingBox));
 	}
 	
+	// ================= EVENT ====================
 	
-// ============================================
-	
-//============================================
-
-	
-// ================= EVENT ====================
 	/**
-	 * This methods will calculate all value necessary for drawing an event in the interface
-	 */
+   * Calculates all positions, scales, and bounding boxes needed for events,
+   * including event background and choices.
+   */
 	private static void getEventValue() {
 		getEventBackgroundValue();
 		getEventChoiceValue();
 		getEventChoiceEndValue();
 	}
 	
+	/**
+   * Calculates the position, scale, and bounding box for the event background.
+   */
 	private static void getEventBackgroundValue() {
 		BufferedImage img = imgLoader.bgImages().get("BG_EVENT");
     int imgW = img.getWidth();
@@ -297,6 +426,9 @@ public class MathLoader {
     renderDataGame.put("BG_EVENT", new RenderData(transform, boundingBox));
 	}
 	
+	/**
+   * Calculates positions and bounding boxes for event choice buttons (choice 1 and choice 2).
+   */
 	private static void getEventChoiceValue() {
 		// Choice 1
 		var img = imgLoader.bgImages().get("BG_CHOICE1");
@@ -319,6 +451,9 @@ public class MathLoader {
 	  renderDataGame.put("BG_CHOICE2", new RenderData(transform2, boundingBox));
 	}
 	
+	/**
+   * Calculates the position and bounding box for the "End Choice" event button.
+   */
 	private static void getEventChoiceEndValue() {
 		var img = imgLoader.bgImages().get("BG_CHOICE_END");
 		int width = img.getWidth(), height = img.getHeight();;
@@ -332,10 +467,11 @@ public class MathLoader {
 	  renderDataGame.put("BG_CHOICE_END", new RenderData(transform, boundingBox));
 	}
 	
+	//================= ENDTURN =====================
 	
-// ===========================================
-	
-//================= ENDTURN =====================
+	 /**
+   * Calculates position, scale, and bounding box of the "End Turn" button.
+   */
 	private static void getEndTurnValue() {
 		var img = imgLoader.bgImages().get("BG_ENDTURN");	
 		int width = img.getWidth();
@@ -349,10 +485,13 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + width*scale), (int) (posY + height*scale)));
 	  renderDataGame.put("BG_ENDTURN", new RenderData(transform, boundingBox));
 	}
+
+	//================= BIN =====================
 	
-//============================================
-	
-//================= BIN =====================
+	/**
+   * Calculates positions, scales, and bounding boxes for the bin button
+   * in both open and closed states.
+   */
 	private static void getBinValue() {
 		var img = imgLoader.bgImages().get("BG_BIN_CLOSE");	
 		int width = img.getWidth();
@@ -368,9 +507,13 @@ public class MathLoader {
 		img = imgLoader.bgImages().get("BG_BIN_OPEN");	
 	  renderDataGame.put("BG_BIN_OPEN", new RenderData(transform, boundingBox));
 	}	
-// ===================
 	
-//================= Shop =====================
+	//================= Shop =====================
+	
+	/**
+   * Calculates all positions, scales, and bounding boxes needed for the shop,
+   * including background, character, bubble, article areas, buttons, and sell area.
+   */
 	private static void getShopValue() {
 		var img = imgLoader.bgImages().get("BG_SHOP");	
 		int width = img.getWidth();
@@ -390,6 +533,11 @@ public class MathLoader {
 	  getSoldOutShopValue(articleWidth, articleHeight);
 	}	
 	
+	/**
+   * Calculates the scale and bounding box for the shop background.
+   *
+   * @return The scale factor applied to the shop background
+   */
 	private static double getBGshopValue() {
 		var img = imgLoader.bgImages().get("BG_SHOP");	
 		int width = img.getWidth();
@@ -405,10 +553,12 @@ public class MathLoader {
 	  return scale;
 	}
 	
+	/**
+   * Calculates the position and bounding box of the shop character.
+   */
 	private static void getCharacterValue(double shopWidth, double shopHeight) {
 		var img = imgLoader.bgImages().get("RolandBody");
 		int width = img.getWidth();
-		int height = img.getHeight();
 		AffineTransform transform = new AffineTransform();
 	  double posX = screenWidth / 2 - (width / 2);
 	  double posY = screenHeight * 0.65;
@@ -417,6 +567,9 @@ public class MathLoader {
 	  renderDataGame.put("RolandBody", new RenderData(transform, boundingBox));
 	}
 	
+	/**
+   * Calculates the position and bounding box for the speech bubble in the shop.
+   */
 	private static void getBubbleShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.15;
@@ -425,6 +578,9 @@ public class MathLoader {
 	  renderDataGame.put("BG_SHOP_BUBBLE", new RenderData(null, boundingBox));
 	}
 	
+	/**
+   * Calculates the area where articles are displayed in the shop.
+   */
 	private static void getArticleAreaShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.1;
@@ -433,6 +589,9 @@ public class MathLoader {
 	  renderDataGame.put("SHOP_ARTICLE", new RenderData(null, boundingBox));
 	}
 	
+	/**
+   * Calculates the position, scale, and bounding box for the sell article button.
+   */
 	private static void getSellArticleShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		double posX = shopBoundingBox.northWest().x() + shopWidth * 0.81;
@@ -449,12 +608,20 @@ public class MathLoader {
 	  renderDataGame.put("SHOP_SELL_ARTICLE", new RenderData(transform, boundingBox));
 	}
 	
+	/**
+   * Calculates the bounding boxes for article names and images in the shop.
+   */
 	private static void getArticleShopValue() {
 		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
 		getArticleNameHolderShopValue(articleBoundingBox);
 	  getArticleImageHolderShopValue(articleBoundingBox);
 	}
 	
+	 /**
+   * Calculates the bounding box for the article name holder.
+   *
+   * @param articleBoundingBox Bounding box of the article container
+   */
 	private static void getArticleNameHolderShopValue(BoundingBox articleBoundingBox) {
 		var buttonBoundingBox = renderDataGame.get("ICON_SHOP_BUY").box();
 		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
@@ -466,6 +633,11 @@ public class MathLoader {
 	  renderDataGame.put("SHOP_ARTICLE_NAME_HOLDER", new RenderData(null, newBoundingBox));
 	}
 	
+	/**
+   * Calculates the bounding box for the article image holder.
+   *
+   * @param articleBoundingBox Bounding box of the article container
+   */
 	private static void getArticleImageHolderShopValue(BoundingBox articleBoundingBox) {
 		var buttonBoundingBox = renderDataGame.get("ICON_SHOP_BUY").box();
 		int articleHeight = articleBoundingBox.southEast().y() - articleBoundingBox.northWest().y();
@@ -477,8 +649,9 @@ public class MathLoader {
 	  renderDataGame.put("SHOP_ARTICLE_IMAGE_HOLDER", new RenderData(null, newBoundingBox));
 	}
 	
-	
-	
+	/**
+	 * Calculates position, scale, and bounding box for the shop exit button.
+	 */
 	private static void getExitShopValue(double shopWidth, double shopHeight) {
 		var shopBoundingBox = renderDataGame.get("BG_SHOP").box();
 		var img = imgLoader.bgImages().get("ICON_EXIT_SHOP");
@@ -494,6 +667,9 @@ public class MathLoader {
 	  renderDataGame.put("ICON_EXIT_SHOP", new RenderData(transform, boundingBox));
 	}
 	
+	/**
+   * Calculates positions and bounding boxes for the left and right shop buttons.
+   */
 	private static void getButtonShopValue(double articleWidth, double articleHeight) {
 		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
 		var img = imgLoader.bgImages().get("ICON_SHOP_LEFT");
@@ -514,6 +690,9 @@ public class MathLoader {
 	  renderDataGame.put("ICON_SHOP_RIGHT", new RenderData(transform, boundingBox));
 	}
 	
+	/**
+   * Calculates the position, scale, and bounding box for the "Buy" button in the shop.
+   */
 	private static void getBuyButtonShopValue(double articleWidth, double articleHeight) {
 		var articleBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
 		var img = imgLoader.bgImages().get("ICON_SHOP_BUY");
@@ -530,6 +709,9 @@ public class MathLoader {
 	  renderDataGame.put("ICON_SHOP_BUY", new RenderData(transform, boundingBox));
 	}
 	
+	/**
+   * Calculates the bounding box for the "Sold Out" icon in the shop.
+   */
 	private static void getSoldOutShopValue(double articleWidth, double articleHeight) {
 		var img = imgLoader.bgImages().get("ICON_SOLDOUT");
 		var shopBoundingBox = renderDataGame.get("SHOP_ARTICLE").box();
@@ -544,7 +726,10 @@ public class MathLoader {
 	  var boundingBox = new BoundingBox(new XY((int) posX, (int) posY), new XY((int) (posX + img.getWidth() * scale), (int) (posY + img.getHeight() * scale)));
 	  renderDataGame.put("ICON_SOLDOUT", new RenderData(transform, boundingBox));
 	}
-//============================================	
+
+	/**
+   * Calculates the position, scale, and bounding box for the "Abandon" (fast-forward) button.
+   */
 	private static void getFFButtonValue() {
 		var img = imgLoader.bgImages().get("ICON_ABANDON");	
 		int width = img.getWidth();
@@ -559,15 +744,31 @@ public class MathLoader {
 	  renderDataGame.put("ICON_ABANDON", new RenderData(transform, boundingBox));
 	}
 	
-//Getter Event
+  // ========================= GETTERS =========================
+
+	/**
+   * Returns a map of all RenderData objects keyed by element name.
+   *
+   * @return LinkedHashMap of element name -> RenderData
+   */
 	public static LinkedHashMap<String, RenderData> getMapEvent() {
 		return renderDataGame;
 	}
 	
+	/**
+   * Returns the screen width.
+   *
+   * @return Screen width in pixels
+   */
 	public static int getScreenWidth() {
 		return screenWidth;
 	}
 	
+	/**
+   * Returns the screen height.
+   *
+   * @return Screen height in pixels
+   */
 	public static int getScreenHeight() {
 		return screenHeight;
 	}

@@ -14,8 +14,8 @@ public class Hero {
 	private int maxHP = 40;
 	private int currentProtection = 0; // damage countered
 	private int currentArmor = 0; // as a percentage (between 0 and 100%)
-	private int energyPoint = 3;
 	private int maxEnergyPoint = 3;
+	private int energyPoint = maxEnergyPoint;
 	private int manaPoint = 0;
 	private int curseRefuse = 0;
 	private float boostDmg = 0;

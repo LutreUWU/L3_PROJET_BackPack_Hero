@@ -10,22 +10,33 @@ import game.data.GameDataCombat;
 import game.data.GameDataHero;
 import model.Effect;
 
+
 /**
- * Class of a Chicken
+ * Represents a Chicken enemy in the game.
+ * 
+ * Attributes:
+ * - HP: Health points. When it reaches 0, the enemy dies.
+ * - Shield: Absorbs incoming damage before HP is reduced.
+ * - Effects: Status effects applied to the enemy (e.g., poison, burn).
+ * - Action: The action the enemy will perform on its next turn.
  */
 public class Chicken implements Enemy{
-	/**
-	 * - HP :				 	When it reach 0, the enemy die
-	 * - Shield : 		Can mitigate damage received
-	 * - action : 		To register which action the enemy will do next turn
-	 */
+  /** Maximum health points of the chicken. */
 	final private int maxHP = 20;
+  /** Current health points. */
 	private int HP = 20;
+  /** Current shield value. */
 	private int shield = 0;
+  /** Active effects on the enemy and their remaining duration. */
 	private final Map<Effect, Integer> effects = new HashMap<>();
+  /** Current action the enemy will perform next turn. */
 	private String action;
+  /** Static information about the enemy (damage, attacks, drop chance, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(20, 4, List.of("Morsure", "Protection"), 0.8, 0.4, "chicken");
 	
+	/**
+   * Resets the HP, shield, and effects to their initial values.
+   */
 	@Override
 	public void resetStats() {
 		HP = maxHP;
@@ -33,22 +44,25 @@ public class Chicken implements Enemy{
 		effects.clear();
 	}
 	
-	/**
-	 * Add an effect to the enemy
-	 * @param effect (Enum of all item)
-	 * @param value (Number of time the effect will be used)
-	 */
+	 /**
+   * Adds or updates a status effect on the enemy.
+   *
+   * @param effect The type of effect to apply (enum of all possible effects).
+   * @param value  The number of turns the effect will remain active.
+   */
 	@Override
 	public void addEffect(Effect effect, int value) {
 		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
 	}
 	
 	/**
-	 * Update all effects and remove them if necessary
-	 */
+   * Updates all active effects by decrementing their duration.
+   * Removes effects whose duration has expired.
+   * 
+   */
 	@Override
 	public void updateEffects() {
-    effects.replaceAll((k, v) -> v - 1);
+    effects.replaceAll((_, v) -> v - 1);
     effects.values().removeIf(v -> v <= 0);
 	}
 	
@@ -65,8 +79,10 @@ public class Chicken implements Enemy{
 	}
 	
 	/**
-	 * Apply the action the monster will do, and choose randomly the next action of the monster
-	 */
+   * Chooses a random action from the enemy's available attacks.
+   *
+   * @return The chosen action for this turn.
+   */
 	@Override
 	public void action(GameData data) {
 		switch(action) {
@@ -85,10 +101,11 @@ public class Chicken implements Enemy{
 	}
 	
 	/**
-	 * Sub the HP by the value
-	 * If he has a shield, subtract it
-	 * 
-	 */
+   * Reduces the chicken's HP by a given value, accounting for its shield first.
+   * Shield absorbs damage before HP is reduced.
+   *
+   * @param value The amount of damage to apply.
+   */
 	@Override
 	public void subHP(int value) {
 		if(shield >= value) {
@@ -99,7 +116,8 @@ public class Chicken implements Enemy{
 		shield = 0;
 	}
 	
-	// Getter 
+  // ========================= GETTERS =========================
+	
 	@Override
 	public int getHP() {
 		return HP;
