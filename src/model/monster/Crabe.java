@@ -12,20 +12,18 @@ import model.Effect;
 import model.map.eventManager.LinkedEvent;
 
 /**
- * Class of a Chicken
+ * Class of a Crabe
  */
 public class Crabe implements Enemy{
-	/**
-	 * - HP :				 	When it reach 0, the enemy die
-	 * - Shield : 		Can mitigate damage received
-	 * - xp :					XP he drops when he die
-	 * - lst_attack : List of all attack the enemy has 
-	 * - action : 		To register which action the enemy will do next turn
-	 */
+  /** Maximum health points*/
 	private int HP = 50;
+  /** Shield points*/
 	private int shield = 0;
+  /** Active of the enemy*/
 	private String action;
+  /** Active effects on the enemy and their remaining duration. */
 	private final Map<Effect, Integer> effects = new HashMap<>();
+  /** Static information about the enemy (damage, attacks, sizeX, sizeY, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(50, 20, List.of("Vomissement", "Pince"), 1.7, 1, "crabe");
 
 	@Override
@@ -35,31 +33,17 @@ public class Crabe implements Enemy{
 		effects.clear();
 	}
 	
-	/**
-	 * Add an effect to the enemy
-	 * @param effect (Enum of all item)
-	 * @param value (Number of time the effect will be used)
-	 */
 	@Override
 	public void addEffect(Effect effect, int value) {
 		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
 	}
 	
-	
-	/**
-	 * Update all effects and remove them if necessary
-	 */
 	@Override
 	public void updateEffects() {
-    effects.replaceAll((k, v) -> v - 1);
+    effects.replaceAll((_, v) -> v - 1);
     effects.values().removeIf(v -> v <= 0);
 	}
 	
-	/**
-	 * Chose randomly an action between all attacks the enemy has.
-	 * 
-	 * @return Action he'll do 
-	 */
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
@@ -67,9 +51,6 @@ public class Crabe implements Enemy{
 		return action;
 	}
 	
-	/**
-	 * Apply the action the monster will do, and choose randomly the next action of the monster
-	 */
 	@Override
 	public void action(GameData data) {
 		switch(action) {
@@ -82,15 +63,11 @@ public class Crabe implements Enemy{
 				GameDataHero.sub("HP", 10);
 				GameDataCombat.addLog("Le crabe pince le héro et lui inflige -10PV");
 			}
+			default -> {throw new IllegalArgumentException("Invalid attack : " + action);}
 		}
 		preAction();
 	}
 	
-	/**
-	 * Sub the HP by the value
-	 * If he has a shield, subtract it
-	 * 
-	 */
 	@Override
 	public void subHP(int value) {
 		if(shield >= value) {

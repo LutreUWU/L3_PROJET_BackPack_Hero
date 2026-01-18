@@ -3,6 +3,7 @@ package model.monster;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import game.GameData;
@@ -21,8 +22,6 @@ import model.Effect;
  * - Action: The action the enemy will perform on its next turn.
  */
 public class Chicken implements Enemy{
-  /** Maximum health points of the chicken. */
-	final private int maxHP = 20;
   /** Current health points. */
 	private int HP = 20;
   /** Current shield value. */
@@ -34,57 +33,34 @@ public class Chicken implements Enemy{
   /** Static information about the enemy (damage, attacks, drop chance, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(20, 4, List.of("Morsure", "Protection"), 0.8, 0.4, "chicken");
 	
-	/**
-   * Resets the HP, shield, and effects to their initial values.
-   */
 	@Override
 	public void resetStats() {
-		HP = maxHP;
+		HP = info.maxHP();
 		shield = 0;
 		effects.clear();
 	}
 	
-	 /**
-   * Adds or updates a status effect on the enemy.
-   *
-   * @param effect The type of effect to apply (enum of all possible effects).
-   * @param value  The number of turns the effect will remain active.
-   */
 	@Override
 	public void addEffect(Effect effect, int value) {
 		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
 	}
 	
-	/**
-   * Updates all active effects by decrementing their duration.
-   * Removes effects whose duration has expired.
-   * 
-   */
 	@Override
 	public void updateEffects() {
     effects.replaceAll((_, v) -> v - 1);
     effects.values().removeIf(v -> v <= 0);
 	}
 	
-	/**
-	 * Chose randomly an action between all attacks the enemy has.
-	 * 
-	 * @return Action he'll do 
-	 */
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
 		action = info.attacks().get(randomNumbers.nextInt(2));
 		return action;
 	}
-	
-	/**
-   * Chooses a random action from the enemy's available attacks.
-   *
-   * @return The chosen action for this turn.
-   */
+
 	@Override
 	public void action(GameData data) {
+		Objects.requireNonNull(data);
 		switch(action) {
 			case "Morsure" -> {
 				GameDataHero.sub("HP", 3);
@@ -96,16 +72,11 @@ public class Chicken implements Enemy{
 				shield += 2;
 				GameDataCombat.addLog("Le poulet malicieux se protège (+2 Shield)");
 				}
+			default -> {throw new IllegalArgumentException("Invalid attack : " + action);}
 		}
 		preAction();
 	}
 	
-	/**
-   * Reduces the chicken's HP by a given value, accounting for its shield first.
-   * Shield absorbs damage before HP is reduced.
-   *
-   * @param value The amount of damage to apply.
-   */
 	@Override
 	public void subHP(int value) {
 		if(shield >= value) {

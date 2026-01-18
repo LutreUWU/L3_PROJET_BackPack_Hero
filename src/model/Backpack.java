@@ -6,39 +6,60 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import game.GameData;
 import game.data.GameDataCombat;
 import model.item.common.Gold;
 import model.item.rare.ManaStone;
 
+/**
+ * Represents the player's backpack grid.
+ *
+ * The backpack is a fixed-size grid that can contain items of various shapes.
+ * It manages item placement, removal, gold and mana aggregation, locked cells,
+ * and mana connectivity between items.
+ */
 public class Backpack {
 	/**
-	 * - Backpack - grid_size - All items in the bag
+	 * 2D grid representing the backpack.
+	 *
+	 * Values meaning:
+	 * - -2 : locked cell
+	 * - -1 : empty cell
+	 * - >= 0 : item ID
 	 */
-	
 	private int[][] backpack;
+	/** Number of rows in the backpack grid. */
 	final private int ROW = 7;
+	/** Number of columns in the backpack grid. */
 	final private int COL = 7;
-
+	/** Pixel size of a single grid cell. */
 	final private int gridSize;
-	final private ArrayList<Item> bagItemLst = new ArrayList<>(); // List of items I have (Index = ID)
-	private int caseUnlock = 0; // Number of case we can currently unlock.
+	/** List of all items currently stored in the backpack. */
+	final private ArrayList<Item> bagItemLst = new ArrayList<>();
+	/** Number of locked cells that can currently be unlocked. */
+	private int caseUnlock = 0;
+	/** Coordinates connected to mana sources. */
 	final private Set<XY> connected = new HashSet<>();
+	/** Items connected, directly or indirectly, to mana sources. */
 	final private Set<Item> connectedItem = new HashSet<>();
 
 		
 	/**
-	 * Register the grid size of each tile in the backpack
-	 * 
-	 * @param gridSize
+	 * Creates a new backpack and initializes its grid.
+	 *
+	 * @param screenHeight the screen height used to compute the grid cell size
 	 */
 	public Backpack(int screenHeight) {
 		backpack = createBackpackGrid();
 		gridSize = screenHeight / 15;
 	}
 	
+	/**
+	 * Creates and initializes the backpack grid.
+	 * Border cells are locked, inner cells are empty.
+	 *
+	 * @return a newly initialized backpack grid
+	 */
 	private int[][] createBackpackGrid() {
     int[][] backpack = new int[ROW][COL];
     for (int i = 0; i < ROW; i++) {
@@ -51,8 +72,15 @@ public class Backpack {
         }
     }
     return backpack;
-}
+	}
 	
+	/**
+	 * Returns the item occupying the given grid coordinate.
+	 *
+	 * @param x column index
+	 * @param y row index
+	 * @return the item at the given position, or null if none exists
+	 */
 	public Item getItem(int x, int y) {
 		var itemFromBag = bagItemLst.stream()
 				.filter(item -> Arrays.stream(item.shape()).anyMatch(b -> (b.x() == x && b.y() == y))).findFirst().orElse(null);
@@ -69,23 +97,38 @@ public class Backpack {
 	}
 
 	/**
-	 * Return an ArrayList of all item in the backpack
+	 * Return an List of all item in the backpack
 	 * 
-	 * @return ArrayList<Item_Object>
+	 * @return List<Item_Object>
 	 */
-	public ArrayList<Item> bagItemLst() {
-		return bagItemLst;
+	public List<Item> bagItemLst() {
+		return List.copyOf(bagItemLst);
 	}
 
+	/**
+	 * Returns the pixel size of a single grid cell.
+	 *
+	 * @return grid cell size
+	 */
 	public int getGridSize() {
 		return gridSize;
 	}
 
+	/**
+	 * Computes the total amount of mana stored in the backpack.
+	 *
+	 * @return total mana value
+	 */
 	public int getManaInBag() {
 		return bagItemLst.stream().filter(item -> item instanceof ManaStone).mapToInt(item -> ((ManaStone) item).value())
 				.sum();
 	}
 
+	/**
+	 * Computes the total amount of gold stored in the backpack.
+	 *
+	 * @return total gold value
+	 */
 	public int getGoldInBag() {
 		return bagItemLst.stream().filter(item -> item instanceof Gold).mapToInt(item -> ((Gold) item).value()).sum();
 	}
@@ -295,29 +338,61 @@ public class Backpack {
 		bagItemLst.remove(item);
 	}
 
+	/**
+	 * Unlock an item from the backpack
+	 * 
+	 * @param coord 	coord of the case we wants to unlock
+	 * @throws Objects.requireNonNull if coord is null
+	 */
 	public void unlockCaseBackpack(XY coord) {
+		Objects.requireNonNull(coord);
 		if (caseUnlock > 0 && backpack[coord.y()][coord.x()] == -2) {
 			backpack[coord.y()][coord.x()] = -1;
 			caseUnlock -= 1;
 		}
 	}
 
+	/**
+	 * Returns the number of backpack cells that can currently be unlocked.
+	 *
+	 * @return number of unlockable cells
+	 */
 	public int getCaseUnlock() {
 		return caseUnlock;
 	}
 
+	/**
+	 * Increases the number of backpack cells that can be unlocked.
+	 *
+	 * @param value number of cells to add to the unlock counter
+	 */
 	public void addCaseUnlock(int value) {
 		caseUnlock += value;
 	}
 
+	/**
+	 * Returns all grid coordinates that are connected to a mana source.
+	 *
+	 * @return an immutable set of coordinates connected to mana
+	 */
 	public Set<XY> getManaConnectedCoords() {
 		return Set.copyOf(connected);
 	}
 	
+	/**
+	 * Returns the number of rows in the backpack grid.
+	 *
+	 * @return row count
+	 */
 	public int getRow() {
 		return ROW;
 	}
 	
+	/**
+	 * Returns the number of columns in the backpack grid.
+	 *
+	 * @return column count
+	 */
 	public int getCol() {
 		return COL;
 	}

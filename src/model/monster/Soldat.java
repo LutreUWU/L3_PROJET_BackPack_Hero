@@ -11,55 +11,38 @@ import game.data.GameDataHero;
 import model.Effect;
 
 /**
- * Class of a Chicken
+ * Class of a Soldat
  */
 public class Soldat implements Enemy{
-	/**
-	 * - HP :				 	When it reach 0, the enemy die
-	 * - Shield : 		Can mitigate damage received
-	 * - xp :					XP he drops when he die
-	 * - lst_attack : List of all attack the enemy has 
-	 * - action : 		To register which action the enemy will do next turn
-	 */
-	final private int maxHP = 25;
+  /** Maximum health points*/
 	private int HP = 25;
+  /** Shield points*/
 	private int shield = 0;
+  /** Active of the enemy*/
 	private String action;
+  /** Active effects on the enemy and their remaining duration. */
 	private final Map<Effect, Integer> effects = new HashMap<>();
+  /** Static information about the enemy (damage, attacks, sizeX, sizeY, etc.) */
 	private static final EnemyInfo info = new EnemyInfo(25, 6, List.of("Coup", "Bouclier"), 1, 1, "soldat");
 
 	@Override
 	public void resetStats() {
-		HP = maxHP;
+		HP = info.maxHP();
 		shield = 0;
 		effects.clear();
 	}
 	
-	/**
-	 * Add an effect to the enemy
-	 * @param effect (Enum of all item)
-	 * @param value (Number of time the effect will be used)
-	 */
 	@Override
 	public void addEffect(Effect effect, int value) {
 		if(effects.getOrDefault(effect, -1) < value) effects.put(effect, value);
 	}
 	
-	
-	/**
-	 * Update all effects and remove them if necessary
-	 */
 	@Override
 	public void updateEffects() {
-    effects.replaceAll((k, v) -> v - 1);
+    effects.replaceAll((_, v) -> v - 1);
     effects.values().removeIf(v -> v <= 0);
 	}
 	
-	/**
-	 * Chose randomly an action between all attacks the enemy has.
-	 * 
-	 * @return Action he'll do 
-	 */
 	@Override
 	public String preAction() {
 		Random randomNumbers = new Random();
@@ -67,9 +50,6 @@ public class Soldat implements Enemy{
 		return action;
 	}
 	
-	/**
-	 * Apply the action the monster will do, and choose randomly the next action of the monster
-	 */
 	@Override
 	public void action(GameData data) {
 		switch(action) {
@@ -85,11 +65,6 @@ public class Soldat implements Enemy{
 		preAction();
 	}
 	
-	/**
-	 * Sub the HP by the value
-	 * If he has a shield, subtract it
-	 * 
-	 */
 	@Override
 	public void subHP(int value) {
 		if(shield >= value) {
@@ -99,8 +74,6 @@ public class Soldat implements Enemy{
 		HP -= value - shield;
 		shield = 0;
 	}
-	
-	
 	
 	// Getter 
 	@Override

@@ -3,6 +3,7 @@ package model;
 import java.util.Random;
 
 public class RandomItem {
+	
 	/**
 	 * Generate a random item with Gauss
 	 * @param current floor
@@ -20,15 +21,3 @@ public class RandomItem {
 		return allItem.get(randomIndexWithGauss);
 	}
 }
-
-/**
-return switch(allItem.get(randomIndexWithGauss)) {
-case Sword _ -> new Sword();
-case Gold _ -> new Gold(1);
-case Gant _ -> new Gant();
-case Massue _ -> new Massue();
-case DespairShield _ -> new DespairShield();
-case Axe _ -> new Axe();
-case Mimicry _ -> new Mimicry();
-default -> throw new IllegalArgumentException("Unexpected value: " + allItem.get(randomIndexWithGauss));
-*/
