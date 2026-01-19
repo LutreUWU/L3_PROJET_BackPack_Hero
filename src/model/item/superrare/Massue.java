@@ -72,7 +72,7 @@ public record Massue(XY[] shape, Direction direction, ItemStats info, int durabi
   	if (durability < 0) {
   		throw new IllegalArgumentException("! Not Negative value !");
   	}
-		this(initShape(coord, direction), direction, ITEM_STATS, DURABILITY);
+		this(initShape(coord, direction), direction, ITEM_STATS, durability);
   }
 	
 	/**

@@ -64,7 +64,7 @@ public class GameController {
 		if (data.getEndGame()) {
 			return false;
 		}
-		Event event = context.pollOrWaitEvent(10);
+		Event event = context.pollOrWaitEvent(100);
 		if (event != null) {
 			switch (event) {
 			case PointerEvent pointerEvent -> checkPointerEvent(data, pointerEvent);
