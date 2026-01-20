@@ -84,6 +84,7 @@ public class GameData {
 		hero = new Hero();
 		floor = 1;
 		score = 0.0;
+		BGName = "BG1";
 		ItemRepository.createItemRepository();
 		EnemyRepository.createEnemyRepository();
 		map = new Floor(floor);

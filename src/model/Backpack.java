@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import game.data.GameDataClick;
 import game.data.GameDataCombat;
 import model.item.common.Gold;
 import model.item.rare.ManaStone;
@@ -207,10 +208,8 @@ public class Backpack {
 					}
 					backpack[block.y()][block.x()] = item.info().ID();
 				}
+	
 				bagItemLst.add(item);
-				if (GameDataCombat.combat()) {
-					GameDataCombat.setCurseEvent(false);
-				}
 				return true;
 			}
 		}

@@ -884,28 +884,12 @@ public class GameDataClick {
 			var item = 	data.dragItem().setXY(GameDataClick.bagClick(x, y));
 			if (data.bag().addItemToBackpack(item)) {
 				removeItemFromDrag(data.dragItem());
-			} else {
-				var itemDrag = data.dragItem();
-				var colideItem = data.bag().getItem(coord.x(), coord.y());
-				if (item.canMerge() && (colideItem != null && itemDrag.info().ID() == colideItem.info().ID())) {
-					switch(itemDrag) {
-					case Gold goldDrag -> {
-						var goldCollide = (Gold) colideItem;
-						data.bag().removeItemFromBackpack(goldCollide);
-						goldCollide = goldCollide.addGoldValue(goldDrag.value());
-						data.bag().addItemToBackpack(goldCollide);
-					}
-					default -> {
-						data.bag().removeItemFromBackpack(colideItem);
-						colideItem = colideItem.addDurability(itemDrag.durability());
-						data.bag().addItemToBackpack(colideItem);
-					}
-					}
-					removeItemFromDrag(itemDrag);
-				} else {
-					addDragItem(data.dragItem());
+				if (GameDataClick.getDragItemMap().isEmpty() && GameDataCombat.getCurseEvent()) {
+					GameDataCombat.setCurseEvent(false);
 				}
-			}
+			} else {
+					fuseItemInBackpack(coord, item);
+				}
   	}
   	if (!GameDataCombat.combat()) {
   		binClick(x, y);
@@ -913,6 +897,29 @@ public class GameDataClick {
   	if (data.getShop()) {
   		sellButtonClick(x, y);
   	}
+  }
+  
+  private static void fuseItemInBackpack(XY coord, Item item) {
+  	var itemDrag = data.dragItem();
+		var colideItem = data.bag().getItem(coord.x(), coord.y());
+		if (item.canMerge() && (colideItem != null && itemDrag.info().ID() == colideItem.info().ID())) {
+			switch(itemDrag) {
+			case Gold goldDrag -> {
+				var goldCollide = (Gold) colideItem;
+				data.bag().removeItemFromBackpack(goldCollide);
+				goldCollide = goldCollide.addGoldValue(goldDrag.value());
+				data.bag().addItemToBackpack(goldCollide);
+			}
+			default -> {
+				data.bag().removeItemFromBackpack(colideItem);
+				colideItem = colideItem.addDurability(itemDrag.durability());
+				data.bag().addItemToBackpack(colideItem);
+			}
+			}
+			removeItemFromDrag(itemDrag);
+		} else {
+			addDragItem(data.dragItem());
+		}
   }
   
   /**

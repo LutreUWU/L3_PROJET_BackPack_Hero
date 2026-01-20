@@ -115,7 +115,6 @@ public class EnemyRepository {
    * @throws IllegalArgumentException if floor above 3
    */
 	public static List<Enemy> createEnemyLst(int floor) {
-		if (floor > 3) throw new IllegalArgumentException("FLOOR > 3 !");
 		Set<Enemy> differentEnemy = new HashSet<>();
 		List<Enemy> enemies = new ArrayList<>();
 		var random = new Random();
@@ -138,7 +137,6 @@ public class EnemyRepository {
    * @throws IllegalArgumentException if floor above 3
    */
   public static Enemy getOneBossLst(int floor) {
-  	if (floor > 3) throw new IllegalArgumentException("FLOOR > 3 !");
   	var random = new Random();
   	var bossIndex = (int) random.nextGaussian(floor, 1);
   	if (bossIndex < 0) {

@@ -23,7 +23,7 @@ import model.Effect;
  */
 public class Chicken implements Enemy{
   /** Current health points. */
-	private int HP = 20;
+	private int HP = 30;
   /** Current shield value. */
 	private int shield = 0;
   /** Active effects on the enemy and their remaining duration. */
@@ -68,10 +68,10 @@ public class Chicken implements Enemy{
 		Objects.requireNonNull(data);
 		switch(action) {
 			case "Morsure" -> {
-				GameDataHero.sub("HP", 3);
-				GameDataCombat.addLog("Le poulet malicieux mord le héro (-3PV)");
+				GameDataHero.sub("HP", 5);
+				GameDataCombat.addLog("Le poulet malicieux mord le héro (-5PV)");
 				GameDataCombat.addLog("La morsure du poulet t'empoisonne");
-				data.hero().addEffect(Effect.POISON, 2);
+				data.hero().addEffect(Effect.POISON, 3);
 				}
 			case "Protection" -> {
 				shield += 2;

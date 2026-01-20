@@ -23,8 +23,7 @@ import loader.MathLoader;
 import model.Curse;
 import model.Item;
 import model.XY;
-import model.item.epic.Shield;
-import model.item.mythic.Mimicry;
+import model.item.common.Gold;
 import model.map.EnemyRoom;
 import model.map.EventRoom;
 import model.map.Exit;
@@ -32,7 +31,7 @@ import model.map.Healer;
 import model.map.LockedDoor;
 import model.map.Shop;
 import model.map.Treasure;
-import model.monster.Chicken;
+import model.monster.Crabe;
 
 /**
  * The SimpleGameController class deals with the main game loop, including
@@ -48,8 +47,7 @@ public class GameController {
 	/**
 	 * Default constructor, which does basically nothing.
 	 */
-	public GameController() {
-	}
+	public GameController() {}
 
 	/**
 	 * Goes once in the game loop, which consists in retrieving user actions,
@@ -376,13 +374,12 @@ public class GameController {
 		// A ENLEVER CAR UTILE SEULEMENT POUR LES TEST
 		case Key.A -> {
 			if (data.dragItem() == null && !GameDataCombat.combat() && data.mapOrBag()) {
-				GameDataClick.addDragItem(new Mimicry());
-				GameDataClick.addDragItem(new Shield());
+				GameDataClick.addDragItem(new Gold(20));
 			}
 		}
 		case Key.I -> {
 			if (GameDataCombat.combat() == false) {
-				GameDataCombat.startCombat(new ArrayList<>(List.of(new Chicken())), data);
+				GameDataCombat.startCombat(new ArrayList<>(List.of(new Crabe())), data);
 			}
 		}
 		///////////////////////////////////////////////////////////////
